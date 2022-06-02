@@ -1,0 +1,12 @@
+node_modules
+shipitfile.js
+heplerFiles
+logs
+downloads
+*.doc
+*.sh
+.idea
+config/develop.js
+.prettierrc.json
+shipitfile.js
+package-lock.json
