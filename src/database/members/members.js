@@ -1,10 +1,12 @@
 const mongoose = require('mongoose');
+const {string} = require("joi");
 const Schema = mongoose.Schema;
 
 const memberSchema = new Schema({
     userId: {type: Schema.Types.ObjectId},
     firstName: {type: String},
     lastName: {type: String},
+    sex:{type:String},
     regNumber: {type: String},
     nid: {type: String},
     groupName: {type: String},

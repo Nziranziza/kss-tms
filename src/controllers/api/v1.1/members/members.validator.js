@@ -9,6 +9,7 @@ const validateMembers = membersData => {
       lastName: Joi.string().label('last name'),
       regNumber: Joi.string().label('reg number'),
       nid: Joi.string(),
+      sex: Joi.string(),
       groupName: Joi.string().label('group name'),
       groupContactPersonNames: Joi.string().label('group contact person names'),
       groupContactPersonPhoneNumber: Joi.string().label('group contact person phone number'),
