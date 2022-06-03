@@ -4,10 +4,11 @@ class BaseRepository {
     this.findOne = this.findOne.bind(this);
     this.find = this.find.bind(this);
     this.update = this.update.bind(this);
+    this.customFindOne = this.customFindOne.bind(this);
   }
 
-  find() {
-    return this.model.find({});
+  find(data) {
+    return this.model.find(data);
   }
 
   findOne(id) {

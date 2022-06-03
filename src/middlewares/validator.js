@@ -15,9 +15,7 @@ module.exports = function(validator) {
         return res.status(422).send({status: 422, errors: err.message});
       }
       else {
-        console.log(err);
-        // next(createHttpError(500));
-        return res.status(500).send({status: 500, errors: err.description});
+        next(createHttpError(500));
       }
     }
   };

@@ -10,6 +10,8 @@ class  BaseController {
     this.create = this.create.bind(this);
     this.update = this.update.bind(this);
     this.remove = this.remove.bind(this);
+    this.find= this.find.bind(this);
+    this.customFindOne = this.customFindOne.bind(this);
 
   }
 
@@ -39,10 +41,10 @@ class  BaseController {
     });
   }
 
-  findOneByName(req, res) {
+  customFindOne(req, res) {
     const { body } = req;
     return asyncWrapper(res, async () => {
-      const data = await this.repository.findOne({ name: body.name });
+      const data = await this.repository.customFindOne(body);
       return responseWrapper({
         res,
         status: statusCodes.OK,
