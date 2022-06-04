@@ -1,5 +1,4 @@
 const mongoose = require('mongoose');
-const {string} = require("joi");
 const Schema = mongoose.Schema;
 
 const memberSchema = new Schema({
@@ -21,7 +20,8 @@ const membersSchema = new Schema({
         type: Schema.Types.ObjectId,
         required: true,
         ref: 'group',
-        index: true
+        index: true,
+        unique: true
     },
     members: {type: [memberSchema], required: true},
     applicationId: { type: Number, required: true }

@@ -25,7 +25,8 @@ const validateGroup = groupData => {
         .trim(),
     applicationId: Joi.number()
         .required()
-        .label('application id')
+        .label('application id'),
+    reference: Joi.string()
   });
   return schema.validate(groupData).value;
 };

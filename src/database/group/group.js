@@ -11,6 +11,7 @@ const groupSchema = new Schema({
     location: { type: locationSchema, required: true },
     meetingSchedule: { type: Date, required: true },
     applicationId: { type: Number, required: true },
+    reference: { type: String },
 });
 
 
