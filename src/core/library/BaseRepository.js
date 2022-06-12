@@ -5,6 +5,7 @@ class BaseRepository {
     this.find = this.find.bind(this);
     this.update = this.update.bind(this);
     this.customFindOne = this.customFindOne.bind(this);
+    this.customFindAll = this.customFindAll.bind(this);
   }
 
   find(data) {
@@ -19,6 +20,10 @@ class BaseRepository {
 
   customFindOne(data) {
     return this.model.findOne(data);
+  }
+
+  customFindAll(data) {
+    return this.model.find(data);
   }
 
   create(entity) {

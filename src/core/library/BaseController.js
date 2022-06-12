@@ -57,7 +57,7 @@ class  BaseController {
   update(req, res) {
     const { body, params } = req;
     return asyncWrapper(res, async () => {
-      const data = await this.repository.find(params.id);
+      const data = await this.repository.findOne(params.id);
       await data.update(body);
       return responseWrapper({
         res,
