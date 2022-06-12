@@ -1,6 +1,6 @@
-const responseWrapper = require('./helpers/responseWrapper');
-const asyncWrapper = require('./helpers/asyncWrapper');
-const CustomError = require('./helpers/customerError');
+const responseWrapper = require('../helpers/responseWrapper');
+const asyncWrapper = require('../helpers/asyncWrapper');
+const CustomError = require('../helpers/customerError');
 const { statusCodes } = require('../../utils/constants/common');
 
 class  BaseController {
