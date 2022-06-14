@@ -11,6 +11,7 @@ module.exports = function (validator) {
       req.body = await Validators[validator](req.body);
       next();
     } catch (err) {
+      console.log(err);
       if (err.isJoi) {
         return res.status(422).send({ status: 422, errors: err.message });
       } else {
