@@ -12,6 +12,7 @@ module.exports = function (validator) {
         const error = await Validators[validator](req.body);
         if (error !== undefined) {
             if (error.isJoi) {
+                console.log(error.message);
                 return responseWrapper({
                     res,
                     status: statusCodes.BAD_REQUEST,

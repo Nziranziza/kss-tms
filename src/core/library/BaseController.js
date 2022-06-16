@@ -3,16 +3,15 @@ const asyncWrapper = require('../helpers/asyncWrapper');
 const CustomError = require('../helpers/customerError');
 const { statusCodes } = require('../../utils/constants/common');
 
-class  BaseController {
+class BaseController {
   constructor(repository) {
     this.repository = repository;
     this.findOne = this.findOne.bind(this);
     this.create = this.create.bind(this);
     this.update = this.update.bind(this);
     this.remove = this.remove.bind(this);
-    this.find= this.find.bind(this);
+    this.find = this.find.bind(this);
     this.customFindOne = this.customFindOne.bind(this);
-
   }
 
   create(req, res) {
@@ -22,9 +21,9 @@ class  BaseController {
       const data = await this.repository.create(body);
       return responseWrapper({
         res,
-        message: 'Record successfully created',
+        message: "Record successfully created",
         status: statusCodes.OK,
-        data
+        data,
       });
     });
   }
@@ -36,8 +35,8 @@ class  BaseController {
       return responseWrapper({
         res,
         status: statusCodes.OK,
-        message: 'Success',
-        data
+        message: "Success",
+        data,
       });
     });
   }
@@ -49,8 +48,8 @@ class  BaseController {
       return responseWrapper({
         res,
         status: statusCodes.OK,
-        message: 'Success',
-        data
+        message: "Success",
+        data,
       });
     });
   }
@@ -63,12 +62,11 @@ class  BaseController {
         body._id = params.id;
         data = await this.repository.update(body);
       }
-
       return responseWrapper({
         res,
         status: statusCodes.OK,
-        message: 'Record successfully updated',
-        data: data
+        message: "Record successfully updated",
+        data
       });
     });
   }
@@ -80,7 +78,7 @@ class  BaseController {
       return responseWrapper({
         res,
         status: statusCodes.OK,
-        message: 'Success'
+        message: "Success",
       });
     });
   }
@@ -89,7 +87,7 @@ class  BaseController {
     return asyncWrapper(res, async () => {
       const data = await this.repository.findOne(req.params.id);
       if (!data) {
-        throw new CustomError('Record not found', statusCodes.NOT_FOUND);
+        throw new CustomError("Record not found", statusCodes.NOT_FOUND);
       }
       req.currentRecord = data;
       return next();
@@ -98,15 +96,17 @@ class  BaseController {
 
   findOne(req, res) {
     return asyncWrapper(res, async () => {
+
       const data = await this.repository.findOne(req.params.id);
+
       if (!data) {
-        throw new CustomError('Record not found', statusCodes.NOT_FOUND);
+        throw new CustomError("Record not found", statusCodes.NOT_FOUND);
       }
       return responseWrapper({
         res,
         status: statusCodes.OK,
-        message: 'Success',
-        data: data
+        message: "Success",
+        data: data,
       });
     });
   }
