@@ -18,6 +18,7 @@ class  BaseController {
   create(req, res) {
     const { body } = req;
     return asyncWrapper(res, async () => {
+      body.applicationId = req.header("bk-app-id");
       const data = await this.repository.create(body);
       return responseWrapper({
         res,
@@ -57,8 +58,12 @@ class  BaseController {
   update(req, res) {
     const { body, params } = req;
     return asyncWrapper(res, async () => {
-      const data = await this.repository.find(params.id);
-      await data.update(body);
+      let data = await this.repository.findOne({_id: params.id});
+      if(data){
+        body._id = params.id;
+        data = await this.repository.update(body);
+      }
+
       return responseWrapper({
         res,
         status: statusCodes.OK,
@@ -93,7 +98,7 @@ class  BaseController {
 
   findOne(req, res) {
     return asyncWrapper(res, async () => {
-      const data = await this.repository.findOne(req.params['id']);
+      const data = await this.repository.findOne(req.params.id);
       if (!data) {
         throw new CustomError('Record not found', statusCodes.NOT_FOUND);
       }

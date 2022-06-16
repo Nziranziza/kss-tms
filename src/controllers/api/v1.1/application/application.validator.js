@@ -9,7 +9,7 @@ const validateApplication = applicationData => {
         .label('application id'),
     description: Joi.string().required()
   });
-  return schema.validate(applicationData).value;
+  return schema.validate(applicationData).error;
 };
 
 module.exports.validateApplication = validateApplication;

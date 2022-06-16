@@ -1,16 +1,19 @@
 const logger = require('../../utils/logging');
-const { statusCodes } = require('../../utils/constants/common');
+const responseWrapper = require("./responseWrapper");
+const {statusCodes} = require("../../utils/constants/common");
 
 const asyncWrapper = async (res, callback) => {
   try {
     await callback();
   } catch (error) {
-    console.log(error);
+    console.log(error.errors);
     logger.error(error.message, error);
-    return res.status(statusCodes.SERVER_ERROR).json({
+    return responseWrapper({
+      res,
       status: statusCodes.SERVER_ERROR,
-      message: 'Something abnormal happened.!'
+      message: error.message
     });
+
   }
 };
 
