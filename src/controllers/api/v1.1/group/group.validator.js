@@ -1,5 +1,6 @@
 let Joi = require('joi');
 Joi.objectId = require('joi-objectid')(Joi);
+
 const validateGroup = groupData => {
   const schema = Joi.object({
     groupName: Joi.string()
@@ -18,17 +19,16 @@ const validateGroup = groupData => {
       cell_id: Joi.objectId().required().label('cell'),
       village_id: Joi.objectId().required().label('village')
     }).required(),
-    meetingSchedule: Joi.string().label('meeting schedule')
-        .trim(),
+    meetingSchedule: Joi.object({
+      meetingDay: Joi.number().label('meeting day'),
+      meetingTime: Joi.date().required().label('meeting time')
+    }),
     description: Joi.string()
         .required()
         .trim(),
-    applicationId: Joi.number()
-        .required()
-        .label('application id'),
     reference: Joi.string()
   });
-  return schema.validate(groupData).value;
+  return schema.validate(groupData).error
 };
 
 module.exports.validateGroup = validateGroup;

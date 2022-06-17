@@ -1,7 +1,7 @@
-const responseWrapper = require("./helpers/responseWrapper");
-const asyncWrapper = require("./helpers/asyncWrapper");
-const CustomError = require("./helpers/customerError");
-const { statusCodes } = require("../../utils/constants/common");
+const responseWrapper = require('../helpers/responseWrapper');
+const asyncWrapper = require('../helpers/asyncWrapper');
+const CustomError = require('../helpers/customerError');
+const { statusCodes } = require('../../utils/constants/common');
 
 class BaseController {
   constructor(repository) {
@@ -17,6 +17,7 @@ class BaseController {
   create(req, res) {
     const { body } = req;
     return asyncWrapper(res, async () => {
+      body.applicationId = req.header("bk-app-id");
       const data = await this.repository.create(body);
       return responseWrapper({
         res,
@@ -56,13 +57,16 @@ class BaseController {
   update(req, res) {
     const { body, params } = req;
     return asyncWrapper(res, async () => {
-      const data = await this.repository.findOne(params.id);
-      await data.update(body);
+      let data = await this.repository.findOne({_id: params.id});
+      if(data){
+        body._id = params.id;
+        data = await this.repository.update(body);
+      }
       return responseWrapper({
         res,
         status: statusCodes.OK,
         message: "Record successfully updated",
-        data: body,
+        data
       });
     });
   }
@@ -92,7 +96,9 @@ class BaseController {
 
   findOne(req, res) {
     return asyncWrapper(res, async () => {
-      const data = await this.repository.findOne(req.params["id"]);
+
+      const data = await this.repository.findOne(req.params.id);
+
       if (!data) {
         throw new CustomError("Record not found", statusCodes.NOT_FOUND);
       }

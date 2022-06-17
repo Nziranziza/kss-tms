@@ -1,6 +1,6 @@
-const asyncWrapper = require("../../../../core/library/helpers/asyncWrapper");
+const asyncWrapper = require("../../../../core/helpers/asyncWrapper");
 const BaseController = require("../../../../core/library/BaseController");
-const responseWrapper = require("../../../../core/library/helpers/responseWrapper");
+const responseWrapper = require("../../../../core/helpers/responseWrapper");
 const {
   trainingRepository,
 } = require("../../../../database/training/training.repository");
@@ -32,7 +32,6 @@ class TrainingController extends BaseController {
       const data = await this.repository.findOne(req.params.id);
       const isDeleted = await data.softDelete();
       console.log(isDeleted);
-
       return responseWrapper({
         res,
         status: statusCodes.OK,

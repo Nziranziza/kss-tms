@@ -1,6 +1,6 @@
-const asyncWrapper = require("../../../../core/library/helpers/asyncWrapper");
+const asyncWrapper = require("../../../../core/helpers/asyncWrapper");
 const BaseController = require("../../../../core/library/BaseController");
-const responseWrapper = require("../../../../core/library/helpers/responseWrapper");
+const responseWrapper = require("../../../../core/helpers/responseWrapper");
 const {
   evaluationRepository,
 } = require("../../../../database/evaluation/evaluation.repository");
