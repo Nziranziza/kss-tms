@@ -5,8 +5,11 @@ const validator = require('../../../../middlewares/validator');
 const routes = Router();
 
 routes.post('/',  validator('validateGroup'), groupCtrl.create);
-routes.put('/:id',validator('validateGroup'), groupCtrl.update);
+routes.put('/:id', groupCtrl.update);
 routes.get('/:id', groupCtrl.findOne);
 routes.post('/reference', groupCtrl.find);
+routes.get('/', groupCtrl.findAll);
+routes.put('/members/:id',validator('validateUpdateMembers'), groupCtrl.updateMembers);
+routes.put('/profile/:id',validator('validateUpdateProfile'), groupCtrl.updateProfile);
 
 module.exports.groups = routes;

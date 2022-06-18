@@ -6,7 +6,7 @@ const routes = Router();
 
 routes.post("/", validator("validateTraining"), trainingCtrl.create);
 routes.get("/:id", trainingCtrl.findOne);
-routes.put("/:id", validator("validateUpdate"), trainingCtrl.update);
+routes.put("/:id", validator("validateUpdateTraining"), trainingCtrl.update);
 routes.get("/app/:id", trainingCtrl.findByApp);
 routes.delete("/:id", trainingCtrl.delete);
 

@@ -18,7 +18,7 @@ const validateTraining = (data) => {
   return Joi.validate(data, schema);
 };
 
-const validateUpdate = (data) => {
+const validateUpdateTraining = (data) => {
   const schema = {
     _id: Joi.string(),
     trainingName: Joi.string().required(),
@@ -39,4 +39,4 @@ const validateUpdate = (data) => {
 }
 
 module.exports.validateTraining = validateTraining;
-module.exports.validateUpdate = validateUpdate;
+module.exports.validateUpdateTraining = validateUpdateTraining;
