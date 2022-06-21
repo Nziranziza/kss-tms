@@ -2,20 +2,21 @@ const asyncWrapper = require("../../../../core/helpers/asyncWrapper");
 const BaseController = require("../../../../core/library/BaseController");
 const responseWrapper = require("../../../../core/helpers/responseWrapper");
 const {
-  trainingRepository,
-} = require("../../../../database/training/training.repository");
+  scheduleRepository,
+} = require("../../../../database/schedule/schedule.repository");
 const { statusCodes } = require("../../../../utils/constants/common");
 
-class TrainingController extends BaseController {
+class ScheduleController extends BaseController {
   constructor(repository) {
     super(repository);
-    this.findByApp = this.findByApp.bind(this);
+    this.findAllByOrg = this.findAllByOrg.bind(this);
     this.delete = this.delete.bind(this);
   }
 
-  findByApp(req, res) {
-    const body = { applicationId: req.params.id };
+  findAllByOrg(req, res) {
+    const body = { referenceId: req.params.id };
     return asyncWrapper(res, async () => {
+      console.log(body);
       const data = await this.repository.customFindAll(body);
       return responseWrapper({
         res,
@@ -30,6 +31,7 @@ class TrainingController extends BaseController {
     return asyncWrapper(res, async () => {
       const data = await this.repository.findOne(req.params.id);
       const isDeleted = await data.softDelete();
+      console.log(isDeleted);
       return responseWrapper({
         res,
         status: statusCodes.OK,
@@ -40,4 +42,4 @@ class TrainingController extends BaseController {
   }
 }
 
-module.exports.trainingCtrl = new TrainingController(trainingRepository);
+module.exports.scheduleCtrl = new ScheduleController(scheduleRepository);

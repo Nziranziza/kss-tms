@@ -1,9 +1,11 @@
 const Joi = require("@hapi/joi");
+const { trainingStatus } = require("../../../../tools/constants");
+Joi.objectId = require("joi-objectid")(Joi);
 
 const validateTraining = (data) => {
   const schema = {
     trainingName: Joi.string().required(),
-    adoptionGap: Joi.string().required().trim(),
+    adoptionGaps: Joi.array().items(Joi.objectId()),
     description: Joi.string().required(),
     materials: Joi.array()
       .items(
@@ -20,9 +22,9 @@ const validateTraining = (data) => {
 
 const validateUpdate = (data) => {
   const schema = {
-    _id: Joi.string(),
+    _id: Joi.objectId(),
     trainingName: Joi.string().required(),
-    adoptionGap: Joi.string().required().trim(),
+    adoptionGaps: Joi.array().items(Joi.objectId()),
     description: Joi.string().required(),
     materials: Joi.array()
       .items(
@@ -33,10 +35,17 @@ const validateUpdate = (data) => {
         })
       )
       .required(),
+    status: Joi.string()
+      .valid([
+        trainingStatus.CONDUCTED,
+        trainingStatus.NOT_SCHEDULED,
+        trainingStatus.SCHEDULED,
+      ])
+      .required(),
     applicationId: Joi.number().required(),
   };
   return Joi.validate(data, schema);
-}
+};
 
 module.exports.validateTraining = validateTraining;
 module.exports.validateUpdate = validateUpdate;
