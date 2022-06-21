@@ -11,13 +11,13 @@ class BaseController {
     this.update = this.update.bind(this);
     this.remove = this.remove.bind(this);
     this.find = this.find.bind(this);
-    this.customFindOne = this.customFindOne.bind(this);
+    this.findAll = this.findAll.bind(this);
+    this.cFindOne = this.cFindOne.bind(this);
   }
 
   create(req, res) {
     const { body } = req;
     return asyncWrapper(res, async () => {
-      body.applicationId = req.header("bk-app-id");
       const data = await this.repository.create(body);
       return responseWrapper({
         res,
@@ -41,10 +41,22 @@ class BaseController {
     });
   }
 
-  customFindOne(req, res) {
+  findAll(req, res) {
+    return asyncWrapper(res, async () => {
+      const data = await this.repository.findAll();
+      return responseWrapper({
+        res,
+        status: statusCodes.OK,
+        message: "Success",
+        data,
+      });
+    });
+  }
+
+  cFindOne(req, res) {
     const { body } = req;
     return asyncWrapper(res, async () => {
-      const data = await this.repository.customFindOne(body);
+      const data = await this.repository.cFindOne(body);
       return responseWrapper({
         res,
         status: statusCodes.OK,
@@ -96,9 +108,7 @@ class BaseController {
 
   findOne(req, res) {
     return asyncWrapper(res, async () => {
-
       const data = await this.repository.findOne(req.params.id);
-
       if (!data) {
         throw new CustomError("Record not found", statusCodes.NOT_FOUND);
       }
