@@ -6,7 +6,7 @@ const routes = Router();
 
 routes.post("/", validator("validateSchedule"), scheduleCtrl.create);
 routes.get("/:id", scheduleCtrl.findOne);
-routes.put("/:id", validator("validateUpdate"), scheduleCtrl.update);
+routes.put("/:id", scheduleCtrl.update);
 routes.get("/org/:id", scheduleCtrl.findAllByOrg);
 routes.delete("/:id", scheduleCtrl.delete);
 
