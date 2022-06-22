@@ -10,13 +10,21 @@ const TRAINEE = new mongoose.Schema({
   surName: { type: String, required: true },
   phoneNumber: { type: String },
   gender: { type: String, required: true },
+  groupId: { type: String, required: true },
+  attended: { type: Boolean, required: true, default: false },
   regNumber: { type: String, required: true },
+});
+
+const TRAINER = new mongoose.Schema({
+  userId: {type: Schema.Types.ObjectId, required: true},
+  
 });
 
 // schedule schema
 const scheduleSchema = new Schema({
   trainingId: { type: Schema.Types.ObjectId, ref: "training" },
-  trainerId: { type: Schema.Types.ObjectId },
+  trainer: { type: TRAINER },
+  groupId: { type: Schema.Types.ObjectId, ref: "group" },
   referenceId: { type: Schema.Types.ObjectId },
   description: { type: String, required: true },
   location: { type: locationSchema },
