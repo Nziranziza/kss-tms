@@ -1,5 +1,5 @@
 const {validateApplication} = require("../application/application.validator");
-const {validateGroup, validateUpdateMembers, validateUpdateProfile} = require("../group/group.validator");
+const {validateGroup, validateUpdateMembers, validateUpdateProfile, validateGetMemberAttendance} = require("../group/group.validator");
 const {validateEvaluation} = require("../evaluations/evaluations.validator");
 const {validateTraining, validateUpdateTraining} = require("../trainings/trainings.validator");
 const {validateSchedule} = require("../schedule/schedule.validator");
@@ -14,5 +14,6 @@ module.exports = {
     validateUpdateMembers,
     validateUpdateProfile,
     validateUpdateTraining,
-    validateSchedule
+    validateSchedule, 
+    validateGetMemberAttendance
 };

@@ -4,7 +4,12 @@ Joi.objectId = require("joi-objectid")(Joi);
 const validateSchedule = (data) => {
   const schema = {
     trainingId: Joi.objectId().required(),
-    trainerId: Joi.objectId().required(),
+    trainer: Joi.object({
+      userId: Joi.objectId().required(),
+      fullName: Joi.string().required(),
+      phoneNumber: Joi.string(),
+    }).required(),
+    groupId: Joi.objectId().required(),
     referenceId: Joi.objectId().required(),
     description: Joi.string().required(),
     location: Joi.object({
@@ -20,6 +25,7 @@ const validateSchedule = (data) => {
     trainees: Joi.array().items(
       Joi.object({
         userId: Joi.objectId().required(),
+        groupId: Joi.objectId().required(),
         foreName: Joi.string().required(),
         surName: Joi.string().required(),
         gender: Joi.string().required(),
