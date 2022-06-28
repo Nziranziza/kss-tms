@@ -1,16 +1,13 @@
 const Router = require('express').Router;
-const { groupCtrl} = require('./group.controller');
 const validator = require('../../../../middlewares/validator');
+const { farmVisitScheduleCtrl } = require('./farm-visit-schedule.controller');
 
 const routes = Router();
 
-routes.post('/',  validator('validateGroup'), groupCtrl.create);
-routes.put('/:id', groupCtrl.update);
-routes.get('/:id', groupCtrl.findOne);
-routes.post('/search', groupCtrl.searchGroup);
-routes.post('/reference', groupCtrl.find);
-routes.get('/', groupCtrl.findAll);
-routes.put('/members/:id',validator('validateUpdateMembers'), groupCtrl.updateMembers);
-routes.put('/profile/:id',validator('validateUpdateProfile'), groupCtrl.updateProfile);
+routes.post(
+    '/',
+    validator('validateFarmVisitSchedule'),
+    farmVisitScheduleCtrl.create
+);
 
-module.exports.groups = routes;
+module.exports.farmVisiteSchedules = routes;

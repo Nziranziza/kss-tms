@@ -13,11 +13,13 @@ class BaseController {
     this.find = this.find.bind(this);
     this.findAll = this.findAll.bind(this);
     this.cFindOne = this.cFindOne.bind(this);
+    this.softDelete = this.softDelete.bind(this);
   }
 
   create(req, res) {
     const { body } = req;
     return asyncWrapper(res, async () => {
+      body.applicationId = req.header['tms-app-id'];
       const data = await this.repository.create(body);
       return responseWrapper({
         res,
@@ -117,6 +119,22 @@ class BaseController {
         status: statusCodes.OK,
         message: "Success",
         data: data,
+      });
+    });
+  }
+
+  softDelete(req, res) {
+    return asyncWrapper(res, async () => {
+      const data = await this.repository.findOne(req.params.id);
+      if (!data) {
+        throw new CustomError("Record not found", statusCodes.NOT_FOUND);
+      }
+      const isDeleted = await data.softDelete();
+      return responseWrapper({
+        res,
+        status: statusCodes.OK,
+        message: "Recorded removed successfully",
+        data,
       });
     });
   }

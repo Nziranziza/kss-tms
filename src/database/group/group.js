@@ -1,7 +1,8 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
-const locationSchema  = require('../../utils/schemas/location')
+const locationSchema  = require('../../utils/schemas/location');
 const timestamps = require("mongoose-timestamp");
+const softDelete = require("../plugins/soft-delete");
 
 const meetingScheduleSchema = new Schema({
     meetingDay: { type: Number, enum: [1, 2, 3, 4, 5, 6] },
@@ -23,11 +24,11 @@ const memberSchema = new Schema({
 
 // Group schema
 const groupSchema = new Schema({
-    groupName: { type: String},
+    groupName: { type: String, index: true },
     leaderNames: { type: String},
     leaderPhoneNumber: { type: String, required: true },
     description: { type: String, required: true },
-    location: { type: locationSchema, required: true },
+    location: { type: locationSchema, required: true},
     meetingSchedule: { type: meetingScheduleSchema },
     applicationId: { type: Number, required: true },
     reference: { type: String },
@@ -39,6 +40,7 @@ groupSchema.plugin(timestamps, {
     updatedAt: 'updatedAt'
 });
 
+groupSchema.plugin(softDelete);
 
 const Group = mongoose.model('group', groupSchema);
 module.exports.Group = Group;

@@ -11,6 +11,7 @@ class GroupController extends BaseController {
         super(repository);
         this.updateMembers =  this.updateMembers.bind(this);
         this.updateProfile = this.updateProfile.bind(this);
+        this.searchGroup = this.searchGroup.bind(this);
     }
 
     updateMembers(req, res) {
@@ -35,6 +36,19 @@ class GroupController extends BaseController {
         const { body } = req;
         return asyncWrapper(res, async () => {
             const data = await this.repository.find(body);
+            return responseWrapper({
+                res,
+                status: statusCodes.OK,
+                message: "Success",
+                data,
+            });
+        });
+    }
+
+    searchGroup(req, res) {
+        const { body } = req;
+        return asyncWrapper(res, async () => {
+            const data = await this.repository.searchGroup(body.name);
             return responseWrapper({
                 res,
                 status: statusCodes.OK,

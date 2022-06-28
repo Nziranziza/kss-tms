@@ -10,6 +10,7 @@ const {
 class GroupRepository extends BaseRepository {
     constructor(model) {
         super(model);
+        this.searchGroup = this.searchGroup.bind(this);
     }
     find(data) {
         return super.find(data)
@@ -21,6 +22,15 @@ class GroupRepository extends BaseRepository {
     }
     findAll() {
         return super.findAll()
+            .populate('location.prov_id', 'namek')
+            .populate('location.dist_id', 'name')
+            .populate('location.sect_id', 'name')
+            .populate('location.cell_id', 'name')
+            .populate('location.village_id', 'name')
+    }
+    searchGroup(name) {
+        return this.model.findOne({
+                groupName: { $regex: name, $options: 'i' }})
             .populate('location.prov_id', 'namek')
             .populate('location.dist_id', 'name')
             .populate('location.sect_id', 'name')
