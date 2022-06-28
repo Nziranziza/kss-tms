@@ -29,6 +29,10 @@ class BaseRepository {
     return this.model.findOne(data);
   }
 
+  customFindAll(data){
+    return this.model.find(data);
+  }
+
   create(entity) {
     return this.model.create(entity);
   }

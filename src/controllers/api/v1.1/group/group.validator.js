@@ -43,7 +43,7 @@ const validateGroup = groupData => {
         applicationId: Joi.number().required(),
         members: Joi.array().items(memberSchema).min(1)
     });
-    return schema.validate(groupData).error
+    return schema.validate(groupData).value;
 };
 const validateUpdateProfile = profileData => {
     const schema = Joi.object({
@@ -80,6 +80,14 @@ const validateUpdateMembers = membersData => {
     return schema.validate(membersData).error;
 };
 
+const validateGetMemberAttendance = data => {
+    const schema = Joi.object({
+      trainingId: Joi.string().required()
+    });
+    return schema.validate(data).value;
+  };
+
 module.exports.validateGroup = validateGroup;
 module.exports.validateUpdateProfile = validateUpdateProfile;
 module.exports.validateUpdateMembers = validateUpdateMembers;
+module.exports.validateGetMemberAttendance = validateGetMemberAttendance;

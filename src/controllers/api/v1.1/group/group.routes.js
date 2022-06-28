@@ -1,16 +1,29 @@
-const Router = require('express').Router;
-const { groupCtrl} = require('./group.controller');
-const validator = require('../../../../middlewares/validator');
+const Router = require("express").Router;
+const { groupCtrl } = require("./group.controller");
+const validator = require("../../../../middlewares/validator");
 
 const routes = Router();
-
-routes.post('/',  validator('validateGroup'), groupCtrl.create);
-routes.put('/:id', groupCtrl.update);
-routes.get('/:id', groupCtrl.findOne);
+routes.post("/", validator("validateGroup"), groupCtrl.create);
+routes.put("/:id", groupCtrl.update);
+routes.get("/:id", groupCtrl.findOne);
+routes.post("/reference", groupCtrl.find);
 routes.post('/search', groupCtrl.searchGroup);
-routes.post('/reference', groupCtrl.find);
-routes.get('/', groupCtrl.findAll);
-routes.put('/members/:id',validator('validateUpdateMembers'), groupCtrl.updateMembers);
-routes.put('/profile/:id',validator('validateUpdateProfile'), groupCtrl.updateProfile);
+routes.get("/", groupCtrl.findAll);
+routes.put(
+  "/members/:id",
+  validator("validateUpdateMembers"),
+  groupCtrl.updateMembers
+);
+routes.put(
+  "/profile/:id",
+  validator("validateUpdateProfile"),
+  groupCtrl.updateProfile
+);
+routes.post(
+  "/attendance/:id",
+  validator("validateGetMemberAttendance"),
+  groupCtrl.groupAttendance
+);
+
 
 module.exports.groups = routes;

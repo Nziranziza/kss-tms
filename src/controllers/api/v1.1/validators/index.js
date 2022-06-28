@@ -1,8 +1,9 @@
 const {validateApplication} = require("../application/application.validator");
-const {validateGroup, validateUpdateMembers, validateUpdateProfile} = require("../group/group.validator");
+const {validateGroup, validateUpdateMembers, validateUpdateProfile, validateGetMemberAttendance} = require("../group/group.validator");
 const {validateEvaluation} = require("../evaluations/evaluations.validator");
 const {validateTraining, validateUpdateTraining} = require("../trainings/trainings.validator");
-const {validateCreateFarmVisitSchedule} = require("../farm-visit-schedule/farm-visit-schedule.validator")
+const {validateCreateFarmVisitSchedule} = require("../farm-visit-schedule/farm-visit-schedule.validator");
+const {validateSchedule} = require("../schedule/schedule.validator");
 
 // Validators will be accessed via a middleware
 
@@ -14,6 +15,9 @@ module.exports = {
     validateUpdateMembers,
     validateUpdateProfile,
     validateUpdateTraining,
-    validateCreateFarmVisitSchedule
-};
 
+    validateCreateFarmVisitSchedule,
+
+    validateSchedule, 
+    validateGetMemberAttendance
+};

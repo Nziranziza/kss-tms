@@ -1,27 +1,29 @@
-const createHttpError = require('http-errors');
-const Validators = require('../controllers/api/v1.1/validators');
+const createHttpError = require("http-errors");
+const Validators = require("../controllers/api/v1.1/validators");
 const responseWrapper = require("../core/helpers/responseWrapper");
-const {statusCodes} = require("../utils/constants/common");
+const { statusCodes } = require("../utils/constants/common");
 
 module.exports = function (validator) {
-    // If validator is not exist, throw err
-    if (!Validators.hasOwnProperty(validator))
-        throw new Error(`'${validator}' validator is not exist`);
+  // If validator is not exist, throw err
+  if (!Validators.hasOwnProperty(validator))
+    throw new Error(`'${validator}' validator is not exist`);
 
-    return async function (req, res, next) {
-        const error = await Validators[validator](req.body);
-        if (error !== undefined) {
-            if (error.isJoi) {
-                console.log(error.message);
-                return responseWrapper({
-                    res,
-                    status: statusCodes.BAD_REQUEST,
-                    message: error.message
-                });
-            } else {
-                createHttpError(500);
-            }
-        }
-        next();
-    };
+  return async function (req, res, next) {
+    try {
+      const validated = await Validators[validator](req.body);
+      req.body = validated;
+      next();
+    } catch (err) {
+      //* Pass err to next
+      //! If validation error occurs call next with HTTP 422. Otherwise HTTP 500
+      console.log(err);
+      if (err.isJoi)
+        return responseWrapper({
+          res,
+          status: statusCodes.BAD_REQUEST,
+          message: err.message,
+        });
+      else next(createHttpError(500));
+    }
+  };
 };

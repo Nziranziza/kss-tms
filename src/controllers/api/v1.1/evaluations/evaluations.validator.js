@@ -9,7 +9,10 @@ const validateEvaluation = (data) => {
         Joi.object({
           question: Joi.string(),
           answerType: Joi.string(),
-          answers: Joi.array().items(Joi.object({ answer: Joi.string() })),
+          marks: Joi.number(),
+          answers: Joi.array().items(
+            Joi.object({ answer: Joi.string(), weight: Joi.number() })
+          ),
         })
       )
       .required(),
