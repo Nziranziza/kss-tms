@@ -26,6 +26,19 @@ class TrainingController extends BaseController {
     });
   }
 
+  findOne(req, res) {
+    return asyncWrapper(res, async () => {
+      const data = await this.repository.findOne(req.params.id);
+      console.log(data)
+      return responseWrapper({
+        res,
+        status: statusCodes.OK,
+        message: "Success",
+        data: data[0],
+      });
+    });
+  }
+
   delete(req, res) {
     return asyncWrapper(res, async () => {
       const data = await this.repository.findOne(req.params.id);
