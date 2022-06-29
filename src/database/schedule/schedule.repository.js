@@ -24,7 +24,12 @@ class ScheduleRepository extends BaseRepository {
     return this.model
       .findOne({ _id: id })
       .populate("trainingId", "trainingName")
-      .populate("groupId", "groupName");
+      .populate("groupId", "groupName")
+      .populate('location.prov_id', 'namek')
+      .populate('location.dist_id', 'name')
+      .populate('location.sect_id', 'name')
+      .populate('location.cell_id', 'name')
+      .populate('location.village_id', 'name');
   }
 }
 module.exports.scheduleRepository = new ScheduleRepository(Schedule);
