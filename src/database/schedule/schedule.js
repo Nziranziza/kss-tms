@@ -34,6 +34,7 @@ const scheduleSchema = new Schema({
   startTime: { type: Date, required: true },
   endTime: { type: Date, required: true },
   trainees: { type: [TRAINEE], required: true },
+  notes: {type: String},
   status: { type: String, default: scheduleStatus.PENDING, required: true },
   applicationId: { type: Number, required: true },
 });

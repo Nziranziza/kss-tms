@@ -11,6 +11,7 @@ class ScheduleController extends BaseController {
     super(repository);
     this.findAllByOrg = this.findAllByOrg.bind(this);
     this.delete = this.delete.bind(this);
+    this.recordAtt = this.recordAtt.bind(this);
   }
 
   findAllByOrg(req, res) {
@@ -31,12 +32,40 @@ class ScheduleController extends BaseController {
     return asyncWrapper(res, async () => {
       const data = await this.repository.findOne(req.params.id);
       const isDeleted = await data.softDelete();
-      console.log(isDeleted);
       return responseWrapper({
         res,
         status: statusCodes.OK,
         message: "Removed successfully",
         data,
+      });
+    });
+  }
+
+  recordAtt(req, res) {
+    const { params, body } = req;
+    return asyncWrapper(res, async () => {
+      const schedule = await this.repository.findOne(params.id);
+      if (schedule) {
+        const attendance = await this.repository.recordAtt(schedule, body);
+        if (attendance)
+          return responseWrapper({
+            res,
+            status: statusCodes.OK,
+            message: "Removed successfully",
+            data: attendance,
+          });
+        else
+          return responseWrapper({
+            res,
+            status: statusCodes.SERVER_ERROR,
+            message: "Could not record attendance.",
+            data: attendance,
+          });
+      }
+      return responseWrapper({
+        res,
+        status: statusCodes.NOT_FOUND,
+        message: "Schedule not found",
       });
     });
   }

@@ -37,4 +37,18 @@ const validateSchedule = (data) => {
   return Joi.validate(data, schema);
 };
 
+const validateRecordAtt = (data) => {
+  const schema = {
+    trainees: Joi.array().items(
+      Joi.object({
+        _id: Joi.objectId().required(),
+        attended: Joi.boolean().required()
+      })
+    ),
+    notes: Joi.string().required(),
+  };
+  return Joi.validate(data, schema);
+};
+
 module.exports.validateSchedule = validateSchedule;
+module.exports.validateRecordAtt = validateRecordAtt;
