@@ -12,6 +12,7 @@ class GroupController extends BaseController {
     this.updateMembers = this.updateMembers.bind(this);
     this.updateProfile = this.updateProfile.bind(this);
     this.groupAttendance = this.groupAttendance.bind(this);
+    this.searchGroup = this.searchGroup.bind(this);
     this.updateSingleMember = this.updateSingleMember.bind(this);
   }
 
@@ -37,6 +38,43 @@ class GroupController extends BaseController {
     const { body } = req;
     return asyncWrapper(res, async () => {
       const data = await this.repository.find(body);
+      return responseWrapper({
+        res,
+        status: statusCodes.OK,
+        message: "Success",
+        data,
+      });
+    });
+  }
+
+  updateSingleMember(req, res) {
+    return asyncWrapper(res, async () => {
+      const { body, params } = req;
+      const member = await this.repository.getSingleMember(
+        params.id,
+        body.userId
+      );
+      if (member) {
+        const update = await this.repository.updateMemberPhone(params.id, body);
+        console.log(update);
+        if (update)
+          return responseWrapper({
+            res,
+            status: statusCodes.OK,
+            message: "Success",
+          });
+      }
+      return responseWrapper({
+        res,
+        status: statusCodes.NOT_FOUND,
+        message: "Member not found",
+      });
+    });
+  }
+  searchGroup(req, res) {
+    const { body } = req;
+    return asyncWrapper(res, async () => {
+      const data = await this.repository.searchGroup(body.name);
       return responseWrapper({
         res,
         status: statusCodes.OK,
@@ -83,31 +121,6 @@ class GroupController extends BaseController {
         status: statusCodes.OK,
         message: "Success",
         data: attendance,
-      });
-    });
-  }
-
-  updateSingleMember(req, res) {
-    return asyncWrapper(res, async () => {
-      const { body, params } = req;
-      const member = await this.repository.getSingleMember(
-        params.id,
-        body.userId
-      );
-      if (member) {
-        const update = await this.repository.updateMemberPhone(params.id, body);
-        console.log(update);
-        if (update)
-          return responseWrapper({
-            res,
-            status: statusCodes.OK,
-            message: "Success",
-          });
-      }
-      return responseWrapper({
-        res,
-        status: statusCodes.NOT_FOUND,
-        message: "Member not found",
       });
     });
   }

@@ -10,27 +10,36 @@ const {
 const { scheduleRepository } = require("../schedule/schedule.repository");
 const { attendanceStatus } = require("../../tools/constants");
 class GroupRepository extends BaseRepository {
-  constructor(model) {
-    super(model);
-  }
-  find(data) {
-    return super
-      .find(data)
-      .populate("location.prov_id", "namek")
-      .populate("location.dist_id", "name")
-      .populate("location.sect_id", "name")
-      .populate("location.cell_id", "name")
-      .populate("location.village_id", "name");
-  }
-  findAll() {
-    return super
-      .findAll()
-      .populate("location.prov_id", "namek")
-      .populate("location.dist_id", "name")
-      .populate("location.sect_id", "name")
-      .populate("location.cell_id", "name")
-      .populate("location.village_id", "name");
-  }
+
+    constructor(model) {
+        super(model);
+        this.searchGroup = this.searchGroup.bind(this);
+    }
+    find(data) {
+        return super.find(data)
+            .populate('location.prov_id', 'namek')
+            .populate('location.dist_id', 'name')
+            .populate('location.sect_id', 'name')
+            .populate('location.cell_id', 'name')
+            .populate('location.village_id', 'name')
+    }
+    findAll() {
+        return super.findAll()
+            .populate('location.prov_id', 'namek')
+            .populate('location.dist_id', 'name')
+            .populate('location.sect_id', 'name')
+            .populate('location.cell_id', 'name')
+            .populate('location.village_id', 'name')
+    }
+    searchGroup(name) {
+        return this.model.findOne({
+                groupName: { $regex: name, $options: 'i' }})
+            .populate('location.prov_id', 'namek')
+            .populate('location.dist_id', 'name')
+            .populate('location.sect_id', 'name')
+            .populate('location.cell_id', 'name')
+            .populate('location.village_id', 'name')
+    }
 
   async membersAttendance(group, trainingId) {
     // Find if group has already been invited for a training
@@ -88,8 +97,6 @@ class GroupRepository extends BaseRepository {
         };
       })
     );
-
-    console.log(data);
 
     return data;
   }

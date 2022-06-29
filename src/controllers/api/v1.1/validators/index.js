@@ -3,6 +3,7 @@ const {validateGroup, validateUpdateMembers, validateUpdateProfile, validateGetM
 const {validateEvaluation} = require("../evaluations/evaluations.validator");
 const {validateTraining, validateUpdateTraining} = require("../trainings/trainings.validator");
 const {validateSchedule, validateRecordAtt} = require("../schedule/schedule.validator");
+const {validateCreateFarmVisitSchedule} = require("../farm-visit-schedule/farm-visit-schedule.validator");
 
 // Validators will be accessed via a middleware
 
@@ -14,6 +15,7 @@ module.exports = {
     validateUpdateMembers,
     validateUpdateProfile,
     validateUpdateTraining,
+    validateCreateFarmVisitSchedule,
     validateSchedule, 
     validateGetMemberAttendance,
     validateRecordAtt

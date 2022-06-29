@@ -31,8 +31,6 @@ class EvaluationController extends BaseController {
     return asyncWrapper(res, async () => {
       const data = await this.repository.findOne(req.params.id);
       const isDeleted = await data.softDelete();
-      console.log(isDeleted);
-
       return responseWrapper({
         res,
         status: statusCodes.OK,

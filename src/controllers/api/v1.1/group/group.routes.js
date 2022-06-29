@@ -3,11 +3,11 @@ const { groupCtrl } = require("./group.controller");
 const validator = require("../../../../middlewares/validator");
 
 const routes = Router();
-
 routes.post("/", validator("validateGroup"), groupCtrl.create);
 routes.put("/:id", groupCtrl.update);
 routes.get("/:id", groupCtrl.findOne);
 routes.post("/reference", groupCtrl.find);
+routes.post('/search', groupCtrl.searchGroup);
 routes.get("/", groupCtrl.findAll);
 routes.put(
   "/members/:id",
@@ -28,5 +28,6 @@ routes.post(
   validator("validateGetMemberAttendance"),
   groupCtrl.groupAttendance
 );
+
 
 module.exports.groups = routes;
