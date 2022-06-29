@@ -7,6 +7,11 @@ const routes = Router();
 routes.post("/", validator("validateSchedule"), scheduleCtrl.create);
 routes.get("/:id", scheduleCtrl.findOne);
 routes.put("/:id", scheduleCtrl.update);
+routes.post(
+  "/attendance/:id",
+  validator("validateRecordAtt"),
+  scheduleCtrl.recordAtt
+);
 routes.get("/org/:id", scheduleCtrl.findAllByOrg);
 routes.delete("/:id", scheduleCtrl.delete);
 

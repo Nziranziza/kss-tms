@@ -93,5 +93,20 @@ class GroupRepository extends BaseRepository {
 
     return data;
   }
+
+  getSingleMember(grpId, mbrId){
+    return this.model.findOne({_id: grpId, 'members.userId': mbrId})
+  }
+
+  updateMemberPhone(id, body) {
+    return this.model.update(
+      { _id: id, "members.userId": body.userId },
+      {
+        $set: {
+          "members.$.phoneNumber": body.phoneNumber,
+        },
+      }
+    );
+  }
 }
 module.exports.groupRepository = new GroupRepository(Group);

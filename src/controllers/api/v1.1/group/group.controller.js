@@ -12,6 +12,7 @@ class GroupController extends BaseController {
     this.updateMembers = this.updateMembers.bind(this);
     this.updateProfile = this.updateProfile.bind(this);
     this.groupAttendance = this.groupAttendance.bind(this);
+    this.updateSingleMember = this.updateSingleMember.bind(this);
   }
 
   updateMembers(req, res) {
@@ -82,6 +83,31 @@ class GroupController extends BaseController {
         status: statusCodes.OK,
         message: "Success",
         data: attendance,
+      });
+    });
+  }
+
+  updateSingleMember(req, res) {
+    return asyncWrapper(res, async () => {
+      const { body, params } = req;
+      const member = await this.repository.getSingleMember(
+        params.id,
+        body.userId
+      );
+      if (member) {
+        const update = await this.repository.updateMemberPhone(params.id, body);
+        console.log(update);
+        if (update)
+          return responseWrapper({
+            res,
+            status: statusCodes.OK,
+            message: "Success",
+          });
+      }
+      return responseWrapper({
+        res,
+        status: statusCodes.NOT_FOUND,
+        message: "Member not found",
       });
     });
   }
