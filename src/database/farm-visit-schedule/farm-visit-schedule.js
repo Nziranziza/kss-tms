@@ -17,6 +17,11 @@ const ownerSchema = new Schema({
     phoneNumber: {type: String}
 });
 
+const expectedDurationSchema = new Schema({
+    from: { type: String },
+    to: { type: String }
+});
+
 const farmSchema = new Schema({
     farmId: {type: Schema.Types.ObjectId},
     location: locationSchema,
@@ -26,14 +31,17 @@ const farmSchema = new Schema({
 
 // Farm visit schema
 const farmVisitScheduleSchema = new Schema({
-    gaps: {type: [Schema.Types.ObjectId]},
+    gaps: {type: [Schema.Types.ObjectId],  ref: "gaps"},
     description: {type: String, required: true},
     date: {type: Date, required: true},
     visitor: {type: Schema.Types.ObjectId},
     applicationId: {type: Number, required: true},
     reference: {type: String},
     farms: {type: [farmSchema]},
-    status: {type: Number}
+    groupId: {type: Schema.Types.ObjectId, ref: "groups",  index: true},
+    status: {type: Number},
+    observation: {type: String},
+    expectedDuration: {type: expectedDurationSchema}
 });
 
 farmVisitScheduleSchema.plugin(timestamps, {

@@ -6,8 +6,8 @@ const routes = Router();
 
 routes.post(
     '/',
-    validator('validateFarmVisitSchedule'),
+    validator('validateCreateFarmVisitSchedule'),
     farmVisitScheduleCtrl.create
 );
 
-module.exports.farmVisiteSchedules = routes;
+module.exports.farmVisitSchedules = routes;

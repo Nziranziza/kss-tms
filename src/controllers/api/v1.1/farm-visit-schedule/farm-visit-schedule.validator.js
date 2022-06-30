@@ -56,7 +56,10 @@ const validateCreateFarmVisitSchedule = scheduleData => {
                     .label('gap')
             })
             .unique('members.gap'),
-        reference: Joi.string().trim()
+        reference: Joi.string().trim(),
+        groupId: Joi.objectId()
+            .required()
+            .label('group')
     });
     return schema.validate(scheduleData).value;
 }

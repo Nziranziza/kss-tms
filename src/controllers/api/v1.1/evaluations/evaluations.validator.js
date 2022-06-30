@@ -15,8 +15,7 @@ const validateEvaluation = (data) => {
           ),
         })
       )
-      .required(),
-    applicationId: Joi.number().required(),
+      .required()
   };
   return Joi.validate(data, schema);
 };

@@ -19,8 +19,9 @@ class BaseController {
   create(req, res) {
     const { body } = req;
     return asyncWrapper(res, async () => {
-      body.applicationId = req.header['tms-app-id'];
+      body.applicationId = req.headers['tms-app-id'];
       const data = await this.repository.create(body);
+      console.log(data);
       return responseWrapper({
         res,
         message: "Record successfully created",
