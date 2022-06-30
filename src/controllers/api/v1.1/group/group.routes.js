@@ -15,6 +15,10 @@ routes.put(
   groupCtrl.updateMembers
 );
 routes.put(
+  "/member/profile/:id",
+  groupCtrl.updateSingleMember
+);
+routes.put(
   "/profile/:id",
   validator("validateUpdateProfile"),
   groupCtrl.updateProfile
