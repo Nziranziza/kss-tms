@@ -71,8 +71,11 @@ class BaseController {
 
   update(req, res) {
     const { body, params } = req;
+    console.log('here');
     return asyncWrapper(res, async () => {
+      console.log(params);
       let data = await this.repository.findOne({_id: params.id});
+      console.log(data);
       if(data){
         body._id = params.id;
         data = await this.repository.update(body);
@@ -134,7 +137,7 @@ class BaseController {
       return responseWrapper({
         res,
         status: statusCodes.OK,
-        message: "Recorded removed successfully",
+        message: "Record successfully deleted!",
         data,
       });
     });
