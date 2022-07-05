@@ -33,7 +33,6 @@ const validateSchedule = (data) => {
         phoneNumber: Joi.string(),
       })
     ),
-    applicationId: Joi.number().required(),
   };
   return Joi.validate(data, schema);
 };

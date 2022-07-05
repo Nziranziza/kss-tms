@@ -9,5 +9,9 @@ routes.post(
     validator('validateFarmVisitSchedule'),
     farmVisitScheduleCtrl.create
 );
+routes.put("/:id", farmVisitScheduleCtrl.update);
+routes.get("/:id", farmVisitScheduleCtrl.findOne);
+routes.post("/reference", farmVisitScheduleCtrl.find);
+routes.delete("/:id", farmVisitScheduleCtrl.softDelete);
 
-module.exports.farmVisiteSchedules = routes;
+module.exports.farmVisitSchedules = routes;

@@ -13,7 +13,7 @@ const ownerSchema =
         groupContactPersonPhoneNumber: Joi.string().label('group contact person phone number'),
         phoneNumber: Joi.string().label('phone number')
     });
-const validateCreateFarmVisitSchedule = scheduleData => {
+const validateFarmVisitSchedule = scheduleData => {
     const schema = Joi.object({
         description: Joi.string()
             .required()
@@ -56,9 +56,12 @@ const validateCreateFarmVisitSchedule = scheduleData => {
                     .label('gap')
             })
             .unique('members.gap'),
-        reference: Joi.string().trim()
+        reference: Joi.string().trim(),
+        groupId: Joi.objectId()
+            .required()
+            .label('group')
     });
     return schema.validate(scheduleData).value;
 }
 
-module.exports.validateCreateFarmVisitSchedule = validateCreateFarmVisitSchedule;
+module.exports.validateFarmVisitSchedule = validateFarmVisitSchedule;

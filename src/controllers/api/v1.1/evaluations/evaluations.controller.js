@@ -16,7 +16,6 @@ class EvaluationController extends BaseController {
   findByApp(req, res) {
     const body = { applicationId: req.params.id };
     return asyncWrapper(res, async () => {
-      console.log(body);
       const data = await this.repository.customFindAll(body);
       return responseWrapper({
         res,
