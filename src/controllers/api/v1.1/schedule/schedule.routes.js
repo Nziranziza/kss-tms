@@ -14,5 +14,6 @@ routes.post(
 );
 routes.get("/org/:id", scheduleCtrl.findAllByOrg);
 routes.delete("/:id", scheduleCtrl.delete);
+routes.get("/sms/:id", scheduleCtrl.sendSMS);
 
 module.exports.schedules = routes;
