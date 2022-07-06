@@ -13,7 +13,6 @@ const asyncWrapper = async (res, callback) => {
       status: statusCodes.SERVER_ERROR,
       message: error.message
     });
-
   }
 };
 

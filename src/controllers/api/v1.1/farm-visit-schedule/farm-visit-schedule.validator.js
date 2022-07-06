@@ -18,6 +18,12 @@ const validateFarmVisitSchedule = scheduleData => {
         description: Joi.string()
             .required()
             .trim(),
+        expectedDuration: Joi.object({
+            from: Joi.string(),
+            to: Joi.string()
+        }),
+        observation: Joi.string(),
+        date: Joi.date(),
         farms: Joi.array()
             .min(1)
             .max(35)
@@ -47,21 +53,27 @@ const validateFarmVisitSchedule = scheduleData => {
                     owner: ownerSchema
                 })
             ),
-        gap: Joi.array()
+        visitor: Joi.objectId(),
+        gaps: Joi.array()
             .min(1)
             .max(35)
-            .items({
-                gap: Joi.objectId()
+            .items(
+                Joi.objectId()
                     .required()
                     .label('gap')
-            })
-            .unique('members.gap'),
+            )
+            .unique(),
         reference: Joi.string().trim(),
         groupId: Joi.objectId()
             .required()
             .label('group')
     });
-    return schema.validate(scheduleData).value;
+    const { error, value } = schema.validate(scheduleData);
+    if (error) {
+        throw error;
+    } else {
+       return value;
+    }
 }
 
 module.exports.validateFarmVisitSchedule = validateFarmVisitSchedule;
