@@ -1,8 +1,8 @@
-const Joi = require("@hapi/joi");
+const Joi = require("joi");
 Joi.objectId = require("joi-objectid")(Joi);
 
 const validateSchedule = (data) => {
-  const schema = {
+  const schema = Joi.object({
     trainingId: Joi.objectId().required(),
     trainer: Joi.object({
       userId: Joi.objectId().required(),
@@ -13,11 +13,11 @@ const validateSchedule = (data) => {
     referenceId: Joi.objectId().required(),
     description: Joi.string().required(),
     location: Joi.object({
-      provId: Joi.objectId().required(),
-      distId: Joi.objectId().required(),
-      sectId: Joi.objectId().required(),
-      cellId: Joi.objectId().required(),
-      villageId: Joi.objectId().required(),
+      prov_id: Joi.objectId().required(),
+      dist_id: Joi.objectId().required(),
+      sect_id: Joi.objectId().required(),
+      cell_id: Joi.objectId().required(),
+      village_id: Joi.objectId().required(),
     }).required(),
     venueName: Joi.string().required(),
     startTime: Joi.date().required(),
@@ -33,8 +33,14 @@ const validateSchedule = (data) => {
         phoneNumber: Joi.string(),
       })
     ),
-  };
-  return Joi.validate(data, schema);
+  });
+
+  const { error, value } = schema.validate(data);
+  if (error) {
+    throw error;
+  } else {
+    return value;
+  }
 };
 
 const validateRecordAtt = (data) => {
@@ -42,7 +48,7 @@ const validateRecordAtt = (data) => {
     trainees: Joi.array().items(
       Joi.object({
         _id: Joi.objectId().required(),
-        attended: Joi.boolean().required()
+        attended: Joi.boolean().required(),
       })
     ),
     notes: Joi.string().required(),
