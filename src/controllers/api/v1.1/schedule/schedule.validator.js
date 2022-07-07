@@ -8,6 +8,7 @@ const validateSchedule = (data) => {
       userId: Joi.objectId().required(),
       fullName: Joi.string().required(),
       phoneNumber: Joi.string(),
+      organisationName: Joi.string().required()
     }).required(),
     groupId: Joi.objectId().required(),
     referenceId: Joi.objectId().required(),

@@ -20,6 +20,7 @@ const TRAINER = new mongoose.Schema({
   userId: { type: Schema.Types.ObjectId, required: true },
   fullName: { type: String, required: true },
   phoneNumber: { type: String },
+  organisationName: {type: String, required: true}
 });
 
 // schedule schema
