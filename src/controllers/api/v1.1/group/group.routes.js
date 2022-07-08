@@ -6,6 +6,7 @@ const routes = Router();
 routes.post("/", validator("validateGroup"), groupCtrl.create);
 routes.put("/:id", groupCtrl.update);
 routes.get("/:id", groupCtrl.findOne);
+routes.delete("/:id", groupCtrl.softDelete);
 routes.post("/reference", groupCtrl.find);
 routes.post('/search', groupCtrl.searchGroup);
 routes.get("/", groupCtrl.findAll);
