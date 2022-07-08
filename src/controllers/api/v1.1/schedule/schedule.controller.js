@@ -79,10 +79,11 @@ class ScheduleController extends BaseController {
       const schedule = await this.repository.findOne(params.id);
 
       if (schedule) {
-        const message = `Mwiriwe, Nkara Dukare ibatumiye mu mahugurwa ya \\" ${
+        const message = `Uruganda ${
+          schedule.trainer.organisationName
+        } rubatumiye mu mahugurwa ya \"${
           schedule.trainingId.trainingName
-        } \\" Azaba ku itariki
-        ${schedule.startTime.toLocaleDateString()} agatangira saa 16:00 Kugeza saa 18:00 - Akazabera ${
+        }\". Azaba ku itariki ${schedule.startTime.toLocaleDateString()}, guhera ${schedule.startTime.toLocaleTimeString()} - kuri:${
           schedule.venueName
         }`;
 

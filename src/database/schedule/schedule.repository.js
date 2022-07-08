@@ -7,7 +7,15 @@ class ScheduleRepository extends BaseRepository {
   }
 
   findGroupSchedule(groupId, trainingId) {
-    return super.cFindOne({ groupId, trainingId });
+    return super
+      .cFindOne({ groupId, trainingId })
+      .populate("trainingId", "trainingName")
+      .populate("groupId", "groupName")
+      .populate("location.prov_id", "namek")
+      .populate("location.dist_id", "name")
+      .populate("location.sect_id", "name")
+      .populate("location.cell_id", "name")
+      .populate("location.village_id", "name");
   }
 
   findMemberAttendance(userId, trainingId) {
@@ -18,7 +26,12 @@ class ScheduleRepository extends BaseRepository {
     return this.model
       .find(data)
       .populate("trainingId", "trainingName")
-      .populate("groupId", "groupName");
+      .populate("groupId", "groupName")
+      .populate("location.prov_id", "namek")
+      .populate("location.dist_id", "name")
+      .populate("location.sect_id", "name")
+      .populate("location.cell_id", "name")
+      .populate("location.village_id", "name");
   }
 
   findOne(id) {
@@ -26,13 +39,12 @@ class ScheduleRepository extends BaseRepository {
       .findOne({ _id: id })
       .populate("trainingId", "trainingName")
       .populate("groupId", "groupName")
-      .populate('location.prov_id', 'namek')
-      .populate('location.dist_id', 'name')
-      .populate('location.sect_id', 'name')
-      .populate('location.cell_id', 'name')
-      .populate('location.village_id', 'name');
+      .populate("location.prov_id", "namek")
+      .populate("location.dist_id", "name")
+      .populate("location.sect_id", "name")
+      .populate("location.cell_id", "name")
+      .populate("location.village_id", "name");
   }
-
 
   // Record Attendance scheduled training
   recordAtt(schedule, data) {
