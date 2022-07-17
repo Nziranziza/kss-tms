@@ -6,7 +6,6 @@ const {
 } = require("../../../../database/schedule/schedule.repository");
 const { statusCodes } = require("../../../../utils/constants/common");
 const { sendAppSMS } = require("../../../../services/comm.service");
-const { RedisService } = require("../../../../services/redis.service");
 
 class ScheduleController extends BaseController {
   constructor(repository) {
