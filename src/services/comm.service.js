@@ -38,6 +38,8 @@ const claimToken = async () => {
     access_key: accessKey,
   };
 
+  console.log("claim token")
+
   const token = await authenticateApp(data);
 
   if (token.status == 200) {
