@@ -2,7 +2,7 @@
 
 const { CommService, Axios } = require("../httpConfig/comm");
 const config = require("config");
-const { RedisService } = require("./redis.service");
+// const { RedisService } = require("./redis.service");
 const appId = config.get("apiEndPoints.commService.appId");
 const accessKey = config.get("apiEndPoints.commService.accessKey");
 
@@ -13,7 +13,7 @@ const accessKey = config.get("apiEndPoints.commService.accessKey");
 const authenticateApp = async (data) => {
   try {
     return await CommService.post("/applications/auth", data, {
-      token: await RedisService.getCachedData("comm-token"),
+      // token: await RedisService.getCachedData("comm-token"),
     });
   } catch (error) {
     return error;
@@ -25,7 +25,7 @@ const sendAppSMS = async (data) => {
   try {
     const token = await RedisService.getCachedData("comm-token");
     return await CommService.post("/messages/app/sendSMS", data, {
-      token: token.replace(/['"]+/g, ""),
+      // token: token.replace(/['"]+/g, ""),
     });
   } catch (error) {
     return error;
