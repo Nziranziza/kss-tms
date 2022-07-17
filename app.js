@@ -41,7 +41,7 @@ app.listen(config.get("app.port"), () => {
   );
 
   client.on("connect", () => {
-    claimToken();
+    // claimToken();
   });
 });
 
