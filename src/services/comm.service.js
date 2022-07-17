@@ -2,7 +2,7 @@
 
 const { CommService, Axios } = require("../httpConfig/comm");
 const config = require("config");
-// const { RedisService } = require("./redis.service");
+const { RedisService } = require("./redis.service");
 const appId = config.get("apiEndPoints.commService.appId");
 const accessKey = config.get("apiEndPoints.commService.accessKey");
 
