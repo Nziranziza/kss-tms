@@ -13,5 +13,6 @@ routes.put("/:id", farmVisitScheduleCtrl.update);
 routes.get("/:id", farmVisitScheduleCtrl.findOne);
 routes.post("/reference", farmVisitScheduleCtrl.find);
 routes.delete("/:id", farmVisitScheduleCtrl.softDelete);
+routes.post("/stats", farmVisitScheduleCtrl.visitStats);
 
 module.exports.farmVisitSchedules = routes;

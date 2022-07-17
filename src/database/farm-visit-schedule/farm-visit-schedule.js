@@ -24,7 +24,7 @@ const expectedDurationSchema = new Schema({
 
 const farmSchema = new Schema({
     farmId: {type: Schema.Types.ObjectId, },
-    location: locationSchema,
+    location: { type: locationSchema, required: true },
     upiNumber: {type: String},
     owner: {type: ownerSchema}
 });

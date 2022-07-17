@@ -62,5 +62,21 @@ const validateRecordAtt = (data) => {
   }
 };
 
+const validateStats = (data) => {
+  const schema = Joi.object({
+    trainingId: Joi.objectId(),
+    trainerId: Joi.objectId(),
+    scheduleId: Joi.objectId(),
+    location: Joi.object({})
+  });
+  const { error, value } = schema.validate(data);
+  if (error) {
+    throw error;
+  } else {
+    return value;
+  }
+};
+
 module.exports.validateSchedule = validateSchedule;
 module.exports.validateRecordAtt = validateRecordAtt;
+module.exports.validateStats = validateStats;
