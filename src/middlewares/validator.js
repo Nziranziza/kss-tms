@@ -10,8 +10,7 @@ module.exports = function (validator) {
 
   return async function (req, res, next) {
     try {
-      const validated = await Validators[validator](req.body);
-      req.body = validated;
+      req.body = await Validators[validator](req.body);
       next();
     } catch (err) {
       //* Pass err to next

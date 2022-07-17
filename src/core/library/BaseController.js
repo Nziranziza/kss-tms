@@ -2,6 +2,7 @@ const responseWrapper = require('../helpers/responseWrapper');
 const asyncWrapper = require('../helpers/asyncWrapper');
 const CustomError = require('../helpers/customerError');
 const { statusCodes } = require('../../utils/constants/common');
+const {response} = require("express");
 
 class BaseController {
   constructor(repository) {
@@ -21,11 +22,12 @@ class BaseController {
     return asyncWrapper(res, async () => {
       body.applicationId = req.headers['tms-app-id'];
       const data = await this.repository.create(body);
+      const response = await this.repository.findOne(data._id);
       return responseWrapper({
         res,
         message: "Record successfully created",
         status: statusCodes.OK,
-        data,
+        data: response
       });
     });
   }
