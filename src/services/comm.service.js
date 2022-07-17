@@ -43,11 +43,12 @@ const claimToken = async () => {
   const token = await authenticateApp(data);
 
   if (token.status == 200) {
-    await RedisService.cacheData(
-      "comm-token",
-      token.data.data.token.replace(/['"]+/g, ""),
-      24 * 60 * 60
-    );
+    console.log(token);
+    // await RedisService.cacheData(
+    //   "comm-token",
+    //   token.data.data.token.replace(/['"]+/g, ""),
+    //   24 * 60 * 60
+    // );
   }
 };
 
