@@ -13,7 +13,7 @@ const accessKey = config.get("apiEndPoints.commService.accessKey");
 const authenticateApp = async (data) => {
   try {
     return await CommService.post("/applications/auth", data, {
-      // token: await RedisService.getCachedData("comm-token"),
+      token: "",
     });
   } catch (error) {
     return error;
@@ -25,7 +25,7 @@ const sendAppSMS = async (data) => {
   try {
     const token = await RedisService.getCachedData("comm-token");
     return await CommService.post("/messages/app/sendSMS", data, {
-      // token: token.replace(/['"]+/g, ""),
+      token: token.replace(/['"]+/g, ""),
     });
   } catch (error) {
     return error;
@@ -38,17 +38,14 @@ const claimToken = async () => {
     access_key: accessKey,
   };
 
-  console.log("claim token")
-
   const token = await authenticateApp(data);
 
   if (token.status == 200) {
-    console.log(token);
-    // await RedisService.cacheData(
-    //   "comm-token",
-    //   token.data.data.token.replace(/['"]+/g, ""),
-    //   24 * 60 * 60
-    // );
+    await RedisService.cacheData(
+      "comm-token",
+      token.data.data.token.replace(/['"]+/g, ""),
+      24 * 60 * 60
+    );
   }
 };
 

@@ -9,7 +9,7 @@ const app = express();
 const mongoCon = require("./src/startup/mongo");
 const client = require("./src/startup/redisconnection");
 const { claimToken } = require("./src/services/comm.service");
-require('./src/cron');
+require("./src/cron");
 
 // Disable Powered By Header
 app.disable("x-powered-by");
@@ -41,7 +41,7 @@ app.listen(config.get("app.port"), () => {
   );
 
   client.on("connect", () => {
-    // claimToken();
+    claimToken();
   });
 });
 
