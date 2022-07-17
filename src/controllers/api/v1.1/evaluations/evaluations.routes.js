@@ -9,5 +9,6 @@ routes.get("/:id", evaluationCtrl.findOne);
 routes.put("/:id", evaluationCtrl.update);
 routes.get("/app/:id", evaluationCtrl.findByApp);
 routes.delete("/:id", evaluationCtrl.delete);
+routes.post("/stats", evaluationCtrl.evaluationStats);
 
 module.exports.evaluations = routes;

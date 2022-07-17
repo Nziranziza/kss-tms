@@ -11,6 +11,7 @@ class EvaluationController extends BaseController {
     super(repository);
     this.findByApp = this.findByApp.bind(this);
     this.delete = this.delete.bind(this);
+    this.evaluationStats = this.evaluationStats.bind(this);
   }
 
   findByApp(req, res) {
@@ -36,6 +37,21 @@ class EvaluationController extends BaseController {
         message: "Removed successfully",
         data,
       });
+    });
+  }
+
+  evaluationStats(req, res){
+    const {body} = req;
+    return asyncWrapper(res, async () => {
+      const summary = await this.repository.evaluationStats(body);
+      if (summary)
+        return responseWrapper({
+          res,
+          status: statusCodes.OK,
+          message: "success",
+          data: summary,
+        });
+        
     });
   }
 }

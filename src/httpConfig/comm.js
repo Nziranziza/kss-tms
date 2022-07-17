@@ -13,7 +13,6 @@ const commService = axios.create({
 commService.interceptors.request.use((configuration) => {
   const { url, method, params, token } = configuration;
   configuration.headers = {...configuration.headers, 'x-access-key': token};
-  console.log(configuration);
   logger.info({ url, method, params, token }, "Requesting data from Ikofi");
 
   return configuration;

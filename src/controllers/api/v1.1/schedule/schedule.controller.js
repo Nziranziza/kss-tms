@@ -15,6 +15,7 @@ class ScheduleController extends BaseController {
     this.delete = this.delete.bind(this);
     this.recordAtt = this.recordAtt.bind(this);
     this.sendSMS = this.sendSMS.bind(this);
+    this.attendanceSummary = this.attendanceSummary.bind(this);
   }
 
   findAllByOrg(req, res) {
@@ -123,6 +124,23 @@ class ScheduleController extends BaseController {
         status: statusCodes.NOT_FOUND,
         message: "Schedule not found",
       });
+    });
+  }
+
+  // Get Attendance Summary
+  attendanceSummary(req, res) {
+    const {body} = req;
+    return asyncWrapper(res, async () => {
+      const summary = await this.repository.attendanceSummary(body);
+
+      if (summary)
+        return responseWrapper({
+          res,
+          status: statusCodes.OK,
+          message: "success",
+          data: summary,
+        });
+        
     });
   }
 }
