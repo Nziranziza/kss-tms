@@ -23,7 +23,7 @@ const expectedDurationSchema = new Schema({
 });
 
 const farmSchema = new Schema({
-    farmId: {type: Schema.Types.ObjectId},
+    farmId: {type: Schema.Types.ObjectId, },
     location: locationSchema,
     upiNumber: {type: String},
     owner: {type: ownerSchema}
@@ -31,14 +31,14 @@ const farmSchema = new Schema({
 
 // Farm visit schema
 const farmVisitScheduleSchema = new Schema({
-    gaps: {type: [Schema.Types.ObjectId],  ref: "gaps"},
+    gaps: {type: [Schema.Types.ObjectId],  ref: "evaluation"},
     description: {type: String, required: true},
     date: {type: Date, required: true},
     visitor: {type: Schema.Types.ObjectId},
     applicationId: {type: Number, required: true},
     reference: {type: String},
     farms: {type: [farmSchema]},
-    groupId: {type: Schema.Types.ObjectId, ref: "groups",  index: true},
+    groupId: {type: Schema.Types.ObjectId, ref: "group",  index: true},
     status: {type: Number},
     observation: {type: String},
     expectedDuration: {type: expectedDurationSchema}
