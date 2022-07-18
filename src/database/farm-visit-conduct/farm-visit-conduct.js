@@ -21,7 +21,7 @@ const ownerSchema = new Schema({
 const answerSchema = new Schema({
     answerId: {type: Schema.Types.ObjectId},
     selected: {type: Boolean},
-    text: {type: Boolean},
+    text: {type: String},
     weight: {type: Number}
 });
 
