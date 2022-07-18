@@ -15,7 +15,8 @@ class FarmVisitScheduleRepository extends BaseRepository {
       .populate("farms.location.sect_id", "name")
       .populate("farms.location.cell_id", "name")
       .populate("farms.location.village_id", "name")
-      .populate("gaps");
+      .populate("gaps")
+      .populate("groupId", "groupName");
   }
   findAll() {
     return super
