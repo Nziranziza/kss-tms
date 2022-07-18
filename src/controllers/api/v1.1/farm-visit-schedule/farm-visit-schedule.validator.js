@@ -49,7 +49,7 @@ const validateFarmVisitSchedule = scheduleData => {
                             .required()
                             .label('village')
                     }).required(),
-                    upiNumber: Joi.string(),
+                    upiNumber: Joi.string().allow(null, ''),
                     owner: ownerSchema
                 })
             ),
