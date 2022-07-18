@@ -135,7 +135,7 @@ class ScheduleRepository extends BaseRepository {
       malePresent,
       maleAbsent,
       totalAbsent: femaleAbsent + maleAbsent,
-      totalPresent: maleAbsent + malePresent,
+      totalPresent: malePresent + femalePresent,
       totalInvitees: femaleAbsent + femalePresent + maleAbsent + malePresent,
     };
   }
