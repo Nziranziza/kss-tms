@@ -25,8 +25,7 @@ class FarmVisitScheduleRepository extends BaseRepository {
       .populate("farms.location.dist_id", "name")
       .populate("farms.location.sect_id", "name")
       .populate("farms.location.cell_id", "name")
-      .populate("gaps")
-      .populate("groupId");
+      .populate("gaps");
   }
   findOne(id) {
     return super
@@ -37,7 +36,7 @@ class FarmVisitScheduleRepository extends BaseRepository {
       .populate("farms.location.cell_id", "name")
       .populate("farms.location.village_id", "name")
       .populate("gaps")
-      .populate("groupId");
+      .populate("groupId", "groupName");
   }
   async visitStats(body) {
     // const { trainingId, trainerId, scheduleId } = body;
