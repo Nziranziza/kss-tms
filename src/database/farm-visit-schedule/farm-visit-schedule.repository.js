@@ -1,3 +1,4 @@
+const { ObjectId } = require("mongodb");
 const BaseRepository = require("../../core/library/BaseRepository");
 const {
   FarmVisitSchedule,
@@ -91,6 +92,24 @@ class FarmVisitScheduleRepository extends BaseRepository {
       femaleFarmVisits,
       totolVisits: maleFarmVisits + femaleFarmVisits,
     };
+  }
+
+  farmerVisits(id) {
+    return this.model.aggregate([
+      {
+        $match: {
+          "farms.owner.userId": ObjectId(id),
+        },
+      },
+      {
+        $unwind: "$farms",
+      },
+      {
+        $match: {
+          "farms.owner.userId": ObjectId(id),
+        },
+      },
+    ]);
   }
 }
 
