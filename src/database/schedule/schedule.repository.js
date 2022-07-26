@@ -74,6 +74,7 @@ class ScheduleRepository extends BaseRepository {
         ...(trainingId && { trainingId: ObjectId(trainingId) }),
         ...(trainerId && { "trainer.userId": ObjectId(trainerId) }),
         ...(scheduleId && { _id: ObjectId(scheduleId) }),
+        status: scheduleStatus.HAPPENED,
       },
     };
 
@@ -105,7 +106,7 @@ class ScheduleRepository extends BaseRepository {
       },
     };
 
-    // Run query // Query will return 4 objects or less each containing stats for each gender 
+    // Run query // Query will return 4 objects or less each containing stats for each gender
     const summary = await this.model.aggregate([
       filter,
       unwind,

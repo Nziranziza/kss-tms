@@ -6,7 +6,7 @@ const trainingStatus = {
 
 const scheduleStatus = {
   PENDING: "pending",
-  HAPPENED: "happened"
+  HAPPENED: "done"
 };
 
 const attendanceStatus = {
