@@ -111,6 +111,24 @@ class FarmVisitScheduleRepository extends BaseRepository {
       },
     ]);
   }
+
+  farmVisits(id){
+    return this.model.aggregate([
+      {
+        $match: {
+          "farms.farmId": ObjectId(id),
+        },
+      },
+      {
+        $unwind: "$farms",
+      },
+      {
+        $match: {
+          "farms.farmId": ObjectId(id),
+        },
+      },
+    ]);
+  }
 }
 
 module.exports.farmVisitScheduleRepository = new FarmVisitScheduleRepository(

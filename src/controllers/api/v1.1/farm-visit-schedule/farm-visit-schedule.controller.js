@@ -11,6 +11,7 @@ class FarmVisitScheduleController extends BaseController {
     super(repository);
     this.visitStats = this.visitStats.bind(this);
     this.farmerVisits = this.farmerVisits.bind(this);
+    this.farmVisits = this.farmVisits.bind(this);
   }
 
   visitStats(req, res) {
@@ -31,6 +32,20 @@ class FarmVisitScheduleController extends BaseController {
     const { params } = req;
     return asyncWrapper(res, async () => {
       const visits = await this.repository.farmerVisits(params.id);
+      if (visits)
+        return responseWrapper({
+          res,
+          status: statusCodes.OK,
+          message: "success",
+          data: visits,
+        });
+    });
+  }
+
+  farmVisits(req, res) {
+    const { params } = req;
+    return asyncWrapper(res, async () => {
+      const visits = await this.repository.farmVisits(params.id);
       if (visits)
         return responseWrapper({
           res,
