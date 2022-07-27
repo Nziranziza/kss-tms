@@ -15,6 +15,7 @@ const {
     validateSchedule,
     validateRecordAtt,
     validateStats,
+    validateFilterSchedule
 } = require("../schedule/schedule.validator");
 const {
     validateFarmVisitSchedule,
@@ -37,4 +38,5 @@ module.exports = {
     validateGetMemberAttendance,
     validateRecordAtt,
     validateStats,
+    validateFilterSchedule
 };

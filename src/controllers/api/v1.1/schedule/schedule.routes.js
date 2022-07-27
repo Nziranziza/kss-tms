@@ -12,7 +12,7 @@ routes.post(
   validator("validateRecordAtt"),
   scheduleCtrl.recordAtt
 );
-routes.get("/org/:id", scheduleCtrl.findAllByOrg);
+routes.post("/reference/:id", scheduleCtrl.findAllByRef);
 routes.delete("/:id", scheduleCtrl.delete);
 routes.get("/sms/:id", scheduleCtrl.sendSMS);
 routes.post(
