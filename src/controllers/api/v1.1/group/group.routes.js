@@ -9,7 +9,10 @@ routes.get("/:id", groupCtrl.findOne);
 routes.delete("/:id", groupCtrl.softDelete);
 routes.post("/reference", groupCtrl.find);
 routes.post('/search', groupCtrl.searchGroup);
-routes.get("/", groupCtrl.findAll);
+routes.post('/report', groupCtrl.report);
+routes.post('/report/download', groupCtrl.downloadReport);
+routes.post('/statistics', groupCtrl.statistics);
+routes.get('/', groupCtrl.findAll);
 routes.put(
   "/members/:id",
   validator("validateUpdateMembers"),

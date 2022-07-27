@@ -13,6 +13,7 @@ class BaseController {
     this.remove = this.remove.bind(this);
     this.find = this.find.bind(this);
     this.findAll = this.findAll.bind(this);
+    this.findAll = this.findAll.bind(this);
     this.cFindOne = this.cFindOne.bind(this);
     this.softDelete = this.softDelete.bind(this);
   }
