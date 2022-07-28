@@ -14,7 +14,8 @@ const ownerSchema = new Schema({
     groupName: {type: String},
     groupContactPersonNames: {type: String},
     groupContactPersonPhoneNumber: {type: String},
-    phoneNumber: {type: String}
+    phoneNumber: {type: String},
+    organisationName: {type: String}
 });
 
 

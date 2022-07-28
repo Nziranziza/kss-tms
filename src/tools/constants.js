@@ -15,6 +15,13 @@ const attendanceStatus = {
   NOT_INVITED: "not_invited"
 };
 
+const groupStatus = {
+  ACTIVE: "active",
+  INACTIVE: "INACTIVE"
+
+};
+
 module.exports.trainingStatus = trainingStatus;
 module.exports.scheduleStatus = scheduleStatus;
 module.exports.attendanceStatus = attendanceStatus;
+module.exports.groupStatus = groupStatus;

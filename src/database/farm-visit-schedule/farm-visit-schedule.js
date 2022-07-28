@@ -14,7 +14,8 @@ const ownerSchema = new Schema({
     groupName: {type: String},
     groupContactPersonNames: {type: String},
     groupContactPersonPhoneNumber: {type: String},
-    phoneNumber: {type: String}
+    phoneNumber: {type: String},
+    organisationName: {type: String}
 });
 
 const expectedDurationSchema = new Schema({
@@ -34,11 +35,11 @@ const farmVisitScheduleSchema = new Schema({
     gaps: {type: [Schema.Types.ObjectId],  ref: "evaluation"},
     description: {type: String, required: true},
     date: {type: Date, required: true},
-    visitor: {type: Schema.Types.ObjectId},
+    visitor:  {type: ownerSchema},
     applicationId: {type: Number, required: true},
     reference: {type: String},
     farms: {type: [farmSchema]},
-    groupId: {type: Schema.Types.ObjectId, ref: "group",  index: true},
+    groupId: {type: Schema.Types.ObjectId, ref: "group"},
     status: {type: Number},
     observation: {type: String},
     expectedDuration: {type: expectedDurationSchema}

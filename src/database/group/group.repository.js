@@ -123,6 +123,7 @@ class GroupRepository extends BaseRepository {
                 ...(body.location && body.location.cell_id && {'location.cell_id': ObjectId(body.location.cell_id)}),
                 ...(body.location && body.location.village_id && {'location.village_id': ObjectId(body.location.village_id)}),
                 ...(body.reference && {'reference': body.reference}),
+                ...({'isDeleted': false})
             }
         };
 
