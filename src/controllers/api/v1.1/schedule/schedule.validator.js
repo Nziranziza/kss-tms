@@ -77,6 +77,19 @@ const validateStats = (data) => {
   }
 };
 
+const validateFilterSchedule = (data) => {
+  const schema = Joi.object({
+    date: Joi.date().format("yyyy-mm-dd")
+  });
+  const { error, value } = schema.validate(data);
+  if (error) {
+    throw error;
+  } else {
+    return value;
+  }
+};
+
 module.exports.validateSchedule = validateSchedule;
 module.exports.validateRecordAtt = validateRecordAtt;
 module.exports.validateStats = validateStats;
+module.exports.validateFilterSchedule = validateFilterSchedule;

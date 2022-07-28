@@ -13,13 +13,7 @@ class GroupRepository extends BaseRepository {
     }
 
     find(data) {
-        return super
-            .find(data)
-            .populate("location.prov_id", "namek")
-            .populate("location.dist_id", "name")
-            .populate("location.sect_id", "name")
-            .populate("location.cell_id", "name")
-            .populate("location.village_id", "name");
+        return super.find(data);
     }
 
     findAll() {
@@ -78,11 +72,13 @@ class GroupRepository extends BaseRepository {
                     trainingId
                 );
 
+
                 let attendance = attendanceStatus.ABSENT;
                 for (const schedule of traineeSchedules) {
                     schedule.trainees.forEach((trainee) => {
                         if (trainee.userId === userId.toString() && trainee.attended) {
                             attendance = attendanceStatus.ATTENDED;
+
                         }
                     });
                 }
@@ -133,38 +129,58 @@ class GroupRepository extends BaseRepository {
                 numberOfGroups: {$sum: 1},
                 numberOfMembers: {
                     $sum: {
-                        $cond: {if: {$isArray: "$members"}, then: {$size: "$members"}, else: 0}
-                    }
+                        $cond: {
+                            if: {$isArray: "$members"},
+                            then: {$size: "$members"},
+                            else: 0,
+                        },
+                    },
                 },
-            }
+            },
         };
         const members = {
             $project: {
                 numberOfMembers: 1,
                 numberOfGroups: 1,
                 groupName: 1,
-                _id: 0
-            }
+                _id: 0,
+            },
         };
 
         return this.model.aggregate([filter, group, members]);
     }
 
     report(body) {
-        const filter =  {
-                ...(body.location && body.location.prov_id && {'location.prov_id': ObjectId(body.location.prov_id)}),
-                ...(body.location && body.location.dist_id && {'location.dist_id': ObjectId(body.location.dist_id)}),
-                ...(body.location && body.location.sect_id && {'location.sect_id': ObjectId(body.location.sect_id)}),
-                ...(body.location && body.location.cell_id && {'location.cell_id': ObjectId(body.location.cell_id)}),
-                ...(body.location && body.location.village_id && {'location.village_id': ObjectId(body.location.village_id)}),
-                ...(body.reference && {'reference': body.reference}),
-            };
-        return this.model.find(filter)
-            .populate('location.prov_id', 'namek')
-            .populate('location.dist_id', 'name')
-            .populate('location.sect_id', 'name')
-            .populate('location.cell_id', 'name')
-            .populate('location.village_id', 'name');
+        const filter = {
+            ...(body.location &&
+                body.location.prov_id && {
+                    "location.prov_id": ObjectId(body.location.prov_id),
+                }),
+            ...(body.location &&
+                body.location.dist_id && {
+                    "location.dist_id": ObjectId(body.location.dist_id),
+                }),
+            ...(body.location &&
+                body.location.sect_id && {
+                    "location.sect_id": ObjectId(body.location.sect_id),
+                }),
+            ...(body.location &&
+                body.location.cell_id && {
+                    "location.cell_id": ObjectId(body.location.cell_id),
+                }),
+            ...(body.location &&
+                body.location.village_id && {
+                    "location.village_id": ObjectId(body.location.village_id),
+                }),
+            ...(body.reference && {reference: body.reference}),
+        };
+        return this.model
+            .find(filter)
+            .populate("location.prov_id", "namek")
+            .populate("location.dist_id", "name")
+            .populate("location.sect_id", "name")
+            .populate("location.cell_id", "name")
+            .populate("location.village_id", "name");
     }
 }
 

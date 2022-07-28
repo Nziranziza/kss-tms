@@ -10,17 +10,23 @@ const { sendAppSMS } = require("../../../../services/comm.service");
 class ScheduleController extends BaseController {
   constructor(repository) {
     super(repository);
-    this.findAllByOrg = this.findAllByOrg.bind(this);
+    this.findAllByRef = this.findAllByRef.bind(this);
     this.delete = this.delete.bind(this);
     this.recordAtt = this.recordAtt.bind(this);
     this.sendSMS = this.sendSMS.bind(this);
     this.attendanceSummary = this.attendanceSummary.bind(this);
   }
 
-  findAllByOrg(req, res) {
-    const body = { referenceId: req.params.id };
+  findAllByRef(req, res) {
+    // const date = req.body;
+    const body = {
+      referenceId: req.params.id,
+      // startTime: {
+      //   $gte: new Date(`${date}T00:00:00.000Z`),
+      //   $lt: new Date(`${date}T00:00:00.000Z`),
+      // },
+    };
     return asyncWrapper(res, async () => {
-      console.log(body);
       const data = await this.repository.customFindAll(body);
       return responseWrapper({
         res,
@@ -87,8 +93,6 @@ class ScheduleController extends BaseController {
           schedule.venueName
         }`;
 
-        console.log(message);
-
         let recipients = [];
 
         for (const trainee of schedule.trainees) {
@@ -139,7 +143,6 @@ class ScheduleController extends BaseController {
           message: "success",
           data: summary,
         });
-        
     });
   }
 }

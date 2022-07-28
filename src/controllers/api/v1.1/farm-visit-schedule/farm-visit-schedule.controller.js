@@ -12,6 +12,7 @@ class FarmVisitScheduleController extends BaseController {
     super(repository);
     this.visitStats = this.visitStats.bind(this);
     this.farmerVisits = this.farmerVisits.bind(this);
+    this.farmsVisits = this.farmsVisits.bind(this);
     this.sendSMS = this.sendSMS.bind(this);
   }
 
@@ -43,8 +44,9 @@ class FarmVisitScheduleController extends BaseController {
     });
   }
 
+
   sendSMS(req, res) {
-    const { params } = req;
+    const {params} = req;
     return asyncWrapper(res, async () => {
       const schedule = await this.repository.findOne(params.id);
       console.log(schedule);
@@ -71,14 +73,41 @@ class FarmVisitScheduleController extends BaseController {
           status: statusCodes.OK,
           message: "Success",
         });
-      }
-      else {
+      } else {
         return responseWrapper({
           res,
           status: statusCodes.NOT_FOUND,
           message: "Schedule not found",
         });
       }
+    });
+  }
+
+  farmVisits(req, res) {
+    const { params } = req;
+    return asyncWrapper(res, async () => {
+      const visits = await this.repository.farmVisits(params.id);
+      if (visits)
+        return responseWrapper({
+          res,
+          status: statusCodes.OK,
+          message: "success",
+          data: visits,
+        });
+    });
+  }
+
+  farmsVisits(req, res) {
+    const { body } = req;
+    return asyncWrapper(res, async () => {
+      const visits = await this.repository.farmsVisits(body);
+      if (visits)
+        return responseWrapper({
+          res,
+          status: statusCodes.OK,
+          message: "success",
+          data: visits,
+        });
     });
   }
 }
