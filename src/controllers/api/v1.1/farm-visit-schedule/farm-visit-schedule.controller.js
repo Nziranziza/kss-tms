@@ -23,7 +23,7 @@ class FarmVisitScheduleController extends BaseController {
     schedulesStats(req, res) {
         const {body} = req;
         return asyncWrapper(res, async () => {
-            const summary = await this.repository.visitStats(body);
+            const summary = await this.repository.schedulesStats(body);
             if (summary)
                 return responseWrapper({
                     res,
