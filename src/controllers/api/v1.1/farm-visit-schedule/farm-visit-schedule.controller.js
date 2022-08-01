@@ -95,7 +95,7 @@ class FarmVisitScheduleController extends BaseController {
                     res,
                     status: statusCodes.OK,
                     message: "success",
-                    data: schedule,
+                    data: schedule[0],
                 });
         });
     }
