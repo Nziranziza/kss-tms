@@ -127,10 +127,7 @@ class FarmVisitScheduleRepository extends BaseRepository {
                     ...(body.scheduleId && {
                         "_id": ObjectId(body.scheduleId),
                     }),
-                    ...(body.reference && {
-                        "reference": body.reference,
-                    }),
-                    ...(body.created_at &&
+                   ...(body.created_at &&
                         {
                             "created_at": {
                                 $gte: body.created_at.from,

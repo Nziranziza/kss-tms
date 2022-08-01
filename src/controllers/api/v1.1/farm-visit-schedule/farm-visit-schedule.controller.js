@@ -53,7 +53,6 @@ class FarmVisitScheduleController extends BaseController {
         const {params} = req;
         return asyncWrapper(res, async () => {
             const schedule = await this.repository.findOne(params.id);
-            console.log(schedule);
             if (schedule) {
                 for (const farm of schedule.farms) {
                     let recipients = [];
