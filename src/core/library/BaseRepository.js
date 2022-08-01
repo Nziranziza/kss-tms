@@ -3,11 +3,20 @@ class BaseRepository {
     this.model = model;
     this.findOne = this.findOne.bind(this);
     this.find = this.find.bind(this);
+    this.findAll = this.findAll.bind(this);
     this.update = this.update.bind(this);
+    this.cFindOne = this.cFindOne.bind(this);
+    this.update = this.update.bind(this);
+    this.remove = this.remove.bind(this);
+    this.create = this.create.bind(this);
   }
 
-  find() {
-    return this.model.find({});
+  find(data) {
+    return this.model.find(data);
+  }
+
+  findAll() {
+    return this.model.find();
   }
 
   findOne(id) {
@@ -16,8 +25,12 @@ class BaseRepository {
     });
   }
 
-  customFindOne(data) {
+  cFindOne(data) {
     return this.model.findOne(data);
+  }
+
+  customFindAll(data){
+    return this.model.find(data);
   }
 
   create(entity) {
@@ -25,7 +38,7 @@ class BaseRepository {
   }
 
   update(entity) {
-    return this.model.findByIdAndUpdate(entity._id, entity, { new: false });
+    return this.model.findByIdAndUpdate(entity._id, entity, { new: true });
   }
 
   remove(id) {

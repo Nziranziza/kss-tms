@@ -1,0 +1,23 @@
+const Router = require('express').Router;
+const validator = require('../../../../middlewares/validator');
+const { farmVisitScheduleCtrl } = require('./farm-visit-schedule.controller');
+const {scheduleCtrl} = require("../schedule/schedule.controller");
+
+const routes = Router();
+
+routes.post(
+    '/',
+    validator('validateFarmVisitSchedule'),
+    farmVisitScheduleCtrl.create
+);
+routes.put("/:id", farmVisitScheduleCtrl.update);
+routes.get("/:id", farmVisitScheduleCtrl.findOne);
+routes.post("/reference", farmVisitScheduleCtrl.find);
+routes.post("/farms/reference", farmVisitScheduleCtrl.farmsScheduledVisits);
+routes.delete("/:id", farmVisitScheduleCtrl.softDelete);
+routes.post("/stats", farmVisitScheduleCtrl.schedulesStats);
+routes.get("/farmer/:id", farmVisitScheduleCtrl.farmerScheduledVisits);
+routes.get("/sms/:id", farmVisitScheduleCtrl.sendSMS);
+routes.post("/farm", farmVisitScheduleCtrl.farmScheduledVisits);
+
+module.exports.farmVisitSchedules = routes;
