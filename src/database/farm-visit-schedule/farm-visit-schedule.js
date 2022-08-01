@@ -27,7 +27,8 @@ const farmSchema = new Schema({
     farmId: {type: Schema.Types.ObjectId, },
     location: { type: locationSchema, required: true },
     upiNumber: {type: String},
-    owner: {type: ownerSchema}
+    owner: {type: ownerSchema},
+    evaluatedGaps: {type: [Schema.Types.ObjectId], default: []}
 });
 
 // Farm visit schema
@@ -52,5 +53,5 @@ farmVisitScheduleSchema.plugin(timestamps, {
 
 farmVisitScheduleSchema.plugin(softDelete);
 
-const FarmVisitSchedule = mongoose.model('farm-visit-schedule', farmVisitScheduleSchema);
+const FarmVisitSchedule = mongoose.model('farm_visit_schedule', farmVisitScheduleSchema);
 module.exports.FarmVisitSchedule = FarmVisitSchedule;

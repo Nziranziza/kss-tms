@@ -23,6 +23,7 @@ class BaseController {
     return asyncWrapper(res, async () => {
       body.applicationId = req.headers['tms-app-id'];
       const data = await this.repository.create(body);
+      console.log(body);
       const response = await this.repository.findOne(data._id);
       return responseWrapper({
         res,

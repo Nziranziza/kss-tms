@@ -28,7 +28,8 @@ class FarmVisitScheduleRepository extends BaseRepository {
             .populate("farms.location.dist_id", "name")
             .populate("farms.location.sect_id", "name")
             .populate("farms.location.cell_id", "name")
-            .populate("gaps");
+            .populate("gaps")
+            .populate("groupId", "groupName");
     }
 
     findOne(id) {
@@ -43,7 +44,7 @@ class FarmVisitScheduleRepository extends BaseRepository {
             .populate("groupId", "groupName");
     }
 
-    async visitStats(body) {
+    async schedulesStats(body) {
         // const { trainingId, trainerId, scheduleId } = body;
 
         // Filter statistics by different values
@@ -94,11 +95,11 @@ class FarmVisitScheduleRepository extends BaseRepository {
         return {
             maleFarmVisits,
             femaleFarmVisits,
-            totolVisits: maleFarmVisits + femaleFarmVisits,
+            totalVisits: maleFarmVisits + femaleFarmVisits,
         };
     }
 
-    farmerVisits(id) {
+    farmerScheduledVisits(id) {
         return this.model.aggregate([
             {
                 $match: {
@@ -116,25 +117,51 @@ class FarmVisitScheduleRepository extends BaseRepository {
         ]);
     }
 
-    farmVisits(id) {
+    farmScheduledVisits(body) {
         return this.model.aggregate([
             {
                 $match: {
-                    "farms.farmId": ObjectId(id),
-                },
+                    ...(body.farmId && {
+                        "farms.farmId": ObjectId(body.farmId),
+                    }),
+                    ...(body.scheduleId && {
+                        "_id": ObjectId(body.scheduleId),
+                    }),
+                    ...(body.reference && {
+                        "reference": body.reference,
+                    }),
+                    ...(body.created_at &&
+                        {
+                            "created_at": {
+                                $gte: body.created_at.from,
+                                $lt: body.created_at.to
+                            }
+                        })
+                }
             },
             {
                 $unwind: "$farms",
             },
             {
                 $match: {
-                    "farms.farmId": ObjectId(id),
+                    ...(body.farmId && {
+                        "farms.farmId": ObjectId(body.farmId),
+                    })
+                }
+
+            },
+            {
+                $lookup: {
+                    from: "evaluations",
+                    localField: "gaps",
+                    foreignField: "_id",
+                    as: "gaps",
                 },
             },
         ]);
     }
 
-    farmsVisits(body) {
+    farmsScheduledVisits(body) {
         const filter = {
             $match: {
                 ...(body.reference && {

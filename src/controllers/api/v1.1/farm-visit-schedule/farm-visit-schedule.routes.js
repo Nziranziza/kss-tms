@@ -13,11 +13,11 @@ routes.post(
 routes.put("/:id", farmVisitScheduleCtrl.update);
 routes.get("/:id", farmVisitScheduleCtrl.findOne);
 routes.post("/reference", farmVisitScheduleCtrl.find);
-routes.post("/farms/reference", farmVisitScheduleCtrl.farmsVisits);
+routes.post("/farms/reference", farmVisitScheduleCtrl.farmsScheduledVisits);
 routes.delete("/:id", farmVisitScheduleCtrl.softDelete);
-routes.post("/stats", farmVisitScheduleCtrl.visitStats);
-routes.get("/farmer/:id", farmVisitScheduleCtrl.farmerVisits);
+routes.post("/stats", farmVisitScheduleCtrl.schedulesStats);
+routes.get("/farmer/:id", farmVisitScheduleCtrl.farmerScheduledVisits);
 routes.get("/sms/:id", farmVisitScheduleCtrl.sendSMS);
-routes.get("/farm/:id", farmVisitScheduleCtrl.farmVisits);
+routes.post("/farm", farmVisitScheduleCtrl.farmScheduledVisits);
 
 module.exports.farmVisitSchedules = routes;

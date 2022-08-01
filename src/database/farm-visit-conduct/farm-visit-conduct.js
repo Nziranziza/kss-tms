@@ -43,7 +43,7 @@ const farmSchema = new Schema({
 // Farm visit schema
 const farmVisitConductSchema = new Schema({
     gap: {type: Schema.Types.ObjectId,  ref: "evaluation"},
-    scheduleId: {type: Schema.Types.ObjectId,  ref: "farm-visit-schedule"},
+    scheduleId: {type: Schema.Types.ObjectId,  ref: "farm_visit_schedule"},
     visitor: {type: ownerSchema},
     applicationId: {type: Number, required: true},
     reference: {type: String},
@@ -61,5 +61,5 @@ farmVisitConductSchema.plugin(timestamps, {
 
 farmVisitConductSchema.plugin(softDelete);
 
-const FarmVisitConduct = mongoose.model('farm-visit-conduct', farmVisitConductSchema);
+const FarmVisitConduct = mongoose.model('farm_visit_conduct', farmVisitConductSchema);
 module.exports.FarmVisitConduct = FarmVisitConduct;
