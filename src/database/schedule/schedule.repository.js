@@ -2,6 +2,7 @@ const { ObjectId } = require("mongodb");
 const BaseRepository = require("../../core/library/BaseRepository");
 const { scheduleStatus } = require("../../tools/constants");
 const { Schedule } = require("./schedule");
+const moment = require("moment");
 class ScheduleRepository extends BaseRepository {
   constructor(model) {
     super(model);
@@ -66,7 +67,25 @@ class ScheduleRepository extends BaseRepository {
 
   // Get Attendance Summary
   async attendanceSummary(body) {
-    const { trainingId, trainerId, scheduleId } = body;
+    const {
+      trainingId,
+      trainerId,
+      scheduleId,
+      referenceId,
+      location,
+      date,
+      groupId,
+    } = body;
+
+    let locSearchBy = "";
+    if (location) locSearchBy = `location.${location.searchBy}`;
+
+    let startDate = "";
+    let endDate = "";
+    if (date) {
+      startDate = moment(date.from).startOf("day").toDate();
+      endDate = moment(date.to).endOf("day").toDate();
+    }
 
     // Filter statistics by different values
     const filter = {
@@ -74,13 +93,23 @@ class ScheduleRepository extends BaseRepository {
         ...(trainingId && { trainingId: ObjectId(trainingId) }),
         ...(trainerId && { "trainer.userId": ObjectId(trainerId) }),
         ...(scheduleId && { _id: ObjectId(scheduleId) }),
-        status: scheduleStatus.HAPPENED,
+        ...(referenceId && { referenceId: ObjectId(referenceId) }),
+        ...(location && { [locSearchBy]: ObjectId(location.locationId) }),
+        ...(date && {
+          startTime: { $gte: startDate, $lt: endDate },
+        }),
       },
     };
 
     // Unwind all trainees so we can compute data
     const unwind = {
       $unwind: "$trainees",
+    };
+
+    const filterGroups = {
+      $match: {
+        ...(groupId && { "trainees.groupId": groupId }),
+      },
     };
 
     // Group by each gender and attendance
@@ -91,7 +120,7 @@ class ScheduleRepository extends BaseRepository {
           gender: "$trainees.gender",
         },
         Unique: {
-          $addToSet: "$trainees._id",
+          $addToSet: "$trainees.userId",
         },
       },
     };
@@ -110,6 +139,7 @@ class ScheduleRepository extends BaseRepository {
     const summary = await this.model.aggregate([
       filter,
       unwind,
+      filterGroups,
       group,
       project,
     ]);

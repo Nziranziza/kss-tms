@@ -1,4 +1,4 @@
-const Joi = require("joi");
+const Joi = require("joi").extend(require('@joi/date'));
 Joi.objectId = require("joi-objectid")(Joi);
 
 const validateSchedule = (data) => {
@@ -8,7 +8,7 @@ const validateSchedule = (data) => {
       userId: Joi.objectId().required(),
       fullName: Joi.string().required(),
       phoneNumber: Joi.string(),
-      organisationName: Joi.string().required()
+      organisationName: Joi.string().required(),
     }).required(),
     groupId: Joi.objectId().required(),
     referenceId: Joi.objectId().required(),
@@ -67,7 +67,18 @@ const validateStats = (data) => {
     trainingId: Joi.objectId(),
     trainerId: Joi.objectId(),
     scheduleId: Joi.objectId(),
-    location: Joi.object({})
+    referenceId: Joi.objectId(),
+    groupId: Joi.objectId(),
+    location: Joi.object({
+      searchBy: Joi.string()
+        .valid("prov_id", "dist_id", "sect_id", "cell_id", "village_id")
+        .required(),
+      locationId: Joi.objectId().required(),
+    }),
+    date: Joi.object({
+      from: Joi.date().format("YYYY-MM-DD").required(),
+      to: Joi.date().format("YYYY-MM-DD").required(),
+    }),
   });
   const { error, value } = schema.validate(data);
   if (error) {
@@ -79,7 +90,7 @@ const validateStats = (data) => {
 
 const validateFilterSchedule = (data) => {
   const schema = Joi.object({
-    date: Joi.date().format("yyyy-mm-dd")
+    date: Joi.date().format("YYYY-mm-dd"),
   });
   const { error, value } = schema.validate(data);
   if (error) {
