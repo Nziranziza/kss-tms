@@ -14,7 +14,8 @@ const ownerSchema = new Schema({
     groupName: {type: String},
     groupContactPersonNames: {type: String},
     groupContactPersonPhoneNumber: {type: String},
-    phoneNumber: {type: String}
+    phoneNumber: {type: String},
+    organisationName: {type: String}
 });
 
 const expectedDurationSchema = new Schema({
@@ -26,7 +27,8 @@ const farmSchema = new Schema({
     farmId: {type: Schema.Types.ObjectId, },
     location: { type: locationSchema, required: true },
     upiNumber: {type: String},
-    owner: {type: ownerSchema}
+    owner: {type: ownerSchema},
+    evaluatedGaps: {type: [Schema.Types.ObjectId], default: []}
 });
 
 // Farm visit schema
@@ -34,11 +36,11 @@ const farmVisitScheduleSchema = new Schema({
     gaps: {type: [Schema.Types.ObjectId],  ref: "evaluation"},
     description: {type: String, required: true},
     date: {type: Date, required: true},
-    visitor: {type: Schema.Types.ObjectId},
+    visitor:  {type: ownerSchema},
     applicationId: {type: Number, required: true},
     reference: {type: String},
     farms: {type: [farmSchema]},
-    groupId: {type: Schema.Types.ObjectId, ref: "group",  index: true},
+    groupId: {type: Schema.Types.ObjectId, ref: "group"},
     status: {type: Number},
     observation: {type: String},
     expectedDuration: {type: expectedDurationSchema}
@@ -51,5 +53,5 @@ farmVisitScheduleSchema.plugin(timestamps, {
 
 farmVisitScheduleSchema.plugin(softDelete);
 
-const FarmVisitSchedule = mongoose.model('farm-visit-schedule', farmVisitScheduleSchema);
+const FarmVisitSchedule = mongoose.model('farm_visit_schedule', farmVisitScheduleSchema);
 module.exports.FarmVisitSchedule = FarmVisitSchedule;

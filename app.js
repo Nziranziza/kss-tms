@@ -5,11 +5,17 @@ const cors = require("cors");
 const logger = require("./src/utils/logging");
 const api = require("./src/routes");
 const app = express();
-
 const mongoCon = require("./src/startup/mongo");
 const client = require("./src/startup/redisconnection");
 const { claimToken } = require("./src/services/comm.service");
 require("./src/cron");
+const appRoot = require('app-root-path');
+const fs = require('fs');
+const dir = `${appRoot}/files/downloads`;
+
+if (!fs.existsSync(dir)){
+  fs.mkdirSync(dir, { recursive: true });
+}
 
 // Disable Powered By Header
 app.disable("x-powered-by");

@@ -8,10 +8,12 @@ const ownerSchema =
         regNumber: Joi.string().label('reg number'),
         nid: Joi.string(),
         sex: Joi.string(),
+        email: Joi.string(),
         groupName: Joi.string().label('group name'),
         groupContactPersonNames: Joi.string().label('group contact person names'),
         groupContactPersonPhoneNumber: Joi.string().label('group contact person phone number'),
-        phoneNumber: Joi.string().label('phone number')
+        phoneNumber: Joi.string().label('phone number'),
+        organisationName: Joi.string().label('organisation name'),
     });
 const validateFarmVisitSchedule = scheduleData => {
     const schema = Joi.object({
@@ -53,7 +55,7 @@ const validateFarmVisitSchedule = scheduleData => {
                     owner: ownerSchema
                 })
             ),
-        visitor: Joi.objectId(),
+        visitor: ownerSchema,
         gaps: Joi.array()
             .min(1)
             .max(35)

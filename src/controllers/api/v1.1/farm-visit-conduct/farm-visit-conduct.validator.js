@@ -7,11 +7,13 @@ const ownerSchema =
         lastName: Joi.string().label('last name'),
         regNumber: Joi.string().label('reg number'),
         nid: Joi.string(),
+        email: Joi.string(),
         sex: Joi.string(),
         groupName: Joi.string().label('group name'),
         groupContactPersonNames: Joi.string().label('group contact person names'),
         groupContactPersonPhoneNumber: Joi.string().label('group contact person phone number'),
-        phoneNumber: Joi.string().label('phone number')
+        phoneNumber: Joi.string().label('phone number'),
+        organisationName: Joi.string().label('organization name'),
     });
 const validateFarmVisitConduct = visitData => {
     const schema = Joi.object({

@@ -1,10 +1,25 @@
 const BaseRepository = require("../../core/library/BaseRepository");
 const {FarmVisitConduct} = require("../farm-visit-conduct/farm-visit-conduct");
+const {
+    FarmVisitSchedule,
+} = require("../farm-visit-schedule/farm-visit-schedule");
+
 
 class FarmVisitConductRepository extends BaseRepository {
     constructor(model) {
         super(model);
     }
+
+    async create(entity) {
+        const conduct = await this.model.create(entity);
+        await FarmVisitSchedule.findOneAndUpdate({'farms.farmId': conduct.farm.farmId,
+            '_id': conduct.scheduleId}, {'$push': {
+                'farms.$.evaluatedGaps': conduct.gap
+            }
+        });
+        return conduct;
+    }
+
     find(data) {
         return super.find(data)
             .populate('farm.location.prov_id', 'namek')
