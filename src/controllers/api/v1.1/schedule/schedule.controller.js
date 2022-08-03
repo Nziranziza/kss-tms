@@ -6,6 +6,14 @@ const {
 } = require("../../../../database/schedule/schedule.repository");
 const { statusCodes } = require("../../../../utils/constants/common");
 const { sendAppSMS } = require("../../../../services/comm.service");
+const {
+  commRepo,
+} = require("../../../../database/communication/communication.repository");
+const {
+  scheduleStatus,
+  smsPurpose,
+  receptionStatus,
+} = require("../../../../tools/constants");
 
 class ScheduleController extends BaseController {
   constructor(repository) {
@@ -80,11 +88,12 @@ class ScheduleController extends BaseController {
   }
 
   sendSMS(req, res) {
-    const { params } = req;
+    const { params, body } = req;
     return asyncWrapper(res, async () => {
       const schedule = await this.repository.findOne(params.id);
 
       if (schedule) {
+        // Build SMS body
         const message = `Uruganda ${
           schedule.trainer.organisationName
         } rubatumiye mu mahugurwa ya \"${
@@ -93,46 +102,52 @@ class ScheduleController extends BaseController {
           schedule.venueName
         }`;
 
+        // Build recipients
         let recipients = [];
-
         for (const trainee of schedule.trainees) {
-          recipients.push(trainee.phoneNumber);
+          // If no phonenumber don't add user to recipients
+          if (trainee.phoneNumber) {
+            recipients.push({
+              userId: trainee.userId,
+              phoneNumber: trainee.phoneNumber,
+              status: receptionStatus.QUEUED,
+            });
+          }
         }
-
-        const data = {
-          recipients: recipients,
-          message: message,
-          sender: "SKS",
-        };
-
-        const sms = await sendAppSMS(data);
-        if (sms.data)
-          return responseWrapper({
+        // create batch in communication db
+        const batch = await commRepo.create(
+          message,
+          recipients,
+          body,
+          "SMS",
+          smsPurpose.TRAINING_INVITE
+        );
+        if (batch.status == 200) {
+          responseWrapper({
             res,
             status: statusCodes.CREATED,
-            message: sms.data.message,
-            data: sms.data.data,
+            message: batch.message,
+            data: batch.data,
           });
-        else {
+        } else {
           return responseWrapper({
             res,
-            status: statusCodes.NOT_FOUND,
-            message: "Could not send SMS to Invitees.",
+            status: statusCodes.SERVER_ERROR,
+            message: "Could not send messages",
           });
         }
-      }
-
-      return responseWrapper({
-        res,
-        status: statusCodes.NOT_FOUND,
-        message: "Schedule not found",
-      });
+      } else
+        return responseWrapper({
+          res,
+          status: statusCodes.NOT_FOUND,
+          message: "Schedule not found or no trainees Added",
+        });
     });
   }
 
   // Get Attendance Summary
   attendanceSummary(req, res) {
-    const {body} = req;
+    const { body } = req;
     return asyncWrapper(res, async () => {
       const summary = await this.repository.attendanceSummary(body);
 
