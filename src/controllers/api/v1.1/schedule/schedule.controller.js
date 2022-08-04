@@ -14,6 +14,7 @@ const {
   smsPurpose,
   receptionStatus,
 } = require("../../../../tools/constants");
+const moment = require("moment");
 
 class ScheduleController extends BaseController {
   constructor(repository) {
@@ -26,13 +27,20 @@ class ScheduleController extends BaseController {
   }
 
   findAllByRef(req, res) {
-    // const date = req.body;
+    const { from, to } = req.query;
+    let startDate = "";
+    let endDate = "";
+    if (from && to) {
+      startDate = moment(from).startOf("day").toDate();
+      endDate = moment(to).endOf("day").toDate();
+    }
+
     const body = {
       referenceId: req.params.id,
-      // startTime: {
-      //   $gte: new Date(`${date}T00:00:00.000Z`),
-      //   $lt: new Date(`${date}T00:00:00.000Z`),
-      // },
+      ...(from &&
+        to && {
+          startTime: { $gte: startDate, $lt: endDate },
+        }),
     };
     return asyncWrapper(res, async () => {
       const data = await this.repository.customFindAll(body);

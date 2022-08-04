@@ -70,8 +70,6 @@ class FarmVisitScheduleRepository extends BaseRepository {
       },
     };
 
-    console.log(filter);
-
     // Unwind all trainees so we can compute data
     const unwind = {
       $unwind: "$farms",
