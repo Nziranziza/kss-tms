@@ -8,6 +8,7 @@ const {statusCodes} = require("../../../../utils/constants/common");
 const excelJS = require("exceljs");
 const appRoot = require('app-root-path');
 const fs = require('fs');
+const CustomError = require("../../../../core/helpers/customerError");
 
 
 class GroupController extends BaseController {
@@ -63,7 +64,6 @@ class GroupController extends BaseController {
             );
             if (member) {
                 const update = await this.repository.updateMemberPhone(params.id, body);
-                console.log(update);
                 if (update)
                     return responseWrapper({
                         res,
@@ -163,7 +163,8 @@ class GroupController extends BaseController {
 
     downloadReport(req, res) {
         return asyncWrapper(res, async () => {
-            const {body} = req;
+            const {body, params} = req;
+            const type = params.type;
             const groups = await this.repository.report(body);
             const workbook = new excelJS.Workbook();
             const worksheet = workbook.addWorksheet("Groups");
@@ -172,7 +173,7 @@ class GroupController extends BaseController {
                 {header: "Group name", key: "groupName", width: 10},
                 {header: "Leader names", key: "leaderNames", width: 10},
                 {header: "Leader phone number", key: "leaderPhoneNumber", width: 10},
-                {header: "Group size", key: "Group size", width: 10},
+                {header: "Group size", key: "groupSize", width: 10},
                 {header: "Location", key: "location", width: 10}
             ];
             groups.forEach((group) => {
@@ -190,21 +191,39 @@ class GroupController extends BaseController {
             worksheet.getRow(1).eachCell((cell) => {
                 cell.font = {bold: true};
             });
-            const fileName = `${path}/${Date.now()}-groups.xlsx`;
-            await workbook.xlsx.writeFile(fileName)
-                .then(() => {
-                    const str = fs.readFileSync(fileName, {encoding: 'base64'});
-                    return responseWrapper({
-                        res,
-                        status: statusCodes.OK,
-                        message: "Success",
-                        data: {
-                            file: str,
-                            type: 'xlsx'
-                        }
+            if(type === 'xlsx') {
+                const fileName = `${path}/${Date.now()}-groups.xlsx`;
+                await workbook.xlsx.writeFile(fileName)
+                    .then(() => {
+                        const str = fs.readFileSync(fileName, {encoding: 'base64'});
+                        return responseWrapper({
+                            res,
+                            status: statusCodes.OK,
+                            message: "Success",
+                            data: {
+                                file: str,
+                                type: 'xlsx'
+                            }
+                        });
                     });
-                });
-
+            } else if(type === 'csv') {
+                const fileName = `${path}/${Date.now()}-groups.csv`;
+                await workbook.xlsx.writeFile(fileName)
+                    .then(() => {
+                        const str = fs.readFileSync(fileName, {encoding: 'base64'});
+                        return responseWrapper({
+                            res,
+                            status: statusCodes.OK,
+                            message: "Success",
+                            data: {
+                                file: str,
+                                type: 'xlsx'
+                            }
+                        });
+                    });
+            } else {
+                throw new CustomError("File type not found", statusCodes.NOT_FOUND);
+            }
         });
     }
 }

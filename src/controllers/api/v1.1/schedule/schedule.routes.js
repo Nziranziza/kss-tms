@@ -1,6 +1,7 @@
 const Router = require("express").Router;
 const { scheduleCtrl } = require("./schedule.controller");
 const validator = require("../../../../middlewares/validator");
+const {groupCtrl} = require("../group/group.controller");
 
 const routes = Router();
 
@@ -20,5 +21,8 @@ routes.post(
   validator("validateStats"),
   scheduleCtrl.attendanceSummary
 );
+routes.post('/report', scheduleCtrl.report);
+routes.post('/report/download/:type', scheduleCtrl.downloadReport);
+routes.post('/statistics', scheduleCtrl.statistics);
 
 module.exports.schedules = routes;

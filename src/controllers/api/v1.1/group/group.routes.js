@@ -10,7 +10,7 @@ routes.delete("/:id", groupCtrl.softDelete);
 routes.post("/reference", groupCtrl.find);
 routes.post('/search', groupCtrl.searchGroup);
 routes.post('/report', groupCtrl.report);
-routes.post('/report/download', groupCtrl.downloadReport);
+routes.post('/report/download/:type', groupCtrl.downloadReport);
 routes.post('/statistics', groupCtrl.statistics);
 routes.get('/', groupCtrl.findAll);
 routes.put(

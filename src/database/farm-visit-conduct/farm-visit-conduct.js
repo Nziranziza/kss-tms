@@ -23,12 +23,12 @@ const answerSchema = new Schema({
     answerId: {type: Schema.Types.ObjectId},
     selected: {type: Boolean},
     text: {type: String},
-    weight: {type: Number}
+    score: {type: Number}
 });
 
 const evaluationSchema = new Schema({
     questionId: {type: Schema.Types.ObjectId},
-    marks: {type: Number},
+    score: {type: Number},
     answers: {type: [answerSchema]}
 });
 

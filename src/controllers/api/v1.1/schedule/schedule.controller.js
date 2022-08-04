@@ -6,6 +6,10 @@ const {
 } = require("../../../../database/schedule/schedule.repository");
 const { statusCodes } = require("../../../../utils/constants/common");
 const { sendAppSMS } = require("../../../../services/comm.service");
+const excelJS = require("exceljs");
+const appRoot = require("app-root-path");
+const fs = require("fs");
+const CustomError = require("../../../../core/helpers/customerError");
 
 class ScheduleController extends BaseController {
   constructor(repository) {
@@ -14,6 +18,9 @@ class ScheduleController extends BaseController {
     this.delete = this.delete.bind(this);
     this.recordAtt = this.recordAtt.bind(this);
     this.sendSMS = this.sendSMS.bind(this);
+    this.report = this.report.bind(this);
+    this.downloadReport = this.downloadReport.bind(this);
+    this.statistics = this.statistics.bind(this);
     this.attendanceSummary = this.attendanceSummary.bind(this);
   }
 
@@ -121,7 +128,6 @@ class ScheduleController extends BaseController {
           });
         }
       }
-
       return responseWrapper({
         res,
         status: statusCodes.NOT_FOUND,
@@ -135,7 +141,6 @@ class ScheduleController extends BaseController {
     const {body} = req;
     return asyncWrapper(res, async () => {
       const summary = await this.repository.attendanceSummary(body);
-
       if (summary)
         return responseWrapper({
           res,
@@ -143,6 +148,105 @@ class ScheduleController extends BaseController {
           message: "success",
           data: summary,
         });
+    });
+  }
+
+  statistics(req, res) {
+    return asyncWrapper(res, async () => {
+      const {body} = req;
+      const schedules = await this.repository.statistics(body);
+      return responseWrapper({
+        res,
+        status: statusCodes.OK,
+        message: "Success",
+        data: schedules,
+      });
+
+    });
+  }
+
+  report(req, res) {
+    return asyncWrapper(res, async () => {
+      const {body} = req;
+      const schedules = await this.repository.report(body);
+      return responseWrapper({
+        res,
+        status: statusCodes.OK,
+        message: "Success",
+        data: schedules,
+      });
+    });
+  }
+
+  downloadReport(req, res) {
+    return asyncWrapper(res, async () => {
+      const {body, params} = req;
+      const type = params.type;
+      const schedules = await this.repository.report(body);
+      const workbook = new excelJS.Workbook();
+      const worksheet = workbook.addWorksheet("Schedules");
+      const path = `${appRoot}/files/downloads`;
+      worksheet.columns = [
+        {header: "Date added", key: "created_at", width: 10},
+        {header: "Firstname", key: "foreName", width: 10},
+        {header: "Lastname", key: "surname", width: 10},
+        {header: "Gender", key: "gender", width: 10},
+        {header: "Training title", key: "trainingName", width: 10},
+        {header: "Date of the training", key: "startTime", width: 10},
+        {header: "Venue", key: "venue", width: 10},
+        {header: "Attended", key: "attendance", width: 10},
+        {header: "Status", key: "status", width: 10}
+      ];
+      schedules.forEach((schedule) => {
+        worksheet.addRow({
+          created_at: schedule.created_at,
+          foreName: schedule.trainees.foreName,
+          surname: schedule.trainees.surname,
+          gender: schedule.trainees.gender,
+          trainingName: schedule.trainingId.trainingName,
+          startTime: schedule.startTime,
+          venue: schedule.venue,
+          attended: schedule.trainees.attended,
+          status: schedule.status
+        });
+      });
+      worksheet.getRow(1).eachCell((cell) => {
+        cell.font = {bold: true};
+      });
+
+      if(type === 'xlsx') {
+        const fileName = `${path}/${Date.now()}-trainings.xlsx`;
+        await workbook.xlsx.writeFile(fileName)
+            .then(() => {
+              const str = fs.readFileSync(fileName, {encoding: 'base64'});
+              return responseWrapper({
+                res,
+                status: statusCodes.OK,
+                message: "Success",
+                data: {
+                  file: str,
+                  type: 'xlsx'
+                }
+              });
+            });
+      } else if (type === 'csv') {
+        const fileName = `${path}/${Date.now()}-trainings.csv`;
+        await workbook.csv.writeFile(fileName)
+            .then(() => {
+              const str = fs.readFileSync(fileName, {encoding: 'base64'});
+              return responseWrapper({
+                res,
+                status: statusCodes.OK,
+                message: "Success",
+                data: {
+                  file: str,
+                  type: 'csv'
+                }
+              });
+            });
+      } else {
+        throw new CustomError("File type not found", statusCodes.NOT_FOUND);
+      }
     });
   }
 }

@@ -10,7 +10,7 @@ const asyncWrapper = async (res, callback) => {
     logger.error(error.message, error);
     return responseWrapper({
       res,
-      status: statusCodes.SERVER_ERROR,
+      status: error.status,
       message: error.message
     });
   }

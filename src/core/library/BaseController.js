@@ -2,7 +2,6 @@ const responseWrapper = require('../helpers/responseWrapper');
 const asyncWrapper = require('../helpers/asyncWrapper');
 const CustomError = require('../helpers/customerError');
 const { statusCodes } = require('../../utils/constants/common');
-const {response} = require("express");
 
 class BaseController {
   constructor(repository) {
@@ -95,7 +94,7 @@ class BaseController {
       return responseWrapper({
         res,
         status: statusCodes.OK,
-        message: "Success",
+        message: "Record successfully removed",
       });
     });
   }
