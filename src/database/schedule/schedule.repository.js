@@ -65,6 +65,21 @@ class ScheduleRepository extends BaseRepository {
     return schedule.save();
   }
 
+    // edit Attendance scheduled training
+    editAtt(schedule, data) {
+      schedule.trainees.forEach(async (trainee) => {
+        const traineeStatus = data.trainees.find(
+          (b) => b._id === trainee._id.toString()
+        );
+        if (traineeStatus && traineeStatus.attended === true) {
+          trainee.attended = true;
+        } else trainee.attended = false;
+      });
+      schedule.notes = data.notes;
+      schedule.lastUpdatedBy = data.lastUpdatedBy;
+      return schedule.save();
+    }
+
   // Get Attendance Summary
   async attendanceSummary(body) {
     const {

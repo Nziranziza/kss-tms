@@ -13,6 +13,7 @@ const {
   scheduleStatus,
   smsPurpose,
   receptionStatus,
+  attendanceStatus,
 } = require("../../../../tools/constants");
 const moment = require("moment");
 
@@ -22,6 +23,7 @@ class ScheduleController extends BaseController {
     this.findAllByRef = this.findAllByRef.bind(this);
     this.delete = this.delete.bind(this);
     this.recordAtt = this.recordAtt.bind(this);
+    this.editAtt = this.editAtt.bind(this);
     this.sendSMS = this.sendSMS.bind(this);
     this.attendanceSummary = this.attendanceSummary.bind(this);
   }
@@ -70,7 +72,7 @@ class ScheduleController extends BaseController {
     const { params, body } = req;
     return asyncWrapper(res, async () => {
       const schedule = await this.repository.findOne(params.id);
-      if (schedule) {
+      if (schedule && schedule.status === scheduleStatus.PENDING) {
         const attendance = await this.repository.recordAtt(schedule, body);
         if (attendance)
           return responseWrapper({
@@ -84,6 +86,35 @@ class ScheduleController extends BaseController {
             res,
             status: statusCodes.SERVER_ERROR,
             message: "Could not record attendance.",
+            data: attendance,
+          });
+      }
+      return responseWrapper({
+        res,
+        status: statusCodes.NOT_FOUND,
+        message: "Schedule not found or schedule attendance already recorded.",
+      });
+    });
+  }
+
+  editAtt(req, res){
+    const { params, body } = req;
+    return asyncWrapper(res, async () => {
+      const schedule = await this.repository.findOne(params.id);
+      if (schedule) {
+        const attendance = await this.repository.editAtt(schedule, body);
+        if (attendance)
+          return responseWrapper({
+            res,
+            status: statusCodes.OK,
+            message: "Updated attendance successfully",
+            data: attendance,
+          });
+        else
+          return responseWrapper({
+            res,
+            status: statusCodes.SERVER_ERROR,
+            message: "Could not update attendance.",
             data: attendance,
           });
       }
