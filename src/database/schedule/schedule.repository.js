@@ -10,7 +10,7 @@ class ScheduleRepository extends BaseRepository {
 
     findGroupSchedule(groupId, trainingId) {
         return super
-            .cFindOne({groupId, trainingId})
+            .cFindOne({ groupId, trainingId })
             .populate("trainingId", "trainingName")
             .populate("groupId", "groupName")
             .populate("location.prov_id", "namek")
@@ -21,7 +21,7 @@ class ScheduleRepository extends BaseRepository {
     }
 
     findMemberAttendance(userId, trainingId) {
-        return super.customFindAll({"trainee.userId": userId});
+        return super.customFindAll({ "trainee.userId": userId });
     }
 
     customFindAll(data) {
@@ -38,7 +38,7 @@ class ScheduleRepository extends BaseRepository {
 
     findOne(id) {
         return this.model
-            .findOne({_id: id})
+            .findOne({ _id: id })
             .populate("trainingId", "trainingName")
             .populate("groupId", "groupName")
             .populate("location.prov_id", "namek")
@@ -67,21 +67,49 @@ class ScheduleRepository extends BaseRepository {
 
     // Get Attendance Summary
     async attendanceSummary(body) {
-        const {trainingId, trainerId, scheduleId} = body;
+        const {
+            trainingId,
+            trainerId,
+            scheduleId,
+            referenceId,
+            location,
+            date,
+            groupId,
+        } = body;
+
+        let locSearchBy = "";
+        if (location) locSearchBy = `location.${location.searchBy}`;
+
+        let startDate = "";
+        let endDate = "";
+        if (date) {
+            startDate = moment(date.from).startOf("day").toDate();
+            endDate = moment(date.to).endOf("day").toDate();
+        }
 
         // Filter statistics by different values
         const filter = {
             $match: {
-                ...(trainingId && {trainingId: ObjectId(trainingId)}),
-                ...(trainerId && {"trainer.userId": ObjectId(trainerId)}),
-                ...(scheduleId && {_id: ObjectId(scheduleId)}),
-                status: scheduleStatus.HAPPENED,
+                ...(trainingId && { trainingId: ObjectId(trainingId) }),
+                ...(trainerId && { "trainer.userId": ObjectId(trainerId) }),
+                ...(scheduleId && { _id: ObjectId(scheduleId) }),
+                ...(referenceId && { referenceId: ObjectId(referenceId) }),
+                ...(location && { [locSearchBy]: ObjectId(location.locationId) }),
+                ...(date && {
+                    startTime: { $gte: startDate, $lt: endDate },
+                }),
             },
         };
 
         // Unwind all trainees so we can compute data
         const unwind = {
             $unwind: "$trainees",
+        };
+
+        const filterGroups = {
+            $match: {
+                ...(groupId && { "trainees.groupId": groupId }),
+            },
         };
 
         // Group by each gender and attendance
@@ -92,7 +120,7 @@ class ScheduleRepository extends BaseRepository {
                     gender: "$trainees.gender",
                 },
                 Unique: {
-                    $addToSet: "$trainees._id",
+                    $addToSet: "$trainees.userId",
                 },
             },
         };
@@ -103,7 +131,7 @@ class ScheduleRepository extends BaseRepository {
                 _id: 0,
                 absence: "$_id.absence",
                 gender: "$_id.gender",
-                unique: {$size: "$Unique"},
+                unique: { $size: "$Unique" },
             },
         };
 
@@ -111,6 +139,7 @@ class ScheduleRepository extends BaseRepository {
         const summary = await this.model.aggregate([
             filter,
             unwind,
+            filterGroups,
             group,
             project,
         ]);

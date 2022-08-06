@@ -15,7 +15,7 @@ routes.post(
 );
 routes.post("/reference/:id", scheduleCtrl.findAllByRef);
 routes.delete("/:id", scheduleCtrl.delete);
-routes.get("/sms/:id", scheduleCtrl.sendSMS);
+routes.post("/sms/:id", scheduleCtrl.sendSMS);
 routes.post(
   "/stats",
   validator("validateStats"),

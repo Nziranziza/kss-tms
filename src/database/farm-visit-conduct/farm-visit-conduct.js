@@ -26,10 +26,17 @@ const answerSchema = new Schema({
     score: {type: Number}
 });
 
-const evaluationSchema = new Schema({
+const questionSchema = new Schema({
     questionId: {type: Schema.Types.ObjectId},
     score: {type: Number},
+    selected: {type: Boolean},
+    text: {type: String},
     answers: {type: [answerSchema]}
+});
+
+const sectionSchema = new Schema({
+    sectionId: {type: Schema.Types.ObjectId},
+    questions: {type: [questionSchema]}
 });
 
 
@@ -46,11 +53,13 @@ const farmVisitConductSchema = new Schema({
     scheduleId: {type: Schema.Types.ObjectId,  ref: "farm_visit_schedule"},
     visitor: {type: ownerSchema},
     applicationId: {type: Number, required: true},
+    overall_score: {type: Number, required: true},
+    overall_weight: {type: Number, required: true},
     reference: {type: String},
     farm: {type: farmSchema},
     owner: {type: ownerSchema},
     groupId: {type: Schema.Types.ObjectId, ref: "group"},
-    evaluation: {type: [evaluationSchema]},
+    evaluation: {type: [sectionSchema]},
     status: {type: Number}
 });
 

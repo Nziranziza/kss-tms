@@ -5,21 +5,33 @@ const softDelete = require("../plugins/soft-delete");
 
 const ANSWER = new mongoose.Schema({
   answer: { type: String, required: false },
-  weight: { type: Number, required: false },
+  description: { type: String },
+  weight: { type: Number },
+  is_not_applicable: { type: Boolean, default: false },
 });
 
 const QUESTIONS = new mongoose.Schema({
   question: { type: String, required: true },
-  answerType: { type: String, required: true },
+  description: { type: String },
+  question_type: { type: String, required: true },
+  weight: { type: Number },
   answers: { type: [ANSWER], required: false },
-  marks: { type: Number, required: false },
+  is_not_applicable: { type: Boolean, default: false },
+});
+
+const SECTIONS = new mongoose.Schema({
+  section_name: { type: String, required: true },
+  questions: { type: [QUESTIONS], required: false },
 });
 
 // Evaluation schema
 const evaluationSchema = new Schema({
-  name: { type: String },
-  description: { type: String },
-  questions: { type: [QUESTIONS], required: true },
+  gap_name: { type: String, required: true },
+  gap_weight: { type: Number, required: true },
+  gap_score: { type: Number, required: true },
+  picture_text: { type: String, required: true },
+  sections: { type: [SECTIONS], required: true },
+  status: {type: String, default: 'active'},
   applicationId: { type: Number, required: true },
 });
 

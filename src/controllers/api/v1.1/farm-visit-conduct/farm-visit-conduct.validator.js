@@ -47,6 +47,7 @@ const validateFarmVisitConduct = visitData => {
         gap: Joi.objectId()
             .required()
             .label('gap'),
+        overall_score: Joi.number(),
         reference: Joi.string().trim(),
         groupId: Joi.objectId()
             .required()
@@ -54,16 +55,21 @@ const validateFarmVisitConduct = visitData => {
         scheduleId: Joi.objectId(),
         evaluation: Joi.array().items(
             Joi.object({
-                questionId: Joi.objectId(),
-                marks: Joi.number(),
-                answers: Joi.array().items(
-                    Joi.object({
-                        answerId: Joi.string(),
-                        selected: Joi.boolean(),
-                        text: Joi.string(),
-                        weight: Joi.number()
-                    })
-                )
+                sectionId: Joi.objectId(),
+                questions: Joi.array().items({
+                    questionId: Joi.objectId(),
+                    score: Joi.number(),
+                    selected: Joi.boolean(),
+                    text: Joi.string(),
+                    answers: Joi.array().items(
+                        Joi.object({
+                            answerId: Joi.string(),
+                            selected: Joi.boolean(),
+                            text: Joi.string(),
+                            score: Joi.number()
+                        })
+                    )
+                })
             })
         )
 

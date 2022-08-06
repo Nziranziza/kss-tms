@@ -3,6 +3,9 @@ const {FarmVisitConduct} = require("../farm-visit-conduct/farm-visit-conduct");
 const {
     FarmVisitSchedule,
 } = require("../farm-visit-schedule/farm-visit-schedule");
+const {
+    evaluationRepository
+} = require("../evaluation/evaluation.repository");
 const {ObjectId} = require("mongodb");
 
 
@@ -12,6 +15,15 @@ class FarmVisitConductRepository extends BaseRepository {
     }
 
     async create(entity) {
+        let score = 0;
+        entity.evaluation.forEach((evaluation) => {
+            evaluation.questions.forEach((question) => {
+                score = score + question.score;
+            });
+        });
+        const gap = await evaluationRepository.findById(entity.gap);
+        entity.overall_score = (gap.weight/100)*score;
+        entity.overall_weight = gap.weight;
         const conduct = await this.model.create(entity);
         await FarmVisitSchedule.findOneAndUpdate({'farms.farmId': conduct.farm.farmId,
             '_id': conduct.scheduleId}, {'$push': {
@@ -80,27 +92,23 @@ class FarmVisitConductRepository extends BaseRepository {
                     }
                 }
             },
-            {
-                $unwind: "$trainees"
-            }
         ];
         const filter = {
             $match: {
-                ...(body.location && body.location.prov_id && {'groupId.location.prov_id': ObjectId(body.location.prov_id)}),
-                ...(body.location && body.location.dist_id && {'groupId.location.dist_id': ObjectId(body.location.dist_id)}),
-                ...(body.location && body.location.sect_id && {'groupId.location.sect_id': ObjectId(body.location.sect_id)}),
-                ...(body.location && body.location.cell_id && {'groupId.location.cell_id': ObjectId(body.location.cell_id)}),
-                ...(body.location && body.location.village_id && {'groupId.location.village_id': ObjectId(body.location.village_id)}),
+                ...(body.location && body.location.prov_id && {'farmId.location.prov_id': ObjectId(body.location.prov_id)}),
+                ...(body.location && body.location.dist_id && {'farmId.location.dist_id': ObjectId(body.location.dist_id)}),
+                ...(body.location && body.location.sect_id && {'farmId.location.sect_id': ObjectId(body.location.sect_id)}),
+                ...(body.location && body.location.cell_id && {'farmId.location.cell_id': ObjectId(body.location.cell_id)}),
+                ...(body.location && body.location.village_id && {'farmId.location.village_id': ObjectId(body.location.village_id)}),
                 ...(body.reference && {'reference': body.reference}),
-                ...(body.trainingId && {'trainingId': body.trainingId}),
-                ...(body.trainerId && {'trainer.userId': body.trainerId}),
+                ...(body.scheduleId && {'scheduleId': body.scheduleId}),
                 ...({'isDeleted': false})
             }
         };
         const group = {
             $group: {
                 _id: null,
-                numberOfTrainees: {$sum: 1},
+                numberOfVisits: {$sum: 1},
                 numberOfAttendedTrainees: {
                     $sum: {
                         $cond: {
