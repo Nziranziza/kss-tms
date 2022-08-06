@@ -4,6 +4,7 @@ const {scheduleStatus} = require("../../tools/constants");
 const {Schedule} = require("./schedule");
 
 class ScheduleRepository extends BaseRepository {
+<<<<<<< HEAD
     constructor(model) {
         super(model);
     }
@@ -169,6 +170,104 @@ class ScheduleRepository extends BaseRepository {
             totalPresent: malePresent + femalePresent,
             totalInvitees: femaleAbsent + femalePresent + maleAbsent + malePresent,
         };
+=======
+  constructor(model) {
+    super(model);
+  }
+
+  findGroupSchedule(groupId, trainingId) {
+    return super
+      .cFindOne({ groupId, trainingId })
+      .populate("trainingId", "trainingName")
+      .populate("groupId", "groupName")
+      .populate("location.prov_id", "namek")
+      .populate("location.dist_id", "name")
+      .populate("location.sect_id", "name")
+      .populate("location.cell_id", "name")
+      .populate("location.village_id", "name");
+  }
+
+  findMemberAttendance(userId, trainingId) {
+    return super.customFindAll({ "trainee.userId": userId });
+  }
+
+  customFindAll(data) {
+    return this.model
+      .find(data)
+      .populate("trainingId", "trainingName")
+      .populate("groupId", "groupName")
+      .populate("location.prov_id", "namek")
+      .populate("location.dist_id", "name")
+      .populate("location.sect_id", "name")
+      .populate("location.cell_id", "name")
+      .populate("location.village_id", "name");
+  }
+
+  findOne(id) {
+    return this.model
+      .findOne({ _id: id })
+      .populate("trainingId", "trainingName")
+      .populate("groupId", "groupName")
+      .populate("location.prov_id", "namek")
+      .populate("location.dist_id", "name")
+      .populate("location.sect_id", "name")
+      .populate("location.cell_id", "name")
+      .populate("location.village_id", "name");
+  }
+
+  // Record Attendance scheduled training
+  recordAtt(schedule, data) {
+    // Loop through every trainne, determine status and update accordingly
+    schedule.trainees.forEach(async (trainee) => {
+      const traineeStatus = data.trainees.find(
+        (b) => b._id === trainee._id.toString()
+      );
+      if (traineeStatus && traineeStatus.attended === true) {
+        trainee.attended = true;
+      } else trainee.attended = false;
+    });
+    schedule.notes = data.notes;
+    // Since Attendance is recored change schedulled attendance to Happened
+    schedule.status = scheduleStatus.HAPPENED;
+    return schedule.save();
+  }
+
+    // edit Attendance scheduled training
+    editAtt(schedule, data) {
+      schedule.trainees.forEach(async (trainee) => {
+        const traineeStatus = data.trainees.find(
+          (b) => b._id === trainee._id.toString()
+        );
+        if (traineeStatus && traineeStatus.attended === true) {
+          trainee.attended = true;
+        } else trainee.attended = false;
+      });
+      schedule.notes = data.notes;
+      schedule.lastUpdatedBy = data.lastUpdatedBy;
+      return schedule.save();
+    }
+
+  // Get Attendance Summary
+  async attendanceSummary(body) {
+    const {
+      trainingId,
+      trainerId,
+      scheduleId,
+      referenceId,
+      location,
+      date,
+      groupId,
+    } = body;
+
+    let locSearchBy = "";
+    if (location) locSearchBy = `location.${location.searchBy}`;
+
+    let startDate = "";
+    let endDate = "";
+    if (date) {
+      startDate = moment(date.from).startOf("day").toDate();
+      endDate = moment(date.to).endOf("day").toDate();
+>>>>>>> 8089b75441b2fc4b5e6c427a795a84521e36ad8a
     }
 
 

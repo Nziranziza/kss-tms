@@ -5,11 +5,17 @@ class EvaluationRepository extends BaseRepository {
     super(model);
   }
 
-  async evaluationStats(body){
+  async evaluationStats(body) {
     const evaluations = await this.model.find(body);
-    return evaluations.map(element => {
-      const { _id, name, isDeleted } = element;
-      return {_id, name, adoptionRate: 50, isDeleted}
+    return evaluations.map((element) => {
+      const { _id, gap_name, isDeleted } = element;
+      return {
+        _id,
+        gap_name,
+        adoptionRate: 50,
+        baselineRate: Math.floor(Math.random() * 10),
+        isDeleted,
+      };
     });
   }
 }

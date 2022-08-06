@@ -14,13 +14,18 @@ const {
     commRepo,
 } = require("../../../../database/communication/communication.repository");
 const {
+
     scheduleStatus,
     smsPurpose,
     receptionStatus,
+    attendanceStatus,
+
 } = require("../../../../tools/constants");
+const moment = require("moment");
 
 
 class ScheduleController extends BaseController {
+
     constructor(repository) {
         super(repository);
         this.findAllByRef = this.findAllByRef.bind(this);
@@ -33,14 +38,22 @@ class ScheduleController extends BaseController {
         this.attendanceSummary = this.attendanceSummary.bind(this);
     }
 
+
     findAllByRef(req, res) {
-        // const date = req.body;
+        const {from, to} = req.query;
+        let startDate = "";
+        let endDate = "";
+        if (from && to) {
+            startDate = moment(from).startOf("day").toDate();
+            endDate = moment(to).endOf("day").toDate();
+        }
+
         const body = {
             referenceId: req.params.id,
-            // startTime: {
-            //   $gte: new Date(`${date}T00:00:00.000Z`),
-            //   $lt: new Date(`${date}T00:00:00.000Z`),
-            // },
+            ...(from &&
+                to && {
+                    startTime: {$gte: startDate, $lt: endDate},
+                }),
         };
         return asyncWrapper(res, async () => {
             const data = await this.repository.customFindAll(body);
@@ -52,6 +65,7 @@ class ScheduleController extends BaseController {
             });
         });
     }
+
 
     delete(req, res) {
         return asyncWrapper(res, async () => {
@@ -70,7 +84,7 @@ class ScheduleController extends BaseController {
         const {params, body} = req;
         return asyncWrapper(res, async () => {
             const schedule = await this.repository.findOne(params.id);
-            if (schedule) {
+            if (schedule && schedule.status === scheduleStatus.PENDING) {
                 const attendance = await this.repository.recordAtt(schedule, body);
                 if (attendance)
                     return responseWrapper({
@@ -90,10 +104,40 @@ class ScheduleController extends BaseController {
             return responseWrapper({
                 res,
                 status: statusCodes.NOT_FOUND,
+                message: "Schedule not found or schedule attendance already recorded.",
+            });
+        });
+    }
+
+    editAtt(req, res) {
+        const {params, body} = req;
+        return asyncWrapper(res, async () => {
+            const schedule = await this.repository.findOne(params.id);
+            if (schedule) {
+                const attendance = await this.repository.editAtt(schedule, body);
+                if (attendance)
+                    return responseWrapper({
+                        res,
+                        status: statusCodes.OK,
+                        message: "Updated attendance successfully",
+                        data: attendance,
+                    });
+                else
+                    return responseWrapper({
+                        res,
+                        status: statusCodes.SERVER_ERROR,
+                        message: "Could not update attendance.",
+                        data: attendance,
+                    });
+            }
+            return responseWrapper({
+                res,
+                status: statusCodes.NOT_FOUND,
                 message: "Schedule not found",
             });
         });
     }
+
 
     sendSMS(req, res) {
         const {params, body} = req;

@@ -27,9 +27,10 @@ class GroupRepository extends BaseRepository {
     }
 
     searchGroup(name) {
+        const regex = new RegExp(["^", name, "$"].join(""), "i");
         return this.model
             .findOne({
-                groupName: {$regex: name, $options: "i"},
+                groupName: regex
             })
             .populate("location.prov_id", "namek")
             .populate("location.dist_id", "name")

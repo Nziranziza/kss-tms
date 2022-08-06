@@ -13,7 +13,9 @@ const {
 } = require("../trainings/trainings.validator");
 const {
     validateSchedule,
+    validateUpdateSchedule,
     validateRecordAtt,
+    validateEditAtt,
     validateStats,
     validateFilterSchedule
 } = require("../schedule/schedule.validator");
@@ -38,7 +40,9 @@ module.exports = {
     validateSchedule,
     validateGetMemberAttendance,
     validateRecordAtt,
+    validateEditAtt,
     validateStats,
     validateFilterSchedule,
-    validateVisitStats
+    validateVisitStats,
+    validateUpdateSchedule
 };

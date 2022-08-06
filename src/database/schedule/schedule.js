@@ -20,7 +20,7 @@ const TRAINER = new mongoose.Schema({
   userId: { type: Schema.Types.ObjectId, required: true },
   fullName: { type: String, required: true },
   phoneNumber: { type: String },
-  organisationName: {type: String, required: true}
+  organisationName: { type: String, required: true },
 });
 
 // schedule schema
@@ -35,7 +35,8 @@ const scheduleSchema = new Schema({
   startTime: { type: Date, required: true },
   endTime: { type: Date, required: true },
   trainees: { type: [TRAINEE], required: true },
-  notes: {type: String},
+  notes: { type: String },
+  lastUpdatedBy: { type: TRAINER },
   status: { type: String, default: scheduleStatus.PENDING, required: true },
   applicationId: { type: Number, required: true },
 });
