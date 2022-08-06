@@ -21,12 +21,16 @@ class FarmVisitConductRepository extends BaseRepository {
                 score = score + question.score;
             });
         });
-        const gap = await evaluationRepository.findById(entity.gap);
-        entity.overall_score = (gap.weight/100)*score;
-        entity.overall_weight = gap.weight;
+        const gap = await evaluationRepository.findOne(entity.gap);
+        entity.overall_score = (gap.gap_weight / 100) * score;
+        entity.overall_weight = gap.gap_weight;
+        console.log(entity);
         const conduct = await this.model.create(entity);
-        await FarmVisitSchedule.findOneAndUpdate({'farms.farmId': conduct.farm.farmId,
-            '_id': conduct.scheduleId}, {'$push': {
+        await FarmVisitSchedule.findOneAndUpdate({
+            'farms.farmId': conduct.farm.farmId,
+            '_id': conduct.scheduleId
+        }, {
+            '$push': {
                 'farms.$.evaluatedGaps': conduct.gap
             }
         });
@@ -44,6 +48,7 @@ class FarmVisitConductRepository extends BaseRepository {
             .populate('groupId')
             .populate('scheduleId');
     }
+
     findAll() {
         return super.findAll()
             .populate('farm.location.prov_id', 'namek')
@@ -55,6 +60,7 @@ class FarmVisitConductRepository extends BaseRepository {
             .populate('groupId')
             .populate('scheduleId');
     }
+
     findOne(id) {
         return super.findOne(id)
             .populate('farm.location.prov_id', 'namek')
@@ -69,14 +75,37 @@ class FarmVisitConductRepository extends BaseRepository {
     }
 
     statistics(body) {
-        const preFilter = [
-            {
-                $match: {
-                    ...(body.groupId && {
-                        "groupId": ObjectId(body.groupId),
-                    })
-                }
+
+        const filter = {
+            $match: {
+                ...(body.location && body.location.prov_id && {'farm.location.prov_id': ObjectId(body.location.prov_id)}),
+                ...(body.location && body.location.dist_id && {'farm.location.dist_id': ObjectId(body.location.dist_id)}),
+                ...(body.location && body.location.sect_id && {'farm.location.sect_id': ObjectId(body.location.sect_id)}),
+                ...(body.location && body.location.cell_id && {'farm.location.cell_id': ObjectId(body.location.cell_id)}),
+                ...(body.location && body.location.village_id && {'farm.location.village_id': ObjectId(body.location.village_id)}),
+                ...(body.reference && {'reference': body.reference}),
+                ...(body.scheduleId && {'scheduleId': body.scheduleId}),
+                ...(body.groupId && {'groupId': body.groupId}),
+                ...({'isDeleted': false})
+            }
+        };
+        const group = {
+            $group: {
+                _id: null,
+                numberOfFarmVisits: {$sum: 1},
             },
+        };
+        const visits = {
+            $project: {
+                numberOfFarmVisits: 1,
+                _id: 0,
+            },
+        };
+        return this.model.aggregate([filter, group, visits]);
+    }
+
+    report(body) {
+        const lookup = [
             {
                 $lookup: {
                     from: "groups",
@@ -92,162 +121,96 @@ class FarmVisitConductRepository extends BaseRepository {
                     }
                 }
             },
+            {
+                $lookup: {
+                    from: 'provinces',
+                    localField: 'location.prov_id',
+                    foreignField: '_id',
+                    as: 'location.prov_id'
+                }
+            },
+            {
+                $addFields: {
+                    'location.prov_id': {
+                        $arrayElemAt: ['$location.prov_id', 0]
+                    }
+                }
+            },
+            {
+                $lookup: {
+                    from: 'districts',
+                    localField: 'location.dist_id',
+                    foreignField: '_id',
+                    as: 'location.dist_id'
+                }
+            },
+            {
+                $addFields: {
+                    'location.dist_id': {
+                        $arrayElemAt: ['$location.dist_id', 0]
+                    }
+                }
+            },
+            {
+                $lookup: {
+                    from: 'sectors',
+                    localField: 'location.sect_id',
+                    foreignField: '_id',
+                    as: 'location.sect_id'
+                }
+            },
+            {
+                $addFields: {
+                    'location.sect_id': {
+                        $arrayElemAt: ['$location.sect_id', 0]
+                    }
+                }
+            },
+            {
+                $lookup: {
+                    from: 'cells',
+                    localField: 'location.cell_id',
+                    foreignField: '_id',
+                    as: 'location.cell_id'
+                }
+            },
+            {
+                $addFields: {
+                    'location.cell_id': {
+                        $arrayElemAt: ['$location.cell_id', 0]
+                    }
+                }
+            },
+            {
+                $lookup: {
+                    from: 'villages',
+                    localField: 'location.village_id',
+                    foreignField: '_id',
+                    as: 'location.village_id'
+                }
+            },
+            {
+                $addFields: {
+                    'location.village_id': {
+                        $arrayElemAt: ['$location.village_id', 0]
+                    }
+                }
+            }
         ];
         const filter = {
             $match: {
-                ...(body.location && body.location.prov_id && {'farmId.location.prov_id': ObjectId(body.location.prov_id)}),
-                ...(body.location && body.location.dist_id && {'farmId.location.dist_id': ObjectId(body.location.dist_id)}),
-                ...(body.location && body.location.sect_id && {'farmId.location.sect_id': ObjectId(body.location.sect_id)}),
-                ...(body.location && body.location.cell_id && {'farmId.location.cell_id': ObjectId(body.location.cell_id)}),
-                ...(body.location && body.location.village_id && {'farmId.location.village_id': ObjectId(body.location.village_id)}),
+                ...(body.location && body.location.prov_id && {'farm.location.prov_id': ObjectId(body.location.prov_id)}),
+                ...(body.location && body.location.dist_id && {'farm.location.dist_id': ObjectId(body.location.dist_id)}),
+                ...(body.location && body.location.sect_id && {'farm.location.sect_id': ObjectId(body.location.sect_id)}),
+                ...(body.location && body.location.cell_id && {'farm.location.cell_id': ObjectId(body.location.cell_id)}),
+                ...(body.location && body.location.village_id && {'farm.location.village_id': ObjectId(body.location.village_id)}),
                 ...(body.reference && {'reference': body.reference}),
                 ...(body.scheduleId && {'scheduleId': body.scheduleId}),
+                ...(body.groupId && {'groupId': body.groupId}),
                 ...({'isDeleted': false})
             }
         };
-        const group = {
-            $group: {
-                _id: null,
-                numberOfVisits: {$sum: 1},
-                numberOfAttendedTrainees: {
-                    $sum: {
-                        $cond: {
-                            if: "$trainees.attended",
-                            then: 1,
-                            else: 0,
-                        },
-                    },
-                },
-            },
-        };
-        const trainees = {
-            $project: {
-                numberOfTrainees: 1,
-                numberOfAttendedTrainees: 1,
-                _id: 0,
-            },
-        };
-        return this.model.aggregate(preFilter.concat([filter, group, trainees]));
-    }
-
-    report(body) {
-        const preFilter = [
-                {
-                    $match: {
-                        ...
-                            (body.groupId && {
-                                "groupId": ObjectId(body.groupId),
-                            })
-                    }
-                },
-                {
-                    $lookup: {
-                        from: "groups",
-                        localField: "groupId",
-                        foreignField: "_id",
-                        as: "groupId",
-                    }
-                },
-                {
-                    $addFields: {
-                        'groupId': {
-                            $arrayElemAt: ['$groupId', 0]
-                        }
-                    }
-                },
-                {
-                    $lookup: {
-                        from: 'provinces',
-                        localField: 'location.prov_id',
-                        foreignField: '_id',
-                        as: 'location.prov_id'
-                    }
-                },
-                {
-                    $addFields: {
-                        'location.prov_id': {
-                            $arrayElemAt: ['$location.prov_id', 0]
-                        }
-                    }
-                },
-                {
-                    $lookup: {
-                        from: 'districts',
-                        localField: 'location.dist_id',
-                        foreignField: '_id',
-                        as: 'location.dist_id'
-                    }
-                },
-                {
-                    $addFields: {
-                        'location.dist_id': {
-                            $arrayElemAt: ['$location.dist_id', 0]
-                        }
-                    }
-                },
-                {
-                    $lookup: {
-                        from: 'sectors',
-                        localField: 'location.sect_id',
-                        foreignField: '_id',
-                        as: 'location.sect_id'
-                    }
-                },
-                {
-                    $addFields: {
-                        'location.sect_id': {
-                            $arrayElemAt: ['$location.sect_id', 0]
-                        }
-                    }
-                },
-                {
-                    $lookup: {
-                        from: 'cells',
-                        localField: 'location.cell_id',
-                        foreignField: '_id',
-                        as: 'location.cell_id'
-                    }
-                },
-                {
-                    $addFields: {
-                        'location.cell_id': {
-                            $arrayElemAt: ['$location.cell_id', 0]
-                        }
-                    }
-                },
-                {
-                    $lookup: {
-                        from: 'villages',
-                        localField: 'location.village_id',
-                        foreignField: '_id',
-                        as: 'location.village_id'
-                    }
-                },
-                {
-                    $addFields: {
-                        'location.village_id': {
-                            $arrayElemAt: ['$location.village_id', 0]
-                        }
-                    }
-                },
-                {
-                    $unwind: "$trainees"
-                },
-            ];
-        const filter = {
-                $match: {
-                    ...(body.location && body.location.prov_id && {'groupId.location.prov_id': ObjectId(body.location.prov_id)}),
-                    ...(body.location && body.location.dist_id && {'groupId.location.dist_id': ObjectId(body.location.dist_id)}),
-                    ...(body.location && body.location.sect_id && {'groupId.location.sect_id': ObjectId(body.location.sect_id)}),
-                    ...(body.location && body.location.cell_id && {'groupId.location.cell_id': ObjectId(body.location.cell_id)}),
-                    ...(body.location && body.location.village_id && {'groupId.location.village_id': ObjectId(body.location.village_id)}),
-                    ...(body.reference && {'reference': body.reference}),
-                    ...(body.trainingId && {'trainingId': body.trainingId}),
-                    ...(body.trainerId && {'trainer.userId': body.trainerId}),
-                    ...({'isDeleted': false})
-                }
-            };
-        return this.model.aggregate(preFilter.concat([filter]));
+        return this.model.aggregate([filter].concat(lookup));
     }
 }
 

@@ -13,5 +13,8 @@ routes.put("/:id", farmVisitConductCtrl.update);
 routes.get("/:id", farmVisitConductCtrl.findOne);
 routes.post("/reference", farmVisitConductCtrl.find);
 routes.delete("/:id", farmVisitConductCtrl.softDelete);
+routes.post('/report', farmVisitConductCtrl.report);
+routes.post('/report/download/:type', farmVisitConductCtrl.downloadReport);
+routes.post('/statistics', farmVisitConductCtrl.statistics);
 
 module.exports.farmVisitConducts = routes;

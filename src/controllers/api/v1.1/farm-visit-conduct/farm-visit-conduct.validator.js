@@ -47,7 +47,6 @@ const validateFarmVisitConduct = visitData => {
         gap: Joi.objectId()
             .required()
             .label('gap'),
-        overall_score: Joi.number(),
         reference: Joi.string().trim(),
         groupId: Joi.objectId()
             .required()
