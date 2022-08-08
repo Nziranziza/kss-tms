@@ -37,6 +37,7 @@ class ScheduleController extends BaseController {
         this.statistics = this.statistics.bind(this);
         this.attendanceSummary = this.attendanceSummary.bind(this);
         this.getFarmerAttendance = this.getFarmerAttendance.bind(this);
+        this.editAtt = this.editAtt.bind(this);
     }
 
 
