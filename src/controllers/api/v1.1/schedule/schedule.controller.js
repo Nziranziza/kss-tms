@@ -36,6 +36,8 @@ class ScheduleController extends BaseController {
         this.downloadReport = this.downloadReport.bind(this);
         this.statistics = this.statistics.bind(this);
         this.attendanceSummary = this.attendanceSummary.bind(this);
+        this.getFarmerAttendance = this.getFarmerAttendance.bind(this);
+        this.editAtt = this.editAtt.bind(this);
     }
 
 
@@ -216,6 +218,21 @@ class ScheduleController extends BaseController {
         return asyncWrapper(res, async () => {
             const {body} = req;
             const schedules = await this.repository.statistics(body);
+            return responseWrapper({
+                res,
+                status: statusCodes.OK,
+                message: "Success",
+                data: schedules,
+            });
+
+        });
+    }
+
+    getFarmerAttendance(req, res){
+        return asyncWrapper(res, async () => {
+            const {params} = req;
+            const schedules = await this.repository.farmerAttendance(params);
+            console.log(schedules);
             return responseWrapper({
                 res,
                 status: statusCodes.OK,

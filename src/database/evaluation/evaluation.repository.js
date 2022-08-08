@@ -1,4 +1,7 @@
 const BaseRepository = require("../../core/library/BaseRepository");
+const {
+  farmVisitConductRepository,
+} = require("../farm-visit-conduct/farm-visit-conduct.repository");
 const { Evaluation } = require("./evaluation");
 class EvaluationRepository extends BaseRepository {
   constructor(model) {
@@ -6,17 +9,27 @@ class EvaluationRepository extends BaseRepository {
   }
 
   async evaluationStats(body) {
-    const evaluations = await this.model.find(body);
-    return evaluations.map((element) => {
-      const { _id, gap_name, isDeleted } = element;
-      return {
-        _id,
-        gap_name,
-        adoptionRate: 50,
-        baselineRate: Math.floor(Math.random() * 10),
-        isDeleted,
-      };
-    });
+    const evaluations = await this.model.find({});
+    return Promise.all(
+      evaluations.map(async (element) => {
+        const { _id, gap_name, isDeleted } = element;
+        const adoption =
+          await farmVisitConductRepository.calculateAdoptionScore({
+            gapId: _id,
+          });
+          
+        return {
+          _id,
+          gap_name,
+          adoptionRate:
+            adoption.length > 0
+              ? (adoption[0].overall_score * 100) / adoption[0].overall_weight
+              : 0,
+          baselineRate: Math.floor(Math.random() * 10),
+          isDeleted,
+        };
+      })
+    );
   }
 }
 module.exports.evaluationRepository = new EvaluationRepository(Evaluation);

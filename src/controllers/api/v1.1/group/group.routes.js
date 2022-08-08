@@ -13,6 +13,7 @@ routes.post('/report', groupCtrl.report);
 routes.post('/report/download/:type', groupCtrl.downloadReport);
 routes.post('/statistics', groupCtrl.statistics);
 routes.get('/', groupCtrl.findAll);
+routes.get('/member/:id', groupCtrl.findMemberGroup);
 routes.put(
   "/members/:id",
   validator("validateUpdateMembers"),
