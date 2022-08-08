@@ -5,8 +5,8 @@ const {
 const {
   FarmVisitSchedule,
 } = require("../farm-visit-schedule/farm-visit-schedule");
-const { evaluationRepository } = require("../evaluation/evaluation.repository");
 const { ObjectId } = require("mongodb");
+const {Evaluation} = require("../evaluation/evaluation");
 
 class FarmVisitConductRepository extends BaseRepository {
   constructor(model) {
@@ -21,7 +21,7 @@ class FarmVisitConductRepository extends BaseRepository {
                 score = score + question.score;
             });
         });
-        const gap = await evaluationRepository.findOne(entity.gap);
+        const gap = await Evaluation.findById(entity.gap);
         entity.overall_score = (gap.gap_weight / 100) * score;
         entity.overall_weight = gap.gap_weight;
         const conduct = await this.model.create(entity);
