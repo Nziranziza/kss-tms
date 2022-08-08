@@ -23,13 +23,21 @@ const expectedDurationSchema = new Schema({
     to: { type: String }
 });
 
+const evaluationGap = new  Schema({
+    gap_id: {type: Schema.Types.ObjectId},
+    overall_weight: {type: Number},
+    overall_score: {type: Number}
+});
+
 const farmSchema = new Schema({
     farmId: {type: Schema.Types.ObjectId, },
     location: { type: locationSchema, required: true },
     upiNumber: {type: String},
     owner: {type: ownerSchema},
-    evaluatedGaps: {type: [Schema.Types.ObjectId], default: []}
+    evaluatedGaps: {type: [evaluationGap]}
 });
+
+
 
 // Farm visit schema
 const farmVisitScheduleSchema = new Schema({

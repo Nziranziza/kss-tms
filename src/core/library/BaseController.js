@@ -9,6 +9,7 @@ class BaseController {
     this.findOne = this.findOne.bind(this);
     this.create = this.create.bind(this);
     this.update = this.update.bind(this);
+    this.customUpdate = this.customUpdate.bind(this);
     this.remove = this.remove.bind(this);
     this.find = this.find.bind(this);
     this.findAll = this.findAll.bind(this);
@@ -78,6 +79,19 @@ class BaseController {
         body._id = params.id;
         data = await this.repository.update(body);
       }
+      return responseWrapper({
+        res,
+        status: statusCodes.OK,
+        message: "Record successfully updated",
+        data
+      });
+    });
+  }
+
+  customUpdate(req, res) {
+    const { body, params } = req;
+    return asyncWrapper(res, async () => {
+      let data = await this.repository.customUpdate(params.id, body);
       return responseWrapper({
         res,
         status: statusCodes.OK,

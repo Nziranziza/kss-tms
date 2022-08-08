@@ -10,6 +10,7 @@ routes.post(
     farmVisitConductCtrl.create
 );
 routes.put("/:id", farmVisitConductCtrl.update);
+routes.put("/custom/:id", farmVisitConductCtrl.customUpdate);
 routes.get("/:id", farmVisitConductCtrl.findOne);
 routes.post("/reference", farmVisitConductCtrl.find);
 routes.delete("/:id", farmVisitConductCtrl.softDelete);

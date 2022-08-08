@@ -24,14 +24,17 @@ class FarmVisitConductRepository extends BaseRepository {
         const gap = await evaluationRepository.findOne(entity.gap);
         entity.overall_score = (gap.gap_weight / 100) * score;
         entity.overall_weight = gap.gap_weight;
-        console.log(entity);
         const conduct = await this.model.create(entity);
         await FarmVisitSchedule.findOneAndUpdate({
             'farms.farmId': conduct.farm.farmId,
             '_id': conduct.scheduleId
         }, {
             '$push': {
-                'farms.$.evaluatedGaps': conduct.gap
+                'farms.$.evaluatedGaps': {
+                    gap_id: conduct.gap,
+                    overall_weight: conduct.overall_weight,
+                    overall_score: conduct.overall_score,
+                }
             }
         });
         return conduct;
