@@ -2,7 +2,10 @@ const asyncWrapper = require("../../../../core/helpers/asyncWrapper");
 const BaseController = require("../../../../core/library/BaseController");
 const responseWrapper = require("../../../../core/helpers/responseWrapper");
 const { statusCodes } = require("../../../../utils/constants/common");
-const { commRepo } = require('../../../../database/communication/communication.repository');
+const {
+  commRepo,
+} = require("../../../../database/communication/communication.repository");
+const { getBalance, orderSMS, getOrders } = require("../../../../services/comm.service");
 
 class CommController extends BaseController {
   constructor(repository) {
@@ -15,8 +18,51 @@ class CommController extends BaseController {
         res,
         status: statusCodes.OK,
         message: "Success",
-        data: 'random data',
+        data: "random data",
       });
+    });
+  }
+
+  orderSMS(req, res) {
+    const {body } = req;
+    return asyncWrapper(res, async () => {
+      const order = await orderSMS(body);
+      if (order.data)
+        return responseWrapper({
+          res,
+          status: order.data.status,
+          message: order.data.message,
+          data: order.data.data,
+        });
+    });
+  }
+
+  getBalance(req, res) {
+    const { params } = req;
+    return asyncWrapper(res, async () => {
+      const balance = await getBalance(params.id);
+      if (balance.data)
+        return responseWrapper({
+          res,
+          status: balance.data.status,
+          message: balance.data.message,
+          data: balance.data.data,
+        });
+    });
+  }
+
+  getOrders(req, res){
+    const { params } = req;
+    console.log(params);
+    return asyncWrapper(res, async () => {
+      const orders = await getOrders(params.id);
+      if (orders.data)
+        return responseWrapper({
+          res,
+          status: orders.data.status,
+          message: orders.data.message,
+          data: orders.data.data,
+        });
     });
   }
 }
