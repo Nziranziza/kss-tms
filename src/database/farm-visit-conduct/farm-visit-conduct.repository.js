@@ -13,7 +13,6 @@ class FarmVisitConductRepository extends BaseRepository {
     super(model);
   }
 
-
     async create(entity) {
         let score = 0;
         entity.evaluation.forEach((evaluation) => {
