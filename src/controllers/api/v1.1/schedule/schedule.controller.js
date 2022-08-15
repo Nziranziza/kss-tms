@@ -266,7 +266,7 @@ class ScheduleController extends BaseController {
             const path = `${appRoot}/files/downloads`;
             worksheet.columns = [
                 {header: "Date added", key: "created_at", width: 10},
-                {header: "Firstname", key: "foreName", width: 10},
+                {header: "Firstname", key: "forename", width: 10},
                 {header: "Lastname", key: "surname", width: 10},
                 {header: "Gender", key: "gender", width: 10},
                 {header: "Training title", key: "trainingName", width: 10},
@@ -277,14 +277,14 @@ class ScheduleController extends BaseController {
             ];
             schedules.forEach((schedule) => {
                 worksheet.addRow({
-                    created_at: schedule.created_at,
-                    foreName: schedule.trainees.foreName,
-                    surname: schedule.trainees.surname,
+                    created_at: schedule.createdAt,
+                    forename: schedule.trainees.foreName,
+                    surname: schedule.trainees.surName,
                     gender: schedule.trainees.gender,
                     trainingName: schedule.trainingId.trainingName,
                     startTime: schedule.startTime,
                     venue: schedule.venue,
-                    attended: schedule.trainees.attended,
+                    attendance: schedule.trainees.attended,
                     status: schedule.status
                 });
             });

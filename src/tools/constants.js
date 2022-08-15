@@ -30,7 +30,7 @@ const smsPurpose = {
 }
 const groupStatus = {
   ACTIVE: "active",
-  INACTIVE: "INACTIVE"
+  INACTIVE: "inactive"
 
 };
 

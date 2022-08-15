@@ -30,7 +30,8 @@ class GroupRepository extends BaseRepository {
         const regex = new RegExp(["^", name, "$"].join(""), "i");
         return this.model
             .findOne({
-                groupName: regex
+                groupName: regex,
+                isDeleted: false
             })
             .populate("location.prov_id", "namek")
             .populate("location.dist_id", "name")
@@ -137,13 +138,22 @@ class GroupRepository extends BaseRepository {
                         },
                     },
                 },
+                inactiveGroups: {
+                    $sum: {
+                        $cond: {
+                            if: { $eq: [ "$status", "inactive"] },
+                            then: 1,
+                            else: 0,
+                        },
+                    },
+                },
             },
         };
         const members = {
             $project: {
                 numberOfMembers: 1,
                 numberOfGroups: 1,
-                groupName: 1,
+                inactiveGroups: 1,
                 _id: 0,
             },
         };

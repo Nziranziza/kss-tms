@@ -39,6 +39,13 @@ if (config.get("app.node_env") === "development") {
   app.use(cors());
 }
 
+app.use((req, res, next) => {
+  res.status(404).send({
+    status: 404,
+    error: 'Resource not found'
+  });
+});
+
 app.listen(config.get("app.port"), () => {
   logger.info(
     `${config.get("app.name")} service is listening on port ${config.get(

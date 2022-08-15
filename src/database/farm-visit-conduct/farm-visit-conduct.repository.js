@@ -140,79 +140,94 @@ class FarmVisitConductRepository extends BaseRepository {
       },
       {
         $lookup: {
-          from: "provinces",
-          localField: "location.prov_id",
+          from: "evaluations",
+          localField: "gap",
           foreignField: "_id",
-          as: "location.prov_id",
+          as: "gap",
         },
       },
       {
         $addFields: {
-          "location.prov_id": {
-            $arrayElemAt: ["$location.prov_id", 0],
+          gap: {
+            $arrayElemAt: ["$gap", 0],
           },
         },
       },
-      {
-        $lookup: {
-          from: "districts",
-          localField: "location.dist_id",
-          foreignField: "_id",
-          as: "location.dist_id",
+        {
+            $lookup: {
+                from: "provinces",
+                localField: "farm.location.prov_id",
+                foreignField: "_id",
+                as: "farm.location.prov_id",
+            },
         },
-      },
-      {
-        $addFields: {
-          "location.dist_id": {
-            $arrayElemAt: ["$location.dist_id", 0],
-          },
+        {
+            $addFields: {
+                "farm.location.prov_id": {
+                    $arrayElemAt: ["$farm.location.prov_id", 0],
+                },
+            },
         },
-      },
-      {
-        $lookup: {
-          from: "sectors",
-          localField: "location.sect_id",
-          foreignField: "_id",
-          as: "location.sect_id",
+        {
+            $lookup: {
+                from: "districts",
+                localField: "farm.location.dist_id",
+                foreignField: "_id",
+                as: "farm.location.dist_id",
+            },
         },
-      },
-      {
-        $addFields: {
-          "location.sect_id": {
-            $arrayElemAt: ["$location.sect_id", 0],
-          },
+        {
+            $addFields: {
+                "farm.location.dist_id": {
+                    $arrayElemAt: ["$farm.location.dist_id", 0],
+                },
+            },
         },
-      },
-      {
-        $lookup: {
-          from: "cells",
-          localField: "location.cell_id",
-          foreignField: "_id",
-          as: "location.cell_id",
+        {
+            $lookup: {
+                from: "sectors",
+                localField: "farm.location.sect_id",
+                foreignField: "_id",
+                as: "farm.location.sect_id",
+            },
         },
-      },
-      {
-        $addFields: {
-          "location.cell_id": {
-            $arrayElemAt: ["$location.cell_id", 0],
-          },
+        {
+            $addFields: {
+                "farm.location.sect_id": {
+                    $arrayElemAt: ["$farm.location.sect_id", 0],
+                },
+            },
         },
-      },
-      {
-        $lookup: {
-          from: "villages",
-          localField: "location.village_id",
-          foreignField: "_id",
-          as: "location.village_id",
+        {
+            $lookup: {
+                from: "cells",
+                localField: "farm.location.cell_id",
+                foreignField: "_id",
+                as: "farm.location.cell_id",
+            },
         },
-      },
-      {
-        $addFields: {
-          "location.village_id": {
-            $arrayElemAt: ["$location.village_id", 0],
-          },
+        {
+            $addFields: {
+                "farm.location.cell_id": {
+                    $arrayElemAt: ["$farm.location.cell_id", 0],
+                },
+            },
         },
-      },
+        {
+            $lookup: {
+                from: "villages",
+                localField: "farm.location.village_id",
+                foreignField: "_id",
+                as: "farm.location.village_id",
+            },
+        },
+        {
+            $addFields: {
+                "farm.location.village_id": {
+                    $arrayElemAt: ["$farm.location.village_id", 0],
+                },
+            },
+        }
     ];
     const filter = {
       $match: {
