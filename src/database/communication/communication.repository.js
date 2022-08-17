@@ -11,7 +11,7 @@ class CommunicationRepository extends BaseRepository {
       sender: input.sender,
       recipients: recipients,
       content: message,
-      senderId: "null",
+      senderId: input.senderId,
       purpose: purpose,
     };
 

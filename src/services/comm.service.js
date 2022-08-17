@@ -32,6 +32,18 @@ const sendAppSMS = async (data) => {
   }
 };
 
+/* sending SMS on the chargeable endpoint */
+const sendClientSMS = async (data) => {
+  try {
+    const token = await RedisService.getCachedData("comm-token");
+    return await CommService.post("/messages/client/sendSMS", data, {
+      token: token.replace(/['"]+/g, ""),
+    });
+  } catch (error) {
+    return error;
+  }
+};
+
 // Get balance for the client
 const getBalance = async (id) => {
   try {
@@ -91,3 +103,4 @@ module.exports.claimToken = claimToken;
 module.exports.getBalance = getBalance;
 module.exports.orderSMS = orderSMS;
 module.exports.getOrders = getOrders;
+module.exports.sendClientSMS = sendClientSMS;

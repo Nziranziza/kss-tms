@@ -3,7 +3,7 @@ const Schema = mongoose.Schema;
 const timestamps = require("mongoose-timestamp");
 const softDelete = require("../plugins/soft-delete");
 const locationSchema = require("../../utils/schemas/location");
-const { scheduleStatus } = require("../../tools/constants");
+const { scheduleStatus, receptionStatus } = require("../../tools/constants");
 
 const TRAINEE = new mongoose.Schema({
   userId: { type: String, required: true },
@@ -21,6 +21,23 @@ const TRAINER = new mongoose.Schema({
   fullName: { type: String, required: true },
   phoneNumber: { type: String },
   organisationName: { type: String, required: true },
+  smsStatus: {
+    type: String,
+    required: true,
+    default: receptionStatus.NOT_SENT,
+  },
+});
+
+const MESSAGE = new mongoose.Schema({
+  message: { type: String, required: true },
+  validPhones: { type: [String] },
+  InvalidPhones: { type: [String] },
+  batch_id: { type: String },
+});
+
+MESSAGE.plugin(timestamps, {
+  createdAt: "createdAt",
+  updatedAt: "updatedAt",
 });
 
 // schedule schema
@@ -37,6 +54,7 @@ const scheduleSchema = new Schema({
   trainees: { type: [TRAINEE], required: true },
   notes: { type: String },
   lastUpdatedBy: { type: TRAINER },
+  smsResponse: { type: MESSAGE },
   status: { type: String, default: scheduleStatus.PENDING, required: true },
   applicationId: { type: Number, required: true },
 });

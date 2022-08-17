@@ -6,38 +6,41 @@ const {
   FarmVisitSchedule,
 } = require("../farm-visit-schedule/farm-visit-schedule");
 const { ObjectId } = require("mongodb");
-const {Evaluation} = require("../evaluation/evaluation");
+const { Evaluation } = require("../evaluation/evaluation");
 
 class FarmVisitConductRepository extends BaseRepository {
   constructor(model) {
     super(model);
   }
 
-    async create(entity) {
-        let score = 0;
-        entity.evaluation.forEach((evaluation) => {
-            evaluation.questions.forEach((question) => {
-                score = score + question.score;
-            });
-        });
-        const gap = await Evaluation.findById(entity.gap);
-        entity.overall_score = (gap.gap_weight / 100) * score;
-        entity.overall_weight = gap.gap_weight;
-        const conduct = await this.model.create(entity);
-        await FarmVisitSchedule.findOneAndUpdate({
-            'farms.farmId': conduct.farm.farmId,
-            '_id': conduct.scheduleId
-        }, {
-            '$push': {
-                'farms.$.evaluatedGaps': {
-                    gap_id: conduct.gap,
-                    overall_weight: conduct.overall_weight,
-                    overall_score: conduct.overall_score,
-                }
-            }
-        });
-        return conduct;
-    }
+  async create(entity) {
+    let score = 0;
+    entity.evaluation.forEach((evaluation) => {
+      evaluation.questions.forEach((question) => {
+        score = score + question.score;
+      });
+    });
+    const gap = await Evaluation.findById(entity.gap);
+    entity.overall_score = (gap.gap_weight / 100) * score;
+    entity.overall_weight = gap.gap_weight;
+    const conduct = await this.model.create(entity);
+    await FarmVisitSchedule.findOneAndUpdate(
+      {
+        "farms.farmId": conduct.farm.farmId,
+        _id: conduct.scheduleId,
+      },
+      {
+        $push: {
+          "farms.$.evaluatedGaps": {
+            gap_id: conduct.gap,
+            overall_weight: conduct.overall_weight,
+            overall_score: conduct.overall_score,
+          },
+        },
+      }
+    );
+    return conduct;
+  }
   find(data) {
     return super
       .find(data)
@@ -249,9 +252,9 @@ class FarmVisitConductRepository extends BaseRepository {
     const { gapId } = data;
 
     const filters = {
-        $match: {
-            ...(gapId && {gap: gapId})
-        }
+      $match: {
+        ...(gapId && { gap: gapId }),
+      },
     };
 
     const group = {
