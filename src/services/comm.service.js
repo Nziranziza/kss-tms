@@ -46,14 +46,14 @@ const sendClientSMS = async (data) => {
 
 // Get balance for the client
 const getBalance = async (id) => {
-  try {
+  // try {
     const token = await RedisService.getCachedData("comm-token");
     return await CommService.get("/orders/getBalance/" + id, {
       token: token.replace(/['"]+/g, ""),
     });
-  } catch (error) {
-    return error;
-  }
+  // } catch (error) {
+  //   return error;
+  // }
 };
 
 // Order SMS for Client

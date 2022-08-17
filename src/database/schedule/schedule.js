@@ -14,18 +14,18 @@ const TRAINEE = new mongoose.Schema({
   groupId: { type: String, required: true },
   attended: { type: Boolean, required: true, default: false },
   regNumber: { type: String, required: true },
+  smsStatus: {
+    type: String,
+    required: true,
+    default: receptionStatus.NOT_SENT,
+  },
 });
 
 const TRAINER = new mongoose.Schema({
   userId: { type: Schema.Types.ObjectId, required: true },
   fullName: { type: String, required: true },
   phoneNumber: { type: String },
-  organisationName: { type: String, required: true },
-  smsStatus: {
-    type: String,
-    required: true,
-    default: receptionStatus.NOT_SENT,
-  },
+  organisationName: { type: String, required: true }
 });
 
 const MESSAGE = new mongoose.Schema({
@@ -54,7 +54,7 @@ const scheduleSchema = new Schema({
   trainees: { type: [TRAINEE], required: true },
   notes: { type: String },
   lastUpdatedBy: { type: TRAINER },
-  smsResponse: { type: MESSAGE },
+  smsResponse: { type: [MESSAGE] },
   status: { type: String, default: scheduleStatus.PENDING, required: true },
   applicationId: { type: Number, required: true },
 });

@@ -148,7 +148,7 @@ class ScheduleController extends BaseController {
         let recipients = [];
         for (const trainee of schedule.trainees) {
           // If no phonenumber don't add user to recipients
-          if (trainee.phoneNumber) {
+          if (trainee.phoneNumber && trainee.smsStatus !== receptionStatus.DELIVERED) {
             recipients.push(trainee.phoneNumber);
             trainee.smsStatus = receptionStatus.QUEUED;
           }
@@ -158,7 +158,7 @@ class ScheduleController extends BaseController {
           recipients: recipients,
           message,
           sender: body.sender,
-          ext_sender_id: body.senderId,
+          ext_sender_id: body.sender_id,
         };
 
         console.log(data);
@@ -173,7 +173,7 @@ class ScheduleController extends BaseController {
             batch_id: sms.data.data.batch_id,
           };
 
-          schedule.smsResponse = response;
+          schedule.smsResponse.push(response);
           await schedule.save();
 
           responseWrapper({

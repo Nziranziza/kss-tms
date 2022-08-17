@@ -7,7 +7,7 @@ class EvaluationRepository extends BaseRepository {
   }
 
   customFindAll(data) {
-    return this.model.find(data).populate("adoptionGaps", "name");
+    return this.model.find(data).populate("adoptionGaps", "gap_name");
   }
 
   findOne(id) {
