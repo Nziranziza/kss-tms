@@ -32,6 +32,54 @@ const sendAppSMS = async (data) => {
   }
 };
 
+/* sending SMS on the chargeable endpoint */
+const sendClientSMS = async (data) => {
+  try {
+    const token = await RedisService.getCachedData("comm-token");
+    return await CommService.post("/messages/client/sendSMS", data, {
+      token: token.replace(/['"]+/g, ""),
+    });
+  } catch (error) {
+    return error;
+  }
+};
+
+// Get balance for the client
+const getBalance = async (id) => {
+  try {
+    const token = await RedisService.getCachedData("comm-token");
+    return await CommService.get("/orders/getBalance/" + id, {
+      token: token.replace(/['"]+/g, ""),
+    });
+  } catch (error) {
+    return error;
+  }
+};
+
+// Order SMS for Client
+const orderSMS = async (data) => {
+  try {
+    const token = await RedisService.getCachedData("comm-token");
+    return await CommService.post("/orders/", data, {
+      token: token.replace(/['"]+/g, ""),
+    });
+  } catch (error) {
+    return error;
+  }
+};
+
+// Get Orders for Client
+const getOrders = async (id) => {
+  try {
+    const token = await RedisService.getCachedData("comm-token");
+    return await CommService.get("/orders/getOrders/" + id, {
+      token: token.replace(/['"]+/g, ""),
+    });
+  } catch (error) {
+    return error;
+  }
+};
+
 const claimToken = async () => {
   const data = {
     app_id: appId,
@@ -52,3 +100,7 @@ const claimToken = async () => {
 module.exports.authenticateApp = authenticateApp;
 module.exports.sendAppSMS = sendAppSMS;
 module.exports.claimToken = claimToken;
+module.exports.getBalance = getBalance;
+module.exports.orderSMS = orderSMS;
+module.exports.getOrders = getOrders;
+module.exports.sendClientSMS = sendClientSMS;

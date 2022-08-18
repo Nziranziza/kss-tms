@@ -16,6 +16,7 @@ const attendanceStatus = {
 };
 
 const receptionStatus = {
+  NOT_SENT: 'NOT_SENT',
   DELIVERED: 'DELIVERED',
   FAILED: 'FAILED',
   PENDING: 'PENDING',
