@@ -12,7 +12,7 @@ const MATERIAL = new mongoose.Schema({
 // Training schema
 const trainingSchema = new Schema({
   trainingName: { type: String },
-  adoptionGaps: [{ type: Schema.Types.ObjectId, ref: "evaluation" }],
+  adoptionGaps: {type: [{ type: Schema.Types.ObjectId, ref: "evaluation" }]},
   description: { type: String, required: true },
   materials: { type: [MATERIAL], required: true },
   status: {type: String, default: trainingStatus.NOT_SCHEDULED, required: true},
