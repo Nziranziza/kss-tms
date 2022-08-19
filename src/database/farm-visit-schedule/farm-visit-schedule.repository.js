@@ -64,9 +64,7 @@ class FarmVisitScheduleRepository extends BaseRepository {
         ...(visitorId && { "visitor.userId": ObjectId(visitorId) }),
         ...(location && { [locSearchBy]: ObjectId(location.locationId) }),
         ...(referenceId && { reference: referenceId }),
-        ...(date && {
-          "expectedDuration.from": { $gte: startDate, $lt: endDate },
-        }),
+        ...(date && { date: { $gte: startDate, $lt: endDate }}),
       },
     };
 
