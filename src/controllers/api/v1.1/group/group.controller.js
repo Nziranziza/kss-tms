@@ -193,6 +193,7 @@ class GroupController extends BaseController {
         { header: "Leader phone number", key: "leaderPhoneNumber", width: 10 },
         { header: "Group size", key: "groupSize", width: 10 },
         { header: "Location", key: "location", width: 10 },
+        { header: "Status", key: "status", width: 10 },
       ];
       groups.forEach((group) => {
         worksheet.addRow({
@@ -201,13 +202,15 @@ class GroupController extends BaseController {
           leaderPhoneNumber: group.leaderPhoneNumber,
           groupSize: group.members.length,
           location:
-            group.location.prov_id.namek +
+            (group.location.prov_id.namek +
             " > " +
             group.location.dist_id.name +
             " > " +
             group.location.sect_id.name +
             " > " +
-            group.location.cell_id.name,
+            group.location.cell_id.name).toLowerCase(),
+          status:  group.status,
+
         });
       });
       worksheet.getRow(1).eachCell((cell) => {
@@ -229,7 +232,7 @@ class GroupController extends BaseController {
         });
       } else if (type === "csv") {
         const fileName = `${path}/${Date.now()}-groups.csv`;
-        await workbook.xlsx.writeFile(fileName).then(() => {
+        await workbook.csv.writeFile(fileName).then(() => {
           const str = fs.readFileSync(fileName, { encoding: "base64" });
           return responseWrapper({
             res,
@@ -237,7 +240,7 @@ class GroupController extends BaseController {
             message: "Success",
             data: {
               file: str,
-              type: "xlsx",
+              type: "csv",
             },
           });
         });

@@ -238,16 +238,16 @@ class ScheduleRepository extends BaseRepository {
           body.location.village_id && {
             "groupId.location.village_id": ObjectId(body.location.village_id),
           }),
-        ...(body.reference && { reference: body.reference }),
-        ...(body.trainingId && { trainingId: body.trainingId }),
-        ...(body.trainerId && { "trainer.userId": body.trainerId }),
+        ...(body.reference && { referenceId: ObjectId(body.reference) }),
+        ...(body.trainingId && { trainingId: ObjectId(body.trainingId) }),
+        ...(body.trainerId && { "trainer.userId": ObjectId(body.trainerId) }),
         ...{ isDeleted: false },
       },
     };
 
     const group = {
       $group: {
-        _id: null,
+        _id: { gender: "$trainees.gender" },
         numberOfTrainees: { $sum: 1 },
         numberOfAttendedTrainees: {
           $sum: {
@@ -262,6 +262,7 @@ class ScheduleRepository extends BaseRepository {
     };
     const trainees = {
       $project: {
+        gender: "$_id.gender",
         numberOfTrainees: 1,
         numberOfAttendedTrainees: 1,
         _id: 0,
@@ -396,9 +397,9 @@ class ScheduleRepository extends BaseRepository {
           body.location.village_id && {
             "groupId.location.village_id": ObjectId(body.location.village_id),
           }),
-        ...(body.reference && { reference: body.reference }),
-        ...(body.trainingId && { trainingId: body.trainingId }),
-        ...(body.trainerId && { "trainer.userId": body.trainerId }),
+        ...(body.reference && { referenceId: ObjectId(body.reference) }),
+        ...(body.trainingId && { "trainingId._id": ObjectId(body.trainingId) }),
+        ...(body.trainerId && { "trainer.userId": ObjectId(body.trainerId) }),
         ...{ isDeleted: false },
       },
     };
@@ -449,9 +450,9 @@ class ScheduleRepository extends BaseRepository {
 
     const filters = {
       $match: {
-        ...(reference && { "referenceId": ObjectId(reference) }),
+        ...(reference && { referenceId: ObjectId(reference) }),
         ...(groupId && { "trainees.groupId": groupId }),
-        status: scheduleStatus.HAPPENED
+        status: scheduleStatus.HAPPENED,
       },
     };
 
@@ -505,12 +506,12 @@ class ScheduleRepository extends BaseRepository {
     summary.forEach((data) => {
       if (data._id == true) {
         attended = data.count + attended;
-      }else{
+      } else {
         absent = data.count + absent;
       }
     });
 
-    if(attended + absent === 0) return 100;
+    if (attended + absent === 0) return 100;
 
     return attended !== 0 ? ~~((attended * 100) / (attended + absent)) : 0;
   }

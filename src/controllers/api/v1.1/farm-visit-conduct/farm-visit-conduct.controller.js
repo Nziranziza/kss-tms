@@ -64,15 +64,16 @@ class FarmVisitConductController extends BaseController {
             ];
             visits.forEach((visit) => {
                 worksheet.addRow({
-                    created_at: visit.created_at,
+                    created_at: visit.createdAt,
                     upi: visit.farm.upiNumber,
-                    surname: visit.farm.owner.surname,
-                    foreName: visit.farm.owner.foreName,
+                    surname: visit.owner.firstName,
+                    foreName: visit.owner.lastName,
                     location: visit.farm.location.prov_id.namek +
                         ' > ' + visit.farm.location.dist_id.name +
                         ' > ' + visit.farm.location.sect_id.name +
-                        ' > ' + visit.farm.location.cell_id.name,
-                    visitor: visit.visitor.surname + ' ' + visit.visitor.foreName,
+                        ' > ' + visit.farm.location.cell_id.name +
+                        ' > ' + visit.farm.location.village_id.name,
+                    visitor: visit.visitor.lastName + ' ' + visit.visitor.firstName,
                     gap: visit.gap.gap_name,
                     adoption: (visit.overall_score/visit.overall_weight) * 100
                 });

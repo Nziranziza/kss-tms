@@ -56,8 +56,11 @@ class GroupRepository extends BaseRepository {
           deletedAt,
           updatedAt,
           createdAt,
-          attendanceRate: await scheduleRepository.groupAttendance({...data, groupId: _id.toString()})
-        }
+          attendanceRate: await scheduleRepository.groupAttendance({
+            ...data,
+            groupId: _id.toString(),
+          }),
+        };
       })
     );
   }
@@ -77,6 +80,7 @@ class GroupRepository extends BaseRepository {
     return this.model
       .findOne({
         groupName: regex,
+        isDeleted: false,
       })
       .populate("location.prov_id", "namek")
       .populate("location.dist_id", "name")
