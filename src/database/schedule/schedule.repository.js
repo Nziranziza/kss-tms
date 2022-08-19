@@ -415,7 +415,7 @@ class ScheduleRepository extends BaseRepository {
     const filter = {
       $match: {
         "trainees.userId": params.id,
-        "status": "done"
+        status: "done",
       },
     };
 
@@ -428,7 +428,7 @@ class ScheduleRepository extends BaseRepository {
 
     // Run query // Query will return 4 objects or less each containing stats for each gender
     const summary = await this.model.aggregate([unwind, filter, group]);
-    console.log(summary)
+    console.log(summary);
 
     let attended = 0;
     let total = 0;
@@ -441,7 +441,78 @@ class ScheduleRepository extends BaseRepository {
       total = data.count + total;
     });
 
-    return attended !== 0 ?(attended * 100) / total : 0;
+    return attended !== 0 ? (attended * 100) / total : 0;
+  }
+
+  async groupAttendance(input) {
+    const { reference, groupId } = input;
+
+    const filters = {
+      $match: {
+        ...(reference && { "referenceId": ObjectId(reference) }),
+        ...(groupId && { "trainees.groupId": groupId }),
+        status: scheduleStatus.HAPPENED
+      },
+    };
+
+    // Unwind all trainees so we can compute data
+    const unwind = {
+      $unwind: "$trainees",
+    };
+
+    // Filter statistics by different values
+    const group = {
+      $group: {
+        _id: {
+          absence: "$trainees.attended",
+          trainingId: "$trainingId",
+        },
+        Unique: {
+          $addToSet: "$trainees.userId",
+        },
+      },
+    };
+
+    const project = {
+      $project: {
+        _id: 0,
+        absence: "$_id.absence",
+        trainingId: "$_id.trainingId",
+        unique: { $size: "$Unique" },
+      },
+    };
+
+    const groupByAbsence = {
+      $group: {
+        _id: "$absence",
+        count: { $sum: "$unique" },
+      },
+    };
+
+    // Run query // Query will return 4 objects or less each containing stats for each gender
+    const summary = await this.model.aggregate([
+      unwind,
+      filters,
+      group,
+      project,
+      groupByAbsence,
+    ]);
+
+    let attended = 0;
+    let absent = 0;
+
+    // Compile results
+    summary.forEach((data) => {
+      if (data._id == true) {
+        attended = data.count + attended;
+      }else{
+        absent = data.count + absent;
+      }
+    });
+
+    if(attended + absent === 0) return 100;
+
+    return attended !== 0 ? ~~((attended * 100) / (attended + absent)) : 0;
   }
 }
 

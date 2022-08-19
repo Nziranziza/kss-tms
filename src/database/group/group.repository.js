@@ -12,14 +12,54 @@ class GroupRepository extends BaseRepository {
     this.report = this.report.bind(this);
   }
 
-  find(data) {
-    return super
-      .find(data)
+  async find(data) {
+    console.log(data);
+    const groups = await super
+      .find()
       .populate("location.prov_id", "namek")
       .populate("location.dist_id", "name")
       .populate("location.sect_id", "name")
       .populate("location.cell_id", "name")
       .populate("location.village_id", "name");
+
+    return Promise.all(
+      groups.map(async (group) => {
+        console.log(group._id);
+        const {
+          _id,
+          status,
+          groupName,
+          leaderNames,
+          leaderPhoneNumber,
+          description,
+          location,
+          meetingSchedule,
+          reference,
+          members,
+          isDeleted,
+          deletedAt,
+          updatedAt,
+          createdAt,
+        } = group;
+        return {
+          _id,
+          status,
+          groupName,
+          leaderNames,
+          leaderPhoneNumber,
+          description,
+          location,
+          meetingSchedule,
+          reference,
+          members,
+          isDeleted,
+          deletedAt,
+          updatedAt,
+          createdAt,
+          attendanceRate: await scheduleRepository.groupAttendance({...data, groupId: _id.toString()})
+        }
+      })
+    );
   }
 
   findAll() {
