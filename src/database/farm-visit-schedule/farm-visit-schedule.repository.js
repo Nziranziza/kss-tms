@@ -54,8 +54,8 @@ class FarmVisitScheduleRepository extends BaseRepository {
     let startDate = "";
     let endDate = "";
     if (date) {
-      startDate = moment(date.from).startOf("day").toISOString();
-      endDate = moment(date.to).endOf("day").toISOString();
+      startDate = moment(date.from).startOf("day").toDate();
+      endDate = moment(date.to).endOf("day").toDate();
     }
 
     // Filter statistics by different values
