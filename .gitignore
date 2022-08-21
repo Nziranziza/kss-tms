@@ -3,6 +3,7 @@ shipitfile.js
 heplerFiles
 logs
 downloads
+files
 *.doc
 *.sh
 .idea
