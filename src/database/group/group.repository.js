@@ -87,7 +87,6 @@ class GroupRepository extends BaseRepository {
                     schedule.trainees.forEach((trainee) => {
                         if (trainee.userId === userId.toString() && trainee.attended) {
                             attendance = attendanceStatus.ATTENDED;
-
                         }
                     });
                 }
@@ -145,6 +144,7 @@ class GroupRepository extends BaseRepository {
             "location.village_id": ObjectId(body.location.village_id),
           }),
         ...(body.reference && { reference: body.reference }),
+        ...(body.id && { _id: ObjectId(body.id) }),
         ...{ isDeleted: false },
       },
     };
@@ -172,7 +172,6 @@ class GroupRepository extends BaseRepository {
         _id: 0,
       },
     };
-
     return this.model.aggregate([filter, group, members]);
   }
 
@@ -199,6 +198,7 @@ class GroupRepository extends BaseRepository {
           "location.village_id": ObjectId(body.location.village_id),
         }),
       ...(body.reference && { reference: body.reference }),
+      ...(body.id && { _id: ObjectId(body.id) }),
     };
     return this.model
       .find(filter)

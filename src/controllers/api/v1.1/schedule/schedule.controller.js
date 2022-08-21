@@ -15,6 +15,9 @@ const {
   receptionStatus,
 } = require("../../../../tools/constants");
 const moment = require("moment");
+const ejs = require("ejs");
+const _path = require("path");
+const pdf = require("html-pdf");
 
 class ScheduleController extends BaseController {
   constructor(repository) {
@@ -330,6 +333,48 @@ class ScheduleController extends BaseController {
                             }
                         });
                     });
+            } else if (type === 'pdf') {
+                ejs.renderFile(
+                    _path.join(__dirname, '/../../../../templates/', 'trainings_report.ejs'),
+                    {schedules: schedules},
+                    (err, data) => {
+                        if (err) {
+                            console.log(err);
+                            return err;
+                        } else {
+                            let options = {
+                                height: '11.25in',
+                                width: '10in',
+                                header: {
+                                    height: '20mm'
+                                },
+                                footer: {
+                                    height: '20mm'
+                                }
+                            };
+                            const fileName = `${path}/${Date.now()}-schedules_report.pdf`;
+                            pdf.create(data, options).toFile(fileName, function (err, data) {
+                                if (err) {
+                                    console.log(err)
+                                    return err;
+                                } else {
+                                    const str = fs.readFileSync(fileName, {encoding: "base64"});
+                                    console.log(str);
+                                    return responseWrapper({
+                                        res,
+                                        status: statusCodes.OK,
+                                        message: "Success",
+                                        data: {
+                                            file: str,
+                                            type: "pdf",
+                                        },
+                                    });
+                                }
+                            });
+                        }
+                    }
+                );
+
             } else {
                 throw new CustomError("File type not found", statusCodes.NOT_FOUND);
             }
