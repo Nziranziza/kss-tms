@@ -3,7 +3,7 @@ const BaseRepository = require("../../core/library/BaseRepository");
 const {
   FarmVisitSchedule,
 } = require("../farm-visit-schedule/farm-visit-schedule");
-const moment = require('moment');
+const moment = require("moment");
 
 class FarmVisitScheduleRepository extends BaseRepository {
   constructor(model) {
@@ -64,11 +64,10 @@ class FarmVisitScheduleRepository extends BaseRepository {
         ...(visitorId && { "visitor.userId": ObjectId(visitorId) }),
         ...(location && { [locSearchBy]: ObjectId(location.locationId) }),
         ...(referenceId && { reference: referenceId }),
-        ...(date && { date: { $gte: startDate, $lt: endDate }}),
+        ...(date && { date: { $gte: startDate, $lt: endDate } }),
       },
     };
 
-    console.log(filter)
 
     // Unwind all trainees so we can compute data
     const unwind = {
@@ -194,6 +193,57 @@ class FarmVisitScheduleRepository extends BaseRepository {
       {
         $unwind: "$farms",
       },
+    ]);
+  }
+
+  fetchVisitedFarmsId(body) {
+    const { location, date, referenceId } = body;
+
+    let locSearchBy = "";
+    if (location) locSearchBy = `farms.location.${location.searchBy}`;
+
+    let startDate = "";
+    let endDate = "";
+    if (date) {
+      startDate = moment(date.from).startOf("day").toDate();
+      endDate = moment(date.to).endOf("day").toDate();
+    }
+
+    // Filter statistics by different values
+    const filter = {
+      $match: {
+        ...(location && { [locSearchBy]: ObjectId(location.locationId) }),
+        ...(referenceId && { reference: referenceId }),
+        ...(date && { date: { $gte: startDate, $lt: endDate } }),
+      },
+    };
+
+    const unwind = {
+      $unwind: {
+        path: "$farms",
+        preserveNullAndEmptyArrays: true
+      }
+    };
+
+    const group = {
+      $group: {
+        _id: "null" ,
+        visits: {$addToSet: "$_id"},
+        farms: {
+          $addToSet: "$farms.farmId"
+        },
+        farmers: {
+          $addToSet: "$farms.owner.userId"
+        }
+      }
+    }
+    return this.model.aggregate([
+      {
+        $unwind: "$farms",
+      },
+      filter,
+      unwind,
+      group
     ]);
   }
 }
