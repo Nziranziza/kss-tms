@@ -56,13 +56,12 @@ class TrainingController extends BaseController {
 
   delete(req, res) {
     return asyncWrapper(res, async () => {
-      const data = await this.repository.findOne(req.params.id);
+      const data = await this.repository.findSingle(req.params.id);
       const isDeleted = await data.softDelete();
       return responseWrapper({
         res,
         status: statusCodes.OK,
         message: "Removed successfully",
-        data,
       });
     });
   }

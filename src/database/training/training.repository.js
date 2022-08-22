@@ -4,10 +4,15 @@ const ObjectId = require("mongodb").ObjectID;
 class EvaluationRepository extends BaseRepository {
   constructor(model) {
     super(model);
+    this.findSingle = this.findSingle.bind(this)
   }
 
   customFindAll(data) {
     return this.model.find(data).populate("adoptionGaps", "gap_name");
+  }
+
+  findSingle(id){
+    return this.model.findOne(ObjectId(id));
   }
 
   findOne(id) {
