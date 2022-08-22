@@ -52,6 +52,7 @@ class ScheduleController extends BaseController {
     };
     return asyncWrapper(res, async () => {
       const data = await this.repository.customFindAll(body);
+      data.filter(schedule => schedule.trainingId === null);
       return responseWrapper({
         res,
         status: statusCodes.OK,
