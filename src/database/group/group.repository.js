@@ -75,9 +75,9 @@ class GroupRepository extends BaseRepository {
             .populate("location.village_id", "name");
     }
 
-    findOne() {
+    findOne(data) {
         return super
-            .findOne()
+            .findOne(data)
             .populate("location.prov_id", "namek")
             .populate("location.dist_id", "name")
             .populate("location.sect_id", "name")
