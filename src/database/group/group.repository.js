@@ -75,6 +75,16 @@ class GroupRepository extends BaseRepository {
             .populate("location.village_id", "name");
     }
 
+    findOne() {
+        return super
+            .findOne()
+            .populate("location.prov_id", "namek")
+            .populate("location.dist_id", "name")
+            .populate("location.sect_id", "name")
+            .populate("location.cell_id", "name")
+            .populate("location.village_id", "name");
+    }
+
     searchGroup(name) {
         const regex = new RegExp(["^", name, "$"].join(""), "i");
         return this.model
