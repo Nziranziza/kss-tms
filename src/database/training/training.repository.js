@@ -8,11 +8,11 @@ class EvaluationRepository extends BaseRepository {
   }
 
   customFindAll(data) {
-    return this.model.find(data).populate("adoptionGaps", "gap_name");
+    return super.find(data).populate("adoptionGaps", "gap_name");
   }
 
   findSingle(id){
-    return this.model.findOne(ObjectId(id));
+    return super.findOne(ObjectId(id));
   }
 
   findOne(id) {
