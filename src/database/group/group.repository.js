@@ -138,7 +138,7 @@ class GroupRepository extends BaseRepository {
                     schedule.trainees.forEach((trainee) => {
                         if (trainee.userId === userId.toString() && trainee.attended && schedule.status === scheduleStatus.HAPPENED ) {
                             attendance = attendanceStatus.ATTENDED;
-                        }else if(trainee.userId === userId.toString() && schedule.status === scheduleStatus.PENDING ){
+                        }else if(schedule.status === scheduleStatus.PENDING ){
                             attendance = attendanceStatus.PENDING
                         }
                     });
