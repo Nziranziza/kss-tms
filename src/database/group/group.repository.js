@@ -1,7 +1,7 @@
 const BaseRepository = require("../../core/library/BaseRepository");
 const {Group} = require("./group");
 const {scheduleRepository} = require("../schedule/schedule.repository");
-const {attendanceStatus} = require("../../tools/constants");
+const {attendanceStatus, scheduleStatus} = require("../../tools/constants");
 const ObjectId = require("mongodb").ObjectID;
 
 class GroupRepository extends BaseRepository {
@@ -128,36 +128,30 @@ class GroupRepository extends BaseRepository {
             members.map(async (member) => {
                 const {userId, firstName, lastName, phoneNumber} = member;
 
-                // If group has a schedule then check past schedules and check whether members have attended at least once
-                return Promise.all(
-                    members.map(async (member) => {
-                        const {userId, firstName, lastName, phoneNumber} = member;
-
-
-                        const traineeSchedules = await scheduleRepository.findMemberAttendance(
-                            userId,
-                            trainingId
-                        );
-
-                        let attendance = attendanceStatus.ABSENT;
-                        for (const schedule of traineeSchedules) {
-                            schedule.trainees.forEach((trainee) => {
-                                if (trainee.userId === userId.toString() && trainee.attended) {
-                                    attendance = attendanceStatus.ATTENDED;
-                                }
-                            });
-                        }
-
-                        return {
-                            userId,
-                            firstName,
-                            lastName,
-                            phoneNumber,
-                            groupId: group._id,
-                            attendance: attendance,
-                        };
-                    })
+                const traineeSchedules = await scheduleRepository.findMemberAttendance(
+                    userId,
+                    trainingId
                 );
+
+                let attendance = attendanceStatus.ABSENT;
+                for (const schedule of traineeSchedules) {
+                    schedule.trainees.forEach((trainee) => {
+                        if (trainee.userId === userId.toString() && trainee.attended && schedule.status === scheduleStatus.HAPPENED ) {
+                            attendance = attendanceStatus.ATTENDED;
+                        }else if(trainee.userId === userId.toString() && schedule.status === scheduleStatus.PENDING ){
+                            attendance = attendanceStatus.PENDING
+                        }
+                    });
+                }
+
+                return {
+                    userId,
+                    firstName,
+                    lastName,
+                    phoneNumber,
+                    groupId: group._id,
+                    attendance: attendance,
+                };
             })
         )
     }

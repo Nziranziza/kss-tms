@@ -12,7 +12,8 @@ const scheduleStatus = {
 const attendanceStatus = {
   ATTENDED: "attended",
   ABSENT: "absent",
-  NOT_INVITED: "not_invited"
+  NOT_INVITED: "not_invited",
+  PENDING: "pending"
 };
 
 const receptionStatus = {
