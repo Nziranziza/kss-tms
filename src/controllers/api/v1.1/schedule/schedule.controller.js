@@ -65,6 +65,13 @@ class ScheduleController extends BaseController {
   delete(req, res) {
     return asyncWrapper(res, async () => {
       const data = await this.repository.findOne(req.params.id);
+      if (data.status === scheduleStatus.HAPPENED)
+        return responseWrapper({
+          res,
+          status: statusCodes.FORBIDDEN,
+          message: "Cannot delete a conducted training.",
+        });
+
       const isDeleted = await data.softDelete();
       return responseWrapper({
         res,

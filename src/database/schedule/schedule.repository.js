@@ -11,7 +11,7 @@ class ScheduleRepository extends BaseRepository {
 
   findGroupSchedule(groupId, trainingId) {
     return super
-      .cFindOne({ groupId, trainingId })
+      .cFindOne({ "trainees.groupId": groupId, trainingId })
       .populate("trainingId", "trainingName")
       .populate("groupId", "groupName")
       .populate("location.prov_id", "namek")
@@ -22,7 +22,7 @@ class ScheduleRepository extends BaseRepository {
   }
 
   findMemberAttendance(userId, trainingId) {
-    return super.customFindAll({ "trainee.userId": userId });
+    return super.customFindAll({ "trainees.userId": userId, trainingId });
   }
 
   customFindAll(data) {
@@ -114,6 +114,7 @@ class ScheduleRepository extends BaseRepository {
         ...(date && {
           startTime: { $gte: startDate, $lt: endDate },
         }),
+        isDeleted: false
       },
     };
 

@@ -142,6 +142,7 @@ class BaseController {
   softDelete(req, res) {
     return asyncWrapper(res, async () => {
       const data = await this.repository.findOne(req.params.id);
+      console.log("Deleting data", data)
       if (!data) {
         throw new CustomError("Record not found", statusCodes.NOT_FOUND);
       }
