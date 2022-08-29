@@ -34,6 +34,7 @@ class ScheduleController extends BaseController {
         this.editAtt = this.editAtt.bind(this);
     }
 
+
     findAllByRef(req, res) {
         const {from, to} = req.query;
         let startDate = "";
@@ -52,18 +53,27 @@ class ScheduleController extends BaseController {
         };
         return asyncWrapper(res, async () => {
             const data = await this.repository.customFindAll(body);
+            const filter = data.filter((schedule) => schedule.trainingId !== null);
             return responseWrapper({
                 res,
                 status: statusCodes.OK,
                 message: "Success",
-                data,
+                data: filter,
             });
         });
     }
 
+
     delete(req, res) {
         return asyncWrapper(res, async () => {
             const data = await this.repository.findOne(req.params.id);
+            if (data.status === scheduleStatus.HAPPENED)
+                return responseWrapper({
+                    res,
+                    status: statusCodes.FORBIDDEN,
+                    message: "Cannot delete a conducted training.",
+                });
+
             const isDeleted = await data.softDelete();
             return responseWrapper({
                 res,
@@ -73,6 +83,7 @@ class ScheduleController extends BaseController {
             });
         });
     }
+
 
     recordAtt(req, res) {
         const {params, body} = req;
@@ -136,76 +147,60 @@ class ScheduleController extends BaseController {
         const {params, body} = req;
         return asyncWrapper(res, async () => {
             const schedule = await this.repository.findOne(params.id);
-
-            if (schedule) {
-                // Build SMS body
-                const message = `Uruganda ${
-                    schedule.trainer.organisationName
-                } rubatumiye mu mahugurwa ya \"${
-                    schedule.trainingId.trainingName
-                }\". Azaba ku itariki ${schedule.startTime.toLocaleDateString()}, guhera ${schedule.startTime.toLocaleTimeString()} - kuri:${
-                    schedule.venueName
-                }`;
-
-                // Build recipients
-                let recipients = [];
-                for (const trainee of schedule.trainees) {
-                    // If no phonenumber don't add user to recipients
-                    if (trainee.phoneNumber && trainee.smsStatus !== receptionStatus.DELIVERED) {
-                        recipients.push(trainee.phoneNumber);
-                        trainee.smsStatus = receptionStatus.QUEUED;
-                    }
+            // Build recipients
+            let recipients = [];
+            for (const trainee of schedule.trainees) {
+                // If no phonenumber don't add user to recipients
+                if (trainee.phoneNumber && trainee.smsStatus !== receptionStatus.DELIVERED) {
+                    recipients.push(trainee.phoneNumber);
+                    trainee.smsStatus = receptionStatus.QUEUED;
                 }
+            }
 
-                const data = {
-                    recipients: recipients,
-                    message,
-                    sender: body.sender,
-                    ext_sender_id: body.sender_id,
+            const data = {
+                recipients: recipients,
+                message,
+                sender: body.sender,
+                ext_sender_id: body.sender_id,
+            };
+
+            console.log(data);
+
+            const sms = await sendClientSMS(data);
+
+            if (sms.data) {
+                const response = {
+                    message: message,
+                    validPhones: sms.data.data.validPhones,
+                    InvalidPhones: sms.data.data.InvalidPhones,
+                    batch_id: sms.data.data.batch_id,
                 };
 
-                console.log(data);
+                schedule.smsResponse.push(response);
+                await schedule.save();
 
-                const sms = await sendClientSMS(data);
-
-                if (sms.data) {
-                    const response = {
-                        message: message,
-                        validPhones: sms.data.data.validPhones,
-                        InvalidPhones: sms.data.data.InvalidPhones,
-                        batch_id: sms.data.data.batch_id,
-                    };
-
-                    schedule.smsResponse.push(response);
-                    await schedule.save();
-
-                    responseWrapper({
-                        res,
-                        status: sms.data.status,
-                        message: sms.data.message,
-                        data: sms.data.data,
-                    });
-                } else if (sms.response.data) {
-                    console.log(sms.response.data);
-                    return responseWrapper({
-                        res,
-                        status: sms.response.data.status,
-                        message: sms.response.data.message,
-                    });
-                } else {
-                    console.log(sms);
-                    return responseWrapper({
-                        res,
-                        status: statusCodes.SERVER_ERROR,
-                        message: "Could not send messages",
-                    });
-                }
-            } else
+                responseWrapper({
+                    res,
+                    status: sms.data.status,
+                    message: sms.data.message,
+                    data: sms.data.data,
+                });
+            } else if (sms.response.data) {
+                console.log(sms.response.data);
                 return responseWrapper({
                     res,
-                    status: statusCodes.NOT_FOUND,
-                    message: "Schedule not found or no trainees Added",
+                    status: sms.response.data.status,
+                    message: sms.response.data.message,
                 });
+            } else {
+                console.log(sms);
+                return responseWrapper({
+                    res,
+                    status: statusCodes.SERVER_ERROR,
+                    message: "Could not send messages",
+                });
+            }
+
         });
     }
 
@@ -236,6 +231,7 @@ class ScheduleController extends BaseController {
             });
         });
     }
+
 
     getFarmerAttendance(req, res) {
         return asyncWrapper(res, async () => {
@@ -376,8 +372,7 @@ class ScheduleController extends BaseController {
             } else {
                 throw new CustomError("File type not found", statusCodes.NOT_FOUND);
             }
-
-        })
+        });
     }
 }
 

@@ -1,7 +1,7 @@
 const BaseRepository = require("../../core/library/BaseRepository");
 const {Group} = require("./group");
 const {scheduleRepository} = require("../schedule/schedule.repository");
-const {attendanceStatus} = require("../../tools/constants");
+const {attendanceStatus, scheduleStatus} = require("../../tools/constants");
 const ObjectId = require("mongodb").ObjectID;
 
 class GroupRepository extends BaseRepository {
@@ -75,6 +75,16 @@ class GroupRepository extends BaseRepository {
             .populate("location.village_id", "name");
     }
 
+    findOne(data) {
+        return super
+            .findOne(data)
+            .populate("location.prov_id", "namek")
+            .populate("location.dist_id", "name")
+            .populate("location.sect_id", "name")
+            .populate("location.cell_id", "name")
+            .populate("location.village_id", "name");
+    }
+
     searchGroup(name) {
         const regex = new RegExp(["^", name, "$"].join(""), "i");
         return this.model
@@ -91,63 +101,39 @@ class GroupRepository extends BaseRepository {
 
     async membersAttendance(group, trainingId) {
         // Find if group has already been invited for a training
-        const groupSchedule = await scheduleRepository.findGroupSchedule(
-            group._id,
-            trainingId
-        );
 
         const members = group.members;
 
-        // If group has no associated scheduled Training then by default all members have not been invited yet
-        if (!groupSchedule) {
-            return members.map((member) => {
-                const {userId, firstName, lastName, phoneNumber} = member;
-                return {
-                    userId,
-                    firstName,
-                    lastName,
-                    phoneNumber,
-                    groupId: group._id,
-                    attendance: attendanceStatus.NOT_INVITED,
-                };
-            });
-        }
 
         // If group has a schedule then check past schedules and check whether members have attended at least once
         return Promise.all(
             members.map(async (member) => {
                 const {userId, firstName, lastName, phoneNumber} = member;
 
-                // If group has a schedule then check past schedules and check whether members have attended at least once
-                return Promise.all(
-                    members.map(async (member) => {
-                        const {userId, firstName, lastName, phoneNumber} = member;
-
-
-                        const traineeSchedules = await scheduleRepository.findMemberAttendance(
-                            userId,
-                            trainingId
-                        );
-
-                        let attendance = attendanceStatus.ABSENT;
-                        for (const schedule of traineeSchedules) {
-                            schedule.trainees.forEach((trainee) => {
-                                if (trainee.userId === userId.toString() && trainee.attended) {
-                                    attendance = attendanceStatus.ATTENDED;
-                                }
-                            });
-                        }
-
-                        return {
-                            userId,
-                            firstName,
-                            lastName,
-                            phoneNumber,
-                            groupId: group._id,
-                            attendance: attendance,
-                        };
-                    })
+                const traineeSchedules = await scheduleRepository.findMemberAttendance(
+                    userId,
+                    trainingId
                 );
+
+                let attendance = attendanceStatus.NOT_INVITED;
+                for (const schedule of traineeSchedules) {
+                    schedule.trainees.forEach((trainee) => {
+                        if (trainee.userId === userId.toString() && trainee.attended && schedule.status === scheduleStatus.HAPPENED ) {
+                            attendance = attendanceStatus.ATTENDED;
+                        }else if(trainee.userId === userId.toString() && !trainee.attended && schedule.status === scheduleStatus.HAPPENED ){
+                            attendance = attendanceStatus.ABSENT
+                        }else if(schedule.status === scheduleStatus.PENDING) attendance = attendanceStatus.PENDING
+                    });
+                }
+
+                return {
+                    userId,
+                    firstName,
+                    lastName,
+                    phoneNumber,
+                    groupId: group._id,
+                    attendance: attendance,
+                };
             })
         )
     }

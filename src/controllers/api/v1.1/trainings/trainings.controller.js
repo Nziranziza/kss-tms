@@ -28,11 +28,14 @@ class TrainingController extends BaseController {
   }
 
   update(req, res){
-    const {body} = req;
+    const {body, params} = req;
     return asyncWrapper(res, async () => {
       body.adoptionGaps.map((data) => ObjectId(data));
-      console.log(body)
-      const data = await this.repository.update(req.body);
+      const toUpdate = {
+        _id: ObjectId(params.id),
+        ...body
+      };
+      const data = await this.repository.update(toUpdate);
       return responseWrapper({
         res,
         status: statusCodes.OK,
@@ -56,13 +59,12 @@ class TrainingController extends BaseController {
 
   delete(req, res) {
     return asyncWrapper(res, async () => {
-      const data = await this.repository.findOne(req.params.id);
+      const data = await this.repository.findSingle(req.params.id);
       const isDeleted = await data.softDelete();
       return responseWrapper({
         res,
         status: statusCodes.OK,
         message: "Removed successfully",
-        data,
       });
     });
   }
