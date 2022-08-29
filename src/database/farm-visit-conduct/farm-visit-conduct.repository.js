@@ -7,6 +7,7 @@ const {
 } = require("../farm-visit-schedule/farm-visit-schedule");
 const { ObjectId } = require("mongodb");
 const { Evaluation } = require("../evaluation/evaluation");
+const moment = require("moment/moment");
 
 class FarmVisitConductRepository extends BaseRepository {
   constructor(model) {
@@ -106,6 +107,11 @@ class FarmVisitConductRepository extends BaseRepository {
         ...(body.reference && { reference: body.reference }),
         ...(body.scheduleId && { scheduleId: body.scheduleId }),
         ...(body.groupId && { groupId: body.groupId }),
+        ...(body.date && { createdAt: { $gte:moment(body.date.from)
+                  .startOf('day')
+                  .toDate() , $lt:  moment(body.date.to)
+                  .endOf('day')
+                  .toDate() }}),
         ...{ isDeleted: false },
       },
     };
@@ -254,10 +260,15 @@ class FarmVisitConductRepository extends BaseRepository {
           body.location.village_id && {
             "farm.location.village_id": ObjectId(body.location.village_id),
           }),
-        ...(body.reference && { reference: body.reference }),
-        ...(body.scheduleId && { scheduleId: body.scheduleId }),
-        ...(body.groupId && { groupId: body.groupId }),
-        ...{ isDeleted: false },
+          ...(body.reference && { reference: body.reference }),
+          ...(body.scheduleId && { scheduleId: body.scheduleId }),
+          ...(body.groupId && { groupId: body.groupId }),
+          ...(body.date && { createdAt: { $gte:moment(body.date.from)
+                      .startOf('day')
+                      .toDate() , $lt:  moment(body.date.to)
+                      .endOf('day')
+                      .toDate() }}),
+          ...{ isDeleted: false },
       },
     };
     return this.model.aggregate([filter].concat(lookup));
