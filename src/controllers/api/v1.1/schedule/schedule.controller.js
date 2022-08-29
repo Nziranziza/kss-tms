@@ -13,11 +13,15 @@ const CustomError = require("../../../../core/helpers/customerError");
 const {
   scheduleStatus,
   receptionStatus,
+  attendanceStatus,
+  trainingStatus,
 } = require("../../../../tools/constants");
 const moment = require("moment");
 const ejs = require("ejs");
 const _path = require("path");
 const pdf = require("html-pdf");
+const { trainingRepository } = require('../../../../database/training/training.repository');
+const { Training } = require('../../../../database/training/training');
 
 class ScheduleController extends BaseController {
   constructor(repository) {
@@ -32,6 +36,25 @@ class ScheduleController extends BaseController {
     this.attendanceSummary = this.attendanceSummary.bind(this);
     this.getFarmerAttendance = this.getFarmerAttendance.bind(this);
     this.editAtt = this.editAtt.bind(this);
+  }
+
+  create(req, res){
+    return asyncWrapper(res, async () => {
+      req.body.applicationId = req.headers['tms-app-id'];
+      const data = await this.repository.create(req.body);
+      const response = await this.repository.findOne(data._id);
+
+      const training = await Training.findOne(req.params.id);
+      training.status = trainingStatus.SCHEDULED;
+      await training.save();
+
+      return responseWrapper({
+        res,
+        message: "Record successfully created",
+        status: statusCodes.OK,
+        data: response
+      });
+    });
   }
 
   findAllByRef(req, res) {
