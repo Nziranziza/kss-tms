@@ -13,8 +13,8 @@ v1_1.use("/groups", groups);
 v1_1.use("/evaluations", evaluations);
 v1_1.use("/trainings", trainings);
 v1_1.use("/schedules", schedules);
-v1_1.use("/farm-visit-schedules", farmVisitSchedules );
-v1_1.use("/farm-visit-conducts", farmVisitConducts );
-v1_1.use("/sms", communication );
+v1_1.use("/farm-visit-schedules", farmVisitSchedules);
+v1_1.use("/farm-visit-conducts", farmVisitConducts);
+v1_1.use("/sms", communication);
 
 module.exports = v1_1;

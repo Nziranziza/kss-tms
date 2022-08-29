@@ -43,7 +43,6 @@ class EvaluationRepository extends BaseRepository {
         },
       },
     ]);
-    // return this.model.populate(schedules[0], {path: "adoptionGaps"});
   }
 }
 module.exports.trainingRepository = new EvaluationRepository(Training);

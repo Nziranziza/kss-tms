@@ -212,6 +212,21 @@ class ScheduleRepository extends BaseRepository {
         },
       },
       {
+        $lookup: {
+          from: "trainings",
+          localField: "trainingId",
+          foreignField: "_id",
+          as: "trainingId",
+        },
+      },
+      {
+        $addFields: {
+          trainingId: {
+            $arrayElemAt: ["$trainingId", 0],
+          },
+        },
+      },
+      {
         $unwind: "$trainees",
       },
     ];
@@ -239,8 +254,15 @@ class ScheduleRepository extends BaseRepository {
             "groupId.location.village_id": ObjectId(body.location.village_id),
           }),
         ...(body.reference && { referenceId: ObjectId(body.reference) }),
-        ...(body.trainingId && { trainingId: ObjectId(body.trainingId) }),
+        ...(body.trainingId && { "trainingId._id": ObjectId(body.trainingId) }),
         ...(body.trainerId && { "trainer.userId": ObjectId(body.trainerId) }),
+        ...(body.status && { status: body.status }),
+        ...(body.gender && { "trainees.gender": body.gender }),
+        ...(body.date && { createdAt: { $gte:moment(body.date.from)
+                .startOf('day')
+                .toDate() , $lt:  moment(body.date.to)
+                .endOf('day')
+                .toDate() }}),
         ...{ isDeleted: false },
       },
     };
@@ -278,7 +300,7 @@ class ScheduleRepository extends BaseRepository {
         $match: {
           ...(body.groupId && {
             groupId: ObjectId(body.groupId),
-          }),
+          })
         },
       },
       {
@@ -293,6 +315,21 @@ class ScheduleRepository extends BaseRepository {
         $addFields: {
           groupId: {
             $arrayElemAt: ["$groupId", 0],
+          },
+        },
+      },
+      {
+        $lookup: {
+          from: "trainings",
+          localField: "trainingId",
+          foreignField: "_id",
+          as: "trainingId",
+        },
+      },
+      {
+        $addFields: {
+          trainingId: {
+            $arrayElemAt: ["$trainingId", 0],
           },
         },
       },
@@ -400,6 +437,13 @@ class ScheduleRepository extends BaseRepository {
         ...(body.reference && { referenceId: ObjectId(body.reference) }),
         ...(body.trainingId && { "trainingId._id": ObjectId(body.trainingId) }),
         ...(body.trainerId && { "trainer.userId": ObjectId(body.trainerId) }),
+        ...(body.status && { status: body.status }),
+        ...(body.gender && { "trainees.gender": body.gender }),
+        ...(body.date && { createdAt: { $gte:moment(body.date.from)
+                .startOf('day')
+                .toDate() , $lt:  moment(body.date.to)
+                .endOf('day')
+                .toDate() }}),
         ...{ isDeleted: false },
       },
     };
@@ -429,7 +473,6 @@ class ScheduleRepository extends BaseRepository {
 
     // Run query // Query will return 4 objects or less each containing stats for each gender
     const summary = await this.model.aggregate([unwind, filter, group]);
-    console.log(summary);
 
     let attended = 0;
     let total = 0;

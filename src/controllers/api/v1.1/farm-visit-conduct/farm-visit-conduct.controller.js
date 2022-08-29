@@ -54,7 +54,7 @@ class FarmVisitConductController extends BaseController {
             const visits = await this.repository.report(body);
             const workbook = new excelJS.Workbook();
             const worksheet = workbook.addWorksheet("Farm-visits");
-            const path = `${appRoot}/files/downloads`;
+            const path = `${appRoot}/downloads`;
             worksheet.columns = [
                 {header: "Date added", key: "created_at", width: 10},
                 {header: "UPI", key: "upi", width: 10},
@@ -117,7 +117,7 @@ class FarmVisitConductController extends BaseController {
                     });
             }  else if (type === 'pdf') {
             ejs.renderFile(
-                _path.join(__dirname, '/../../../../templates/', 'farm_visits_report.ejs'),
+                _path.join(__dirname, '/../../../../views/', 'farm_visits_report.ejs'),
                 {visits:visits },
                 (err, data) => {
                     if (err) {
