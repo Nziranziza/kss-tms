@@ -42,7 +42,7 @@ class FarmVisitScheduleRepository extends BaseRepository {
       .populate("farms.location.cell_id", "name")
       .populate("farms.location.village_id", "name")
       .populate("gaps")
-      .populate("groupId", "groupName");
+      .populate("groupId", "groupName").lean();
   }
 
   async schedulesStats(body) {
