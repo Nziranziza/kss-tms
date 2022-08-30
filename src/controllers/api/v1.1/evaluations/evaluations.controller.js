@@ -18,11 +18,13 @@ class EvaluationController extends BaseController {
     const body = { applicationId: req.params.id };
     return asyncWrapper(res, async () => {
       const data = await this.repository.customFindAll(body);
+      const gaps = await this.repository.calculateScore(data);
+
       return responseWrapper({
         res,
         status: statusCodes.OK,
         message: "Success",
-        data,
+        data: gaps,
       });
     });
   }
