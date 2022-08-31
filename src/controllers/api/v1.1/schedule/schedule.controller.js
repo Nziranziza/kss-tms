@@ -11,29 +11,51 @@ const appRoot = require("app-root-path");
 const fs = require("fs");
 const CustomError = require("../../../../core/helpers/customerError");
 const {
-    scheduleStatus,
-    receptionStatus,
+  scheduleStatus,
+  receptionStatus,
+  attendanceStatus,
+  trainingStatus
 } = require("../../../../tools/constants");
 const moment = require("moment");
 const ejs = require("ejs");
 const _path = require("path");
 const pdf = require("html-pdf");
+const { trainingRepository } = require('../../../../database/training/training.repository');
+const { Training } = require('../../../../database/training/training');
 
 class ScheduleController extends BaseController {
-    constructor(repository) {
-        super(repository);
-        this.findAllByRef = this.findAllByRef.bind(this);
-        this.delete = this.delete.bind(this);
-        this.recordAtt = this.recordAtt.bind(this);
-        this.sendSMS = this.sendSMS.bind(this);
-        this.report = this.report.bind(this);
-        this.downloadReport = this.downloadReport.bind(this);
-        this.statistics = this.statistics.bind(this);
-        this.attendanceSummary = this.attendanceSummary.bind(this);
-        this.getFarmerAttendance = this.getFarmerAttendance.bind(this);
-        this.editAtt = this.editAtt.bind(this);
-    }
+  constructor(repository) {
+    super(repository);
+    this.findAllByRef = this.findAllByRef.bind(this);
+    this.delete = this.delete.bind(this);
+    this.recordAtt = this.recordAtt.bind(this);
+    this.sendSMS = this.sendSMS.bind(this);
+    this.report = this.report.bind(this);
+    this.downloadReport = this.downloadReport.bind(this);
+    this.statistics = this.statistics.bind(this);
+    this.attendanceSummary = this.attendanceSummary.bind(this);
+    this.getFarmerAttendance = this.getFarmerAttendance.bind(this);
+    this.editAtt = this.editAtt.bind(this);
+  }
 
+  create(req, res){
+    return asyncWrapper(res, async () => {
+      req.body.applicationId = req.headers['tms-app-id'];
+      const data = await this.repository.create(req.body);
+      const response = await this.repository.findOne(data._id);
+
+      const training = await Training.findOne(req.params.id);
+      training.status = trainingStatus.SCHEDULED;
+      await training.save();
+
+      return responseWrapper({
+        res,
+        message: "Record successfully created",
+        status: statusCodes.OK,
+        data: response
+      });
+    });
+  }
 
     findAllByRef(req, res) {
         const {from, to} = req.query;
@@ -147,60 +169,82 @@ class ScheduleController extends BaseController {
         const {params, body} = req;
         return asyncWrapper(res, async () => {
             const schedule = await this.repository.findOne(params.id);
-            // Build recipients
-            let recipients = [];
-            for (const trainee of schedule.trainees) {
-                // If no phonenumber don't add user to recipients
-                if (trainee.phoneNumber && trainee.smsStatus !== receptionStatus.DELIVERED) {
+
+            if (schedule) {
+                // Build SMS body
+                const message = `Uruganda ${
+                  schedule.trainer.organisationName
+                } rubatumiye mu mahugurwa ya \"${
+                  schedule.trainingId.trainingName
+                }\". Azaba ku itariki ${schedule.startTime.toLocaleDateString()}, guhera ${schedule.startTime.toLocaleTimeString()} - kuri:${
+                  schedule.venueName
+                }`;
+        
+                // Build recipients
+                let recipients = [];
+                for (const trainee of schedule.trainees) {
+                  // If no phonenumber don't add user to recipients
+                  if (
+                    trainee.phoneNumber &&
+                    trainee.smsStatus !== receptionStatus.DELIVERED
+                  ) {
                     recipients.push(trainee.phoneNumber);
                     trainee.smsStatus = receptionStatus.QUEUED;
+                  }
                 }
-            }
-
-            const data = {
-                recipients: recipients,
-                message,
-                sender: body.sender,
-                ext_sender_id: body.sender_id,
-            };
-
-            console.log(data);
-
-            const sms = await sendClientSMS(data);
-
-            if (sms.data) {
-                const response = {
+        
+                const data = {
+                  recipients: recipients,
+                  message,
+                  sender: body.sender,
+                  ext_sender_id: body.sender_id,
+                  callBack: body.callback,
+                };
+        
+                console.log(data);
+        
+                const sms = await sendClientSMS(data);
+        
+                if (sms.data) {
+                  const response = {
                     message: message,
                     validPhones: sms.data.data.validPhones,
                     InvalidPhones: sms.data.data.InvalidPhones,
                     batch_id: sms.data.data.batch_id,
-                };
-
-                schedule.smsResponse.push(response);
-                await schedule.save();
-
-                responseWrapper({
+                  };
+        
+                  schedule.smsResponse.push(response);
+                  await schedule.save();
+        
+                  responseWrapper({
                     res,
                     status: sms.data.status,
                     message: sms.data.message,
                     data: sms.data.data,
-                });
-            } else if (sms.response.data) {
-                console.log(sms.response.data);
-                return responseWrapper({
+                  });
+                } else if (sms.response.data) {
+                  console.log(sms.response.data);
+                  return responseWrapper({
                     res,
                     status: sms.response.data.status,
                     message: sms.response.data.message,
-                });
-            } else {
-                console.log(sms);
-                return responseWrapper({
+                  });
+                } else {
+                  console.log(sms);
+                  return responseWrapper({
                     res,
                     status: statusCodes.SERVER_ERROR,
                     message: "Could not send messages",
-                });
-            }
-
+                  });
+                }
+              }
+              else
+              return responseWrapper({
+                res,
+                status: statusCodes.NOT_FOUND,
+                message: "Schedule not found or no trainees Added",
+              });
+      
         });
     }
 

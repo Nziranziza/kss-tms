@@ -25,8 +25,35 @@ class EvaluationRepository extends BaseRepository {
             adoption.length > 0
               ? (adoption[0].overall_score * 100) / adoption[0].overall_weight
               : 0,
-          baselineRate: Math.floor(Math.random() * 10),
+          baselineRate: 10,
           isDeleted,
+        };
+      })
+    );
+  }
+
+  calculateScore(data){
+    return Promise.all(
+      data.map(async (element) => {
+        const { _id, gap_name, gap_weight, gap_score, sections, status, createdAt } = element;
+        const adoption =
+          await farmVisitConductRepository.calculateAdoptionScore({
+            gapId: _id,
+          });
+          
+        return {
+          _id,
+          gap_name,
+          gap_weight,
+          gap_score,
+          sections,
+          status,
+          createdAt,
+          adoptionRate:
+            adoption.length > 0
+              ? (adoption[0].overall_score * 100) / adoption[0].overall_weight
+              : 0,
+          baselineRate: 10
         };
       })
     );

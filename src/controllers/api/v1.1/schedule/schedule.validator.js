@@ -46,9 +46,10 @@ const validateSchedule = (data) => {
 
 const validateUpdateSchedule = (data) => {
   const schema = Joi.object({
-    _id: Joi.objectId.required(),
+    _id: Joi.objectId().required(),
     trainingId: Joi.objectId().required(),
     trainer: Joi.object({
+      _id: Joi.objectId().required(),
       userId: Joi.objectId().required(),
       fullName: Joi.string().required(),
       phoneNumber: Joi.string(),
@@ -58,6 +59,7 @@ const validateUpdateSchedule = (data) => {
     referenceId: Joi.objectId().required(),
     description: Joi.string().required(),
     location: Joi.object({
+      _id: Joi.objectId().required(),
       prov_id: Joi.objectId().required(),
       dist_id: Joi.objectId().required(),
       sect_id: Joi.objectId().required(),
@@ -69,6 +71,7 @@ const validateUpdateSchedule = (data) => {
     endTime: Joi.date().required(),
     trainees: Joi.array().items(
       Joi.object({
+        _id: Joi.objectId(),
         userId: Joi.objectId().required(),
         groupId: Joi.objectId().required(),
         foreName: Joi.string().required(),

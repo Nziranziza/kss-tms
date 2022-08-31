@@ -6,6 +6,7 @@ const {
   commRepo,
 } = require("../../../../database/communication/communication.repository");
 const { getBalance, orderSMS, getOrders } = require("../../../../services/comm.service");
+const { scheduleRepository } = require('../../../../database/schedule/schedule.repository');
 
 class CommController extends BaseController {
   constructor(repository) {
@@ -14,6 +15,17 @@ class CommController extends BaseController {
 
   callback(req, res) {
     return asyncWrapper(res, async () => {
+      const {body} = req;
+      console.log("callback with called with body:", body);
+
+      const schedule = await scheduleRepository.cFindOne({'smsResponse.batch_id': body.batch_id});
+
+      schedule.trainees.map(trainee => {
+        trainee.smsStatus = body.status
+      });
+
+      await schedule.save();
+
       return responseWrapper({
         res,
         status: statusCodes.OK,

@@ -42,7 +42,7 @@ class FarmVisitScheduleRepository extends BaseRepository {
       .populate("farms.location.cell_id", "name")
       .populate("farms.location.village_id", "name")
       .populate("gaps")
-      .populate("groupId", "groupName");
+      .populate("groupId", "groupName").lean();
   }
 
   async schedulesStats(body) {
@@ -197,7 +197,7 @@ class FarmVisitScheduleRepository extends BaseRepository {
     ]);
   }
 
-  fetchVisitedFarmsId(body) {
+  visitedFarmsOverview(body) {
     const { location, date, referenceId } = body;
 
     let locSearchBy = "";
@@ -229,13 +229,7 @@ class FarmVisitScheduleRepository extends BaseRepository {
     const group = {
       $group: {
         _id: "null" ,
-        visits: {$addToSet: "$_id"},
-        farms: {
-          $addToSet: "$farms.farmId"
-        },
-        farmers: {
-          $addToSet: "$farms.owner.userId"
-        }
+        visits: {$addToSet: "$_id"}
       }
     }
     return this.model.aggregate([
