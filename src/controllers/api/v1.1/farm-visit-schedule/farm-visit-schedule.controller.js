@@ -18,7 +18,7 @@ class FarmVisitScheduleController extends BaseController {
     this.farmsScheduledVisits = this.farmsScheduledVisits.bind(this);
     this.farmScheduledVisits = this.farmScheduledVisits.bind(this);
     this.sendSMS = this.sendSMS.bind(this);
-    this.fetchVisitedFarmsId = this.fetchVisitedFarmsId.bind(this);
+    this.visitedFarmsOverview = this.visitedFarmsOverview.bind(this);
   }
 
   schedulesStats(req, res) {
@@ -114,16 +114,17 @@ class FarmVisitScheduleController extends BaseController {
     });
   }
 
-  fetchVisitedFarmsId(req, res) {
+  visitedFarmsOverview(req, res) {
     const { body } = req;
     return asyncWrapper(res, async () => {
-      const visits = await this.repository.fetchVisitedFarmsId(body);
+      const visits = await this.repository.visitedFarmsOverview(body);
+
       if (visits)
         return responseWrapper({
           res,
           status: statusCodes.OK,
           message: "success",
-          data: visits.length > 0 ? visits[0] : [],
+          data: visits.length > 0 ? visits[0] : {visits: 0},
         });
     });
   }

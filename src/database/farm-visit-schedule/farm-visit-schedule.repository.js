@@ -197,7 +197,7 @@ class FarmVisitScheduleRepository extends BaseRepository {
     ]);
   }
 
-  fetchVisitedFarmsId(body) {
+  visitedFarmsOverview(body) {
     const { location, date, referenceId } = body;
 
     let locSearchBy = "";
@@ -229,13 +229,7 @@ class FarmVisitScheduleRepository extends BaseRepository {
     const group = {
       $group: {
         _id: "null" ,
-        visits: {$addToSet: "$_id"},
-        farms: {
-          $addToSet: "$farms.farmId"
-        },
-        farmers: {
-          $addToSet: "$farms.owner.userId"
-        }
+        visits: {$addToSet: "$_id"}
       }
     }
     return this.model.aggregate([

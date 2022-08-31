@@ -22,6 +22,6 @@ routes.post(
 routes.get("/farmer/:id", farmVisitScheduleCtrl.farmerScheduledVisits);
 routes.get("/sms/:id", farmVisitScheduleCtrl.sendSMS);
 routes.post("/farm", farmVisitScheduleCtrl.farmScheduledVisits);
-routes.post("/visited/farms", farmVisitScheduleCtrl.fetchVisitedFarmsId);
+routes.post("/visited/farms", farmVisitScheduleCtrl.visitedFarmsOverview);
 
 module.exports.farmVisitSchedules = routes;
