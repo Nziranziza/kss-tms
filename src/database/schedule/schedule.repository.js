@@ -446,6 +446,7 @@ class ScheduleRepository extends BaseRepository {
                 .endOf('day')
                 .toDate() }}),
         ...{ isDeleted: false },
+        ...{ isDeleted: false },
       },
     };
     return this.model.aggregate(preFilter.concat([filter]));
