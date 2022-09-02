@@ -44,9 +44,9 @@ EXPOSE 7063
 
 RUN sudo npm install --location=global npm@latest
 RUN npm i --include=dev
-RUN npm run build
+#RUN npm run build
 RUN mkdir logs 
 
 RUN sudo service nginx restart
-RUN sudo chmod -R  755 build/
-RUN sudo chown -R docker-deployer:docker-deployer build/
+#RUN sudo chmod -R  755 build/
+#RUN sudo chown -R docker-deployer:docker-deployer build/
