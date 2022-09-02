@@ -40,7 +40,7 @@ WORKDIR /home/docker-deployer/
 COPY --chown=docker-deployer:docker-deployer ./package.json ./
 COPY --chown=docker-deployer:docker-deployer . .
 
-EXPOSE 7059
+EXPOSE 7063
 
 RUN sudo npm install --location=global npm@latest
 RUN npm i --include=dev
