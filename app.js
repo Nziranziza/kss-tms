@@ -12,6 +12,7 @@ require("./src/cron");
 const appRoot = require('app-root-path');
 const fs = require('fs');
 const dir = `${appRoot}/files/downloads`;
+const fileUpload = require('express-fileupload');
 
 if (!fs.existsSync(dir)){
   fs.mkdirSync(dir, { recursive: true });
