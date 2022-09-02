@@ -46,6 +46,12 @@ app.use((req, res, next) => {
   });
 });
 
+app.use(
+    fileUpload({
+      limits: { fileSize: 50 * 1024 * 1024 }
+    })
+);
+
 app.listen(config.get("app.port"), () => {
   logger.info(
     `${config.get("app.name")} service is listening on port ${config.get(
