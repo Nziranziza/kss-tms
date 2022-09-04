@@ -12,6 +12,7 @@ require("./src/cron");
 const appRoot = require('app-root-path');
 const fs = require('fs');
 const dir = `${appRoot}/files/downloads`;
+const fileUpload = require('express-fileupload');
 
 if (!fs.existsSync(dir)){
   fs.mkdirSync(dir, { recursive: true });
@@ -45,6 +46,12 @@ app.use((req, res, next) => {
     error: 'Resource not found'
   });
 });
+
+app.use(
+    fileUpload({
+      limits: { fileSize: 50 * 1024 * 1024 }
+    })
+);
 
 app.listen(config.get("app.port"), () => {
   logger.info(

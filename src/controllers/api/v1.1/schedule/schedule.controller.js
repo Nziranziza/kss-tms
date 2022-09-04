@@ -397,7 +397,6 @@ class ScheduleController extends BaseController {
                                     return err;
                                 } else {
                                     const str = fs.readFileSync(fileName, {encoding: "base64"});
-                                    console.log(str);
                                     return responseWrapper({
                                         res,
                                         status: statusCodes.OK,

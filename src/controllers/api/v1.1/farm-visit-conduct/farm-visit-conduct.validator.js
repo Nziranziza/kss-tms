@@ -52,6 +52,7 @@ const validateFarmVisitConduct = visitData => {
             .required()
             .label('group'),
         scheduleId: Joi.objectId(),
+        photos:  Joi.array().items(Joi.string()),
         evaluation: Joi.array().items(
             Joi.object({
                 sectionId: Joi.objectId(),

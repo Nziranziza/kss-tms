@@ -448,6 +448,7 @@ class ScheduleRepository extends BaseRepository {
           },
         }),
         ...{ isDeleted: false },
+        ...{ isDeleted: false },
       },
     };
     return this.model.aggregate(preFilter.concat([filter]));
