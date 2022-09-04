@@ -16,6 +16,7 @@ class EvaluationRepository extends BaseRepository {
         const adoption =
           await farmVisitConductRepository.calculateAdoptionScore({
             gapId: _id,
+            ...body
           });
           
         return {
