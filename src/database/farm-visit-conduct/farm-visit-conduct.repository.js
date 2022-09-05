@@ -293,7 +293,7 @@ class FarmVisitConductRepository extends BaseRepository {
         ...(referenceId && { referenceId: referenceId }),
         ...(location && { [locSearchBy]: ObjectId(location.locationId) }),
         ...(date && {
-          startTime: { $gte: startDate, $lt: endDate },
+          createdAt: { $gte: startDate, $lt: endDate },
         }),
         isDeleted: false
       },
