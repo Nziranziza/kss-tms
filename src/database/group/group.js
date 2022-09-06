@@ -26,7 +26,7 @@ const memberSchema = new Schema({
 
 // Group schema
 const groupSchema = new Schema({
-    groupName: {type: String, index: true, unique: true},
+    groupName: {type: String, index: true},
     leaderNames: {type: String},
     leaderPhoneNumber: {type: String, required: true},
     description: {type: String, required: true},

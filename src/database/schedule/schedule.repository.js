@@ -114,7 +114,7 @@ class ScheduleRepository extends BaseRepository {
         ...(date && {
           startTime: { $gte: startDate, $lt: endDate },
         }),
-        isDeleted: false
+        isDeleted: false,
       },
     };
 
@@ -259,11 +259,12 @@ class ScheduleRepository extends BaseRepository {
         ...(body.trainerId && { "trainer.userId": ObjectId(body.trainerId) }),
         ...(body.status && { status: body.status }),
         ...(body.gender && { "trainees.gender": body.gender }),
-        ...(body.date && { createdAt: { $gte:moment(body.date.from)
-                .startOf('day')
-                .toDate() , $lt:  moment(body.date.to)
-                .endOf('day')
-                .toDate() }}),
+        ...(body.date && {
+          createdAt: {
+            $gte: moment(body.date.from).startOf("day").toDate(),
+            $lt: moment(body.date.to).endOf("day").toDate(),
+          },
+        }),
         ...{ isDeleted: false },
       },
     };
@@ -301,7 +302,7 @@ class ScheduleRepository extends BaseRepository {
         $match: {
           ...(body.groupId && {
             groupId: ObjectId(body.groupId),
-          })
+          }),
         },
       },
       {
@@ -446,7 +447,7 @@ class ScheduleRepository extends BaseRepository {
                 .toDate() , $lt:  moment(body.date.to)
                 .endOf('day')
                 .toDate() }}),
-        ...{ isDeleted: false },
+
         ...{ isDeleted: false },
       },
     };
@@ -560,6 +561,76 @@ class ScheduleRepository extends BaseRepository {
     if (attended + absent === 0) return 100;
 
     return attended !== 0 ? ~~((attended * 100) / (attended + absent)) : 0;
+  }
+
+  // This method returns a training associated trainers and groups
+  getTrainingFilters(body) {
+    const { referenceId, location, date } = body;
+
+    let locSearchBy = "";
+    if (location) locSearchBy = `location.${location.searchBy}`;
+
+    let startDate = "";
+    let endDate = "";
+    if (date) {
+      startDate = moment(date.from).startOf("day").toDate();
+      endDate = moment(date.to).endOf("day").toDate();
+    }
+
+    // Filter statistics by different values
+    const filter = {
+      $match: {
+        ...(referenceId && { referenceId: ObjectId(referenceId) }),
+        ...(location && { [locSearchBy]: ObjectId(location.locationId) }),
+        ...(date && {
+          startTime: { $gte: startDate, $lt: endDate },
+        }),
+        isDeleted: false,
+      },
+    };
+
+    // Lookup Trainings
+    const lookup = {
+      $lookup: {
+        from: "trainings",
+        localField: "trainingId",
+        foreignField: "_id",
+        as: "training",
+      },
+    };
+
+    // Unwind all tranings
+    const unwind = {
+      $unwind: "$training",
+    };
+
+    const unwindTrainees = {
+      $unwind: "$trainees",
+    };
+
+    // Group by training
+    const group = {
+      $group: {
+        _id: "$trainingId",
+        trainingName: {
+          $first: "$training.trainingName",
+        },
+        trainers: {
+          $addToSet: "$trainer",
+        },
+        groups: {
+          $addToSet: "$trainees.groupId",
+        },
+      },
+    };
+
+    return this.model.aggregate([
+      filter,
+      lookup,
+      unwind,
+      unwindTrainees,
+      group,
+    ]);
   }
 }
 

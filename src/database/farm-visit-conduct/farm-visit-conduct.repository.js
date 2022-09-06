@@ -275,11 +275,27 @@ class FarmVisitConductRepository extends BaseRepository {
   }
 
   calculateAdoptionScore(data) {
-    const { gapId } = data;
+    const { gapId, referenceId, location, date } = data;
+
+    let locSearchBy = "";
+    if (location) locSearchBy = `farm.location.${location.searchBy}`;
+
+    let startDate = "";
+    let endDate = "";
+    if (date) {
+      startDate = moment(date.from).startOf("day").toDate();
+      endDate = moment(date.to).endOf("day").toDate();
+    }
 
     const filters = {
       $match: {
         ...(gapId && { gap: gapId }),
+        ...(referenceId && { referenceId: referenceId }),
+        ...(location && { [locSearchBy]: ObjectId(location.locationId) }),
+        ...(date && {
+          createdAt: { $gte: startDate, $lt: endDate },
+        }),
+        isDeleted: false
       },
     };
 
