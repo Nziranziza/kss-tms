@@ -48,6 +48,7 @@ const sendClientSMS = async (data) => {
 const getBalance = async (id) => {
   try {
     const token = await RedisService.getCachedData("comm-token");
+    console.log("cached token", token)
     return await CommService.get("/orders/getBalance/" + id, {
       token: token.replace(/['"]+/g, ""),
     });
