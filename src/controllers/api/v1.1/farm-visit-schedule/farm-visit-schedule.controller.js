@@ -57,8 +57,8 @@ class FarmVisitScheduleController extends BaseController {
         for (const farm of schedule.farms) {
           let recipients = [];
 
-          const message = `Uruganda ${schedule.visitor.organisationName} ruzasura umulima wawe uherereye ${farm.location.village_id.name}.
-          ku itariki ${schedule.date.toLocaleTimeString()} saa ${
+          const message = `Uruganda ${schedule.visitor.organisationName} ruzasura umurima wawe uherereye ${farm.location.village_id.name}.
+          ku itariki ${schedule.date.toLocaleDateString()} saa ${
             schedule.expectedDuration.from } - ${schedule.expectedDuration.to}`;
 
           if (farm.owner.phoneNumber) {
