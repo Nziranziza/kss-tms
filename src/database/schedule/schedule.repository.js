@@ -439,15 +439,15 @@ class ScheduleRepository extends BaseRepository {
         ...(body.reference && { referenceId: ObjectId(body.reference) }),
         ...(body.trainingId && { "trainingId._id": ObjectId(body.trainingId) }),
         ...(body.trainerId && { "trainer.userId": ObjectId(body.trainerId) }),
+        ...(body.groupId && { groupId: body.groupId }),
         ...(body.status && { status: body.status }),
         ...(body.gender && { "trainees.gender": body.gender }),
-        ...(body.date && {
-          createdAt: {
-            $gte: moment(body.date.from).startOf("day").toDate(),
-            $lt: moment(body.date.to).endOf("day").toDate(),
-          },
-        }),
-        ...{ isDeleted: false },
+        ...(body.date && { startTime: { $gte:moment(body.date.from)
+                .startOf('day')
+                .toDate() , $lt:  moment(body.date.to)
+                .endOf('day')
+                .toDate() }}),
+
         ...{ isDeleted: false },
       },
     };

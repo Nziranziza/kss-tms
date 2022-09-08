@@ -236,6 +236,7 @@ class GroupRepository extends BaseRepository {
         };
         return this.model
             .find(filter)
+            .lean()
             .populate("location.prov_id", "namek")
             .populate("location.dist_id", "name")
             .populate("location.sect_id", "name")
