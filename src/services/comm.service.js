@@ -16,6 +16,7 @@ const authenticateApp = async (data) => {
       token: "",
     });
   } catch (error) {
+    console.log(error)
     return error;
   }
 };
@@ -48,7 +49,7 @@ const sendClientSMS = async (data) => {
 const getBalance = async (id) => {
   try {
     const token = await RedisService.getCachedData("comm-token");
-    console.log("cached token", token)
+    if(token == null) claimToken();
     return await CommService.get("/orders/getBalance/" + id, {
       token: token.replace(/['"]+/g, ""),
     });
@@ -98,6 +99,7 @@ const claimToken = async () => {
       token.data.data.token.replace(/['"]+/g, ""),
       24 * 60 * 60
     );
+    return token.data.data.token.replace(/['"]+/g, "");
   }
 };
 
