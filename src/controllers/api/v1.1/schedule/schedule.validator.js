@@ -21,8 +21,8 @@ const validateSchedule = (data) => {
       village_id: Joi.objectId().required(),
     }).required(),
     venueName: Joi.string().required(),
-    startTime: Joi.date().required(),
-    endTime: Joi.date().required(),
+    startTime: Joi.string().required(),
+    endTime: Joi.string().required(),
     trainees: Joi.array().items(
       Joi.object({
         userId: Joi.objectId().required(),
