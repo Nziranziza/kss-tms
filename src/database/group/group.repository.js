@@ -13,7 +13,6 @@ class GroupRepository extends BaseRepository {
     }
 
     async find(data) {
-        console.log(data);
         const groups = await super
             .find()
             .populate("location.prov_id", "namek")
@@ -103,7 +102,6 @@ class GroupRepository extends BaseRepository {
         // Find if group has already been invited for a training
 
         const members = group.members;
-
 
         // If group has a schedule then check past schedules and check whether members have attended at least once
         return Promise.all(
