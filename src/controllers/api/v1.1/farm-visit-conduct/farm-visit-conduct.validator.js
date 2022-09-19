@@ -40,7 +40,6 @@ const validateFarmVisitConduct = visitData => {
                         .label('village')
                 }).required(),
                 upiNumber: Joi.string(),
-
             }),
         visitor: ownerSchema,
         owner: ownerSchema,
