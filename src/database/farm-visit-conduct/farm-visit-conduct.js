@@ -43,7 +43,7 @@ const sectionSchema = new Schema({
 const farmSchema = new Schema({
     farmId: {type: Schema.Types.ObjectId},
     location: locationSchema,
-    upiNumber: { type: String },
+    upiNumber: { type: String, default : null },
     owner: {type: ownerSchema}
 });
 
