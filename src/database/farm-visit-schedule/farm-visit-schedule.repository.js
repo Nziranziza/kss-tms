@@ -344,6 +344,81 @@ class FarmVisitScheduleRepository extends BaseRepository {
       {
         $unwind: "$farms",
       },
+      {
+        $lookup: {
+          from: "provinces",
+          localField: "farms.location.prov_id",
+          foreignField: "_id",
+          as: "farms.location.prov_id",
+        },
+      },
+      {
+        $addFields: {
+          "farms.location.prov_id": {
+            $arrayElemAt: ["$farms.location.prov_id", 0],
+          },
+        },
+      },
+      {
+        $lookup: {
+          from: "districts",
+          localField: "farms.location.dist_id",
+          foreignField: "_id",
+          as: "farms.location.dist_id",
+        },
+      },
+      {
+        $addFields: {
+          "farms.location.dist_id": {
+            $arrayElemAt: ["$farms.location.dist_id", 0],
+          },
+        },
+      },
+      {
+        $lookup: {
+          from: "sectors",
+          localField: "farms.location.sect_id",
+          foreignField: "_id",
+          as: "farms.location.sect_id",
+        },
+      },
+      {
+        $addFields: {
+          "farms.location.sect_id": {
+            $arrayElemAt: ["$farms.location.sect_id", 0],
+          },
+        },
+      },
+      {
+        $lookup: {
+          from: "cells",
+          localField: "farms.location.cell_id",
+          foreignField: "_id",
+          as: "farms.location.cell_id",
+        },
+      },
+      {
+        $addFields: {
+          "farms.location.cell_id": {
+            $arrayElemAt: ["$farms.location.cell_id", 0],
+          },
+        },
+      },
+      {
+        $lookup: {
+          from: "villages",
+          localField: "farms.location.village_id",
+          foreignField: "_id",
+          as: "farms.location.village_id",
+        },
+      },
+      {
+        $addFields: {
+          "farms.location.village_id": {
+            $arrayElemAt: ["$farms.location.village_id", 0],
+          },
+        },
+      }
     ]);
   }
 
