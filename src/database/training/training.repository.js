@@ -23,6 +23,12 @@ class EvaluationRepository extends BaseRepository {
       },
     };
 
+    const match = {
+      $match: {
+        'schedules.isDeleted': false
+      }
+    };
+
     const locationPopulate = [
       {
         $lookup: {
@@ -149,6 +155,7 @@ class EvaluationRepository extends BaseRepository {
         },
       },
       unwind,
+      match,
       ...locationPopulate,
       group,
     ]);

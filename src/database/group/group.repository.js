@@ -14,13 +14,14 @@ class GroupRepository extends BaseRepository {
 
     async find(data) {
         const groups = await super
-            .find()
+            .find(data)
             .populate("location.prov_id", "namek")
             .populate("location.dist_id", "name")
             .populate("location.sect_id", "name")
             .populate("location.cell_id", "name")
             .populate("location.village_id", "name");
 
+        // Add attendance rate on every group
         return Promise.all(
             groups.map(async (group) => {
                 console.log(group._id);
