@@ -290,7 +290,7 @@ class FarmVisitConductRepository extends BaseRepository {
     const filters = {
       $match: {
         ...(gapId && { gap: gapId }),
-        ...(referenceId && { referenceId: referenceId }),
+        ...(referenceId && { reference: referenceId }),
         ...(location && { [locSearchBy]: ObjectId(location.locationId) }),
         ...(date && {
           createdAt: { $gte: startDate, $lt: endDate },
