@@ -104,7 +104,6 @@ class GroupRepository extends BaseRepository {
 
         const members = group.members;
 
-
         // If group has a schedule then check past schedules and check whether members have attended at least once
         return Promise.all(
             members.map(async (member) => {
