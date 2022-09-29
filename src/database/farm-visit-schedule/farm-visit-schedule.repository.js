@@ -139,13 +139,13 @@ class FarmVisitScheduleRepository extends BaseRepository {
           from: "provinces",
           localField: "farms.location.prov_id",
           foreignField: "_id",
-          as: "farm.location.prov_id",
+          as: "farms.location.prov_id",
         },
       },
       {
         $addFields: {
-          "farm.location.prov_id": {
-            $arrayElemAt: ["$farm.location.prov_id", 0],
+          "farms.location.prov_id": {
+            $arrayElemAt: ["$farms.location.prov_id", 0],
           },
         },
       },
@@ -154,7 +154,7 @@ class FarmVisitScheduleRepository extends BaseRepository {
           from: "districts",
           localField: "farms.location.dist_id",
           foreignField: "_id",
-          as: "farm.location.dist_id",
+          as: "farms.location.dist_id",
         },
       },
       {
@@ -169,13 +169,13 @@ class FarmVisitScheduleRepository extends BaseRepository {
           from: "sectors",
           localField: "farms.location.sect_id",
           foreignField: "_id",
-          as: "farm.location.sect_id",
+          as: "farms.location.sect_id",
         },
       },
       {
         $addFields: {
-          "farm.location.sect_id": {
-            $arrayElemAt: ["$farm.location.sect_id", 0],
+          "farms.location.sect_id": {
+            $arrayElemAt: ["$farms.location.sect_id", 0],
           },
         },
       },
@@ -184,13 +184,13 @@ class FarmVisitScheduleRepository extends BaseRepository {
           from: "cells",
           localField: "farms.location.cell_id",
           foreignField: "_id",
-          as: "farm.location.cell_id",
+          as: "farms.location.cell_id",
         },
       },
       {
         $addFields: {
-          "farm.location.cell_id": {
-            $arrayElemAt: ["$farm.location.cell_id", 0],
+          "farms.location.cell_id": {
+            $arrayElemAt: ["$farms.location.cell_id", 0],
           },
         },
       },
@@ -199,13 +199,13 @@ class FarmVisitScheduleRepository extends BaseRepository {
           from: "villages",
           localField: "farms.location.village_id",
           foreignField: "_id",
-          as: "farm.location.village_id",
+          as: "farms.location.village_id",
         },
       },
       {
         $addFields: {
-          "farm.location.village_id": {
-            $arrayElemAt: ["$farm.location.village_id", 0],
+          "farms.location.village_id": {
+            $arrayElemAt: ["$farms.location.village_id", 0],
           },
         },
       },
@@ -250,13 +250,13 @@ class FarmVisitScheduleRepository extends BaseRepository {
           from: "provinces",
           localField: "farms.location.prov_id",
           foreignField: "_id",
-          as: "farm.location.prov_id",
+          as: "farms.location.prov_id",
         },
       },
       {
         $addFields: {
-          "farm.location.prov_id": {
-            $arrayElemAt: ["$farm.location.prov_id", 0],
+          "farms.location.prov_id": {
+            $arrayElemAt: ["$farms.location.prov_id", 0],
           },
         },
       },
@@ -265,13 +265,13 @@ class FarmVisitScheduleRepository extends BaseRepository {
           from: "districts",
           localField: "farms.location.dist_id",
           foreignField: "_id",
-          as: "farm.location.dist_id",
+          as: "farms.location.dist_id",
         },
       },
       {
         $addFields: {
-          "farm.location.dist_id": {
-            $arrayElemAt: ["$farm.location.dist_id", 0],
+          "farms.location.dist_id": {
+            $arrayElemAt: ["$farms.location.dist_id", 0],
           },
         },
       },
@@ -280,13 +280,13 @@ class FarmVisitScheduleRepository extends BaseRepository {
           from: "sectors",
           localField: "farms.location.sect_id",
           foreignField: "_id",
-          as: "farm.location.sect_id",
+          as: "farms.location.sect_id",
         },
       },
       {
         $addFields: {
-          "farm.location.sect_id": {
-            $arrayElemAt: ["$farm.location.sect_id", 0],
+          "farms.location.sect_id": {
+            $arrayElemAt: ["$farms.location.sect_id", 0],
           },
         },
       },
@@ -295,13 +295,13 @@ class FarmVisitScheduleRepository extends BaseRepository {
           from: "cells",
           localField: "farms.location.cell_id",
           foreignField: "_id",
-          as: "farm.location.cell_id",
+          as: "farms.location.cell_id",
         },
       },
       {
         $addFields: {
-          "farm.location.cell_id": {
-            $arrayElemAt: ["$farm.location.cell_id", 0],
+          "farms.location.cell_id": {
+            $arrayElemAt: ["$farms.location.cell_id", 0],
           },
         },
       },
@@ -310,13 +310,13 @@ class FarmVisitScheduleRepository extends BaseRepository {
           from: "villages",
           localField: "farms.location.village_id",
           foreignField: "_id",
-          as: "farm.location.village_id",
+          as: "farms.location.village_id",
         },
       },
       {
         $addFields: {
-          "farm.location.village_id": {
-            $arrayElemAt: ["$farm.location.village_id", 0],
+          "farms.location.village_id": {
+            $arrayElemAt: ["$farms.location.village_id", 0],
           },
         },
       },
