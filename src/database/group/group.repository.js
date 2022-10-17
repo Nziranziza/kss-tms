@@ -15,6 +15,7 @@ class GroupRepository extends BaseRepository {
     async find(data) {
         const groups = await super
             .find(data)
+            .sort({createdAt: -1})
             .populate("location.prov_id", "namek")
             .populate("location.dist_id", "name")
             .populate("location.sect_id", "name")
@@ -24,7 +25,6 @@ class GroupRepository extends BaseRepository {
         // Add attendance rate on every group
         return Promise.all(
             groups.map(async (group) => {
-                console.log(group._id);
                 const {
                     _id,
                     status,
