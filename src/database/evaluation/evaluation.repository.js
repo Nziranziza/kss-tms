@@ -12,7 +12,7 @@ class EvaluationRepository extends BaseRepository {
     const evaluations = await this.model.find({});
     return Promise.all(
       evaluations.map(async (element) => {
-        const { _id, gap_name, isDeleted } = element;
+        const { _id, gap_name, baselineRate, isDeleted } = element;
         const adoption =
           await farmVisitConductRepository.calculateAdoptionScore({
             gapId: _id,
@@ -26,7 +26,7 @@ class EvaluationRepository extends BaseRepository {
             adoption.length > 0
               ? (adoption[0].overall_score * 100) / adoption[0].overall_weight
               : 0,
-          baselineRate: 10,
+          baselineRate,
           isDeleted,
         };
       })
@@ -36,7 +36,7 @@ class EvaluationRepository extends BaseRepository {
   calculateScore(data){
     return Promise.all(
       data.map(async (element) => {
-        const { _id, gap_name, gap_weight, gap_score, sections, status, createdAt } = element;
+        const { _id, gap_name, gap_weight, gap_score, sections, status, createdAt, baselineRate } = element;
         const adoption =
           await farmVisitConductRepository.calculateAdoptionScore({
             gapId: _id,
@@ -54,10 +54,24 @@ class EvaluationRepository extends BaseRepository {
             adoption.length > 0
               ? (adoption[0].overall_score * 100) / adoption[0].overall_weight
               : 0,
-          baselineRate: 10
+          baselineRate
         };
       })
     );
+  }
+
+  async computeBaseline() {
+    // Fetch all gaps
+    const gaps = await this.model.find({});
+    Promise.all(
+      gaps.map(async gap => {
+        const score = await farmVisitConductRepository.calculateBaselineScore({gapId: gap._id});
+        gap.baselineRate = score.length > 0 ? score[0].overall_score : 0;
+        await gap.save();
+
+      })
+    );
+    return gaps;
   }
 }
 module.exports.evaluationRepository = new EvaluationRepository(Evaluation);
