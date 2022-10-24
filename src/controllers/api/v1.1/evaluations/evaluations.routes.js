@@ -5,6 +5,7 @@ const validator = require("../../../../middlewares/validator");
 const routes = Router();
 
 routes.post("/", validator("validateEvaluation"), evaluationCtrl.create);
+routes.get('/computeBaseline', evaluationCtrl.computeBaseline);
 routes.get("/:id", evaluationCtrl.findOne);
 routes.put("/:id", evaluationCtrl.update);
 routes.get("/app/:id", evaluationCtrl.findByApp);
