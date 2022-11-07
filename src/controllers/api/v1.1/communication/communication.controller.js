@@ -65,7 +65,6 @@ class CommController extends BaseController {
 
   getOrders(req, res){
     const { params } = req;
-    console.log(params);
     return asyncWrapper(res, async () => {
       const orders = await getOrders(params.id);
       if (orders.data)
