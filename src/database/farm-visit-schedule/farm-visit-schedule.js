@@ -25,6 +25,8 @@ const expectedDurationSchema = new Schema({
 
 const evaluationGap = new  Schema({
     gap_id: {type: Schema.Types.ObjectId},
+    conduct_id: {type: Schema.Types.ObjectId},
+    photos: {type: [String]},
     overall_weight: {type: Number},
     overall_score: {type: Number}
 });
