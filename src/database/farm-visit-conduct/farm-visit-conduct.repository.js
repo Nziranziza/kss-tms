@@ -36,6 +36,8 @@ class FarmVisitConductRepository extends BaseRepository {
             gap_id: conduct.gap,
             overall_weight: conduct.overall_weight,
             overall_score: conduct.overall_score,
+            conduct_id: conduct._id,
+            photos: conduct.photos
           },
         },
       }
