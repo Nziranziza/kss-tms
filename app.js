@@ -61,7 +61,7 @@ app.listen(config.get("app.port"), () => {
   );
 
   client.on("connect", () => {
-    console.log("Skipped claiming token fff")
+    console.log("Skipped claiming token")
     claimToken();
   });
 });
