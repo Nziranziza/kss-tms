@@ -4,9 +4,6 @@ const BaseController = require("../../../../core/library/BaseController");
 const {
   farmVisitScheduleRepository,
 } = require("../../../../database/farm-visit-schedule/farm-visit-schedule.repository");
-const {
-  farmVisitConductRepository,
-} = require("../../../../database/farm-visit-conduct/farm-visit-conduct.repository");
 const { statusCodes } = require("../../../../utils/constants/common");
 const { sendAppSMS } = require("../../../../services/comm.service");
 

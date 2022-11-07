@@ -13,6 +13,7 @@ class FarmVisitScheduleRepository extends BaseRepository {
   find(data) {
     return super
       .find(data)
+      .sort({createdAt: -1})
       .populate("farms.location.prov_id", "namek")
       .populate("farms.location.dist_id", "name")
       .populate("farms.location.sect_id", "name")

@@ -56,6 +56,8 @@ class ScheduleController extends BaseController {
   }
 
     findAllByRef(req, res) {
+
+        // Build find by date queries
         const {from, to} = req.query;
         let startDate = "";
         let endDate = "";
@@ -64,6 +66,7 @@ class ScheduleController extends BaseController {
             endDate = moment(to).endOf("day").toDate();
         }
 
+        // Filters
         const body = {
             referenceId: req.params.id,
             ...(from &&
@@ -73,6 +76,7 @@ class ScheduleController extends BaseController {
         };
         return asyncWrapper(res, async () => {
             const data = await this.repository.customFindAll(body);
+            // if Associated training is null remove object
             const filter = data.filter((schedule) => schedule.trainingId !== null);
             return responseWrapper({
                 res,
