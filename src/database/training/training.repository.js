@@ -25,7 +25,7 @@ class EvaluationRepository extends BaseRepository {
 
     const match = {
       $match: {
-        'schedules.isDeleted': false
+        //'schedules.isDeleted': false
       }
     };
 
