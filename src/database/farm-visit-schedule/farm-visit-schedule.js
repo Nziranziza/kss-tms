@@ -39,8 +39,6 @@ const farmSchema = new Schema({
     evaluatedGaps: {type: [evaluationGap]}
 });
 
-
-
 // Farm visit schema
 const farmVisitScheduleSchema = new Schema({
     gaps: {type: [Schema.Types.ObjectId],  ref: "evaluation"},

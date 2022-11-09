@@ -71,5 +71,6 @@ farmVisitConductSchema.plugin(timestamps, {
 
 farmVisitConductSchema.plugin(softDelete);
 
+
 const FarmVisitConduct = mongoose.model('farm_visit_conduct', farmVisitConductSchema);
 module.exports.FarmVisitConduct = FarmVisitConduct;
