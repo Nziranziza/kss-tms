@@ -12,16 +12,33 @@ const scheduleStatus = {
 const attendanceStatus = {
   ATTENDED: "attended",
   ABSENT: "absent",
-  NOT_INVITED: "not_invited"
+  NOT_INVITED: "not_invited",
+  PENDING: "pending"
 };
 
+const receptionStatus = {
+  NOT_SENT: 'NOT_SENT',
+  DELIVERED: 'DELIVERED',
+  FAILED: 'FAILED',
+  PENDING: 'PENDING',
+  QUEUED: 'QUEUED',
+  REJECTED: 'REJECTED',
+  UNREACHABLE: 'UNREACHABLE'
+}
+
+const smsPurpose = {
+  TRAINING_INVITE: 'TRAINING_INVITE',
+  INFORM_VISIT: 'INFORM_VISIT' 
+}
 const groupStatus = {
   ACTIVE: "active",
-  INACTIVE: "INACTIVE"
+  INACTIVE: "inactive"
 
 };
 
 module.exports.trainingStatus = trainingStatus;
 module.exports.scheduleStatus = scheduleStatus;
 module.exports.attendanceStatus = attendanceStatus;
+module.exports.receptionStatus = receptionStatus;
+module.exports.smsPurpose = smsPurpose;
 module.exports.groupStatus = groupStatus;

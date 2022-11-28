@@ -13,12 +13,15 @@ const {
 } = require("../trainings/trainings.validator");
 const {
     validateSchedule,
+    validateUpdateSchedule,
     validateRecordAtt,
+    validateEditAtt,
     validateStats,
     validateFilterSchedule
 } = require("../schedule/schedule.validator");
 const {
     validateFarmVisitSchedule,
+    validateVisitStats
 } = require("../farm-visit-schedule/farm-visit-schedule.validator");
 
 
@@ -37,6 +40,9 @@ module.exports = {
     validateSchedule,
     validateGetMemberAttendance,
     validateRecordAtt,
+    validateEditAtt,
     validateStats,
-    validateFilterSchedule
+    validateFilterSchedule,
+    validateVisitStats,
+    validateUpdateSchedule
 };

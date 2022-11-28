@@ -39,8 +39,7 @@ const validateFarmVisitConduct = visitData => {
                         .required()
                         .label('village')
                 }).required(),
-                upiNumber: Joi.string(),
-
+                upiNumber: Joi.string()
             }),
         visitor: ownerSchema,
         owner: ownerSchema,
@@ -52,18 +51,24 @@ const validateFarmVisitConduct = visitData => {
             .required()
             .label('group'),
         scheduleId: Joi.objectId(),
+        photos:  Joi.array().items(Joi.string()),
         evaluation: Joi.array().items(
             Joi.object({
-                questionId: Joi.objectId(),
-                marks: Joi.number(),
-                answers: Joi.array().items(
-                    Joi.object({
-                        answerId: Joi.string(),
-                        selected: Joi.boolean(),
-                        text: Joi.string(),
-                        weight: Joi.number()
-                    })
-                )
+                sectionId: Joi.objectId(),
+                questions: Joi.array().items({
+                    questionId: Joi.objectId(),
+                    score: Joi.number(),
+                    selected: Joi.boolean(),
+                    text: Joi.string(),
+                    answers: Joi.array().items(
+                        Joi.object({
+                            answerId: Joi.string(),
+                            selected: Joi.boolean(),
+                            text: Joi.string(),
+                            score: Joi.number()
+                        })
+                    )
+                })
             })
         )
 

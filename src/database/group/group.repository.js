@@ -1,7 +1,7 @@
 const BaseRepository = require("../../core/library/BaseRepository");
 const {Group} = require("./group");
 const {scheduleRepository} = require("../schedule/schedule.repository");
-const {attendanceStatus} = require("../../tools/constants");
+const {attendanceStatus, scheduleStatus} = require("../../tools/constants");
 const ObjectId = require("mongodb").ObjectID;
 
 class GroupRepository extends BaseRepository {
@@ -12,8 +12,57 @@ class GroupRepository extends BaseRepository {
         this.report = this.report.bind(this);
     }
 
-    find(data) {
-        return super.find(data);
+    async find(data) {
+        const groups = await super
+            .find(data)
+            .sort({createdAt: -1})
+            .populate("location.prov_id", "namek")
+            .populate("location.dist_id", "name")
+            .populate("location.sect_id", "name")
+            .populate("location.cell_id", "name")
+            .populate("location.village_id", "name");
+
+        // Add attendance rate on every group
+        return Promise.all(
+            groups.map(async (group) => {
+                const {
+                    _id,
+                    status,
+                    groupName,
+                    leaderNames,
+                    leaderPhoneNumber,
+                    description,
+                    location,
+                    meetingSchedule,
+                    reference,
+                    members,
+                    isDeleted,
+                    deletedAt,
+                    updatedAt,
+                    createdAt,
+                } = group;
+                return {
+                    _id,
+                    status,
+                    groupName,
+                    leaderNames,
+                    leaderPhoneNumber,
+                    description,
+                    location,
+                    meetingSchedule,
+                    reference,
+                    members,
+                    isDeleted,
+                    deletedAt,
+                    updatedAt,
+                    createdAt,
+                    attendanceRate: await scheduleRepository.groupAttendance({
+                        ...data,
+                        groupId: _id.toString(),
+                    }),
+                };
+            })
+        );
     }
 
     findAll() {
@@ -26,10 +75,22 @@ class GroupRepository extends BaseRepository {
             .populate("location.village_id", "name");
     }
 
+    findOne(data) {
+        return super
+            .findOne(data)
+            .populate("location.prov_id", "namek")
+            .populate("location.dist_id", "name")
+            .populate("location.sect_id", "name")
+            .populate("location.cell_id", "name")
+            .populate("location.village_id", "name");
+    }
+
     searchGroup(name) {
+        const regex = new RegExp(["^", name, "$"].join(""), "i");
         return this.model
             .findOne({
-                groupName: {$regex: name, $options: "i"},
+                groupName: regex,
+                isDeleted: false,
             })
             .populate("location.prov_id", "namek")
             .populate("location.dist_id", "name")
@@ -40,27 +101,8 @@ class GroupRepository extends BaseRepository {
 
     async membersAttendance(group, trainingId) {
         // Find if group has already been invited for a training
-        const groupSchedule = await scheduleRepository.findGroupSchedule(
-            group._id,
-            trainingId
-        );
 
         const members = group.members;
-
-        // If group has no associated scheduled Training then by default all members have not been invited yet
-        if (!groupSchedule) {
-            return members.map((member) => {
-                const {userId, firstName, lastName, phoneNumber} = member;
-                return {
-                    userId,
-                    firstName,
-                    lastName,
-                    phoneNumber,
-                    groupId: group._id,
-                    attendance: attendanceStatus.NOT_INVITED,
-                };
-            });
-        }
 
         // If group has a schedule then check past schedules and check whether members have attended at least once
         return Promise.all(
@@ -72,14 +114,14 @@ class GroupRepository extends BaseRepository {
                     trainingId
                 );
 
-
-                let attendance = attendanceStatus.ABSENT;
+                let attendance = attendanceStatus.NOT_INVITED;
                 for (const schedule of traineeSchedules) {
                     schedule.trainees.forEach((trainee) => {
-                        if (trainee.userId === userId.toString() && trainee.attended) {
+                        if (trainee.userId === userId.toString() && trainee.attended && schedule.status === scheduleStatus.HAPPENED ) {
                             attendance = attendanceStatus.ATTENDED;
-
-                        }
+                        }else if(trainee.userId === userId.toString() && !trainee.attended && schedule.status === scheduleStatus.HAPPENED ){
+                            attendance = attendanceStatus.ABSENT
+                        }else if(schedule.status === scheduleStatus.PENDING) attendance = attendanceStatus.PENDING
                     });
                 }
 
@@ -92,8 +134,9 @@ class GroupRepository extends BaseRepository {
                     attendance: attendance,
                 };
             })
-        );
+        )
     }
+
 
     getSingleMember(grpId, mbrId) {
         return this.model.findOne({_id: grpId, "members.userId": mbrId});
@@ -113,14 +156,30 @@ class GroupRepository extends BaseRepository {
     statistics(body) {
         const filter = {
             $match: {
-                ...(body.location && body.location.prov_id && {'location.prov_id': ObjectId(body.location.prov_id)}),
-                ...(body.location && body.location.dist_id && {'location.dist_id': ObjectId(body.location.dist_id)}),
-                ...(body.location && body.location.sect_id && {'location.sect_id': ObjectId(body.location.sect_id)}),
-                ...(body.location && body.location.cell_id && {'location.cell_id': ObjectId(body.location.cell_id)}),
-                ...(body.location && body.location.village_id && {'location.village_id': ObjectId(body.location.village_id)}),
-                ...(body.reference && {'reference': body.reference}),
-                ...({'isDeleted': false})
-            }
+                ...(body.location &&
+                    body.location.prov_id && {
+                        "location.prov_id": ObjectId(body.location.prov_id),
+                    }),
+                ...(body.location &&
+                    body.location.dist_id && {
+                        "location.dist_id": ObjectId(body.location.dist_id),
+                    }),
+                ...(body.location &&
+                    body.location.sect_id && {
+                        "location.sect_id": ObjectId(body.location.sect_id),
+                    }),
+                ...(body.location &&
+                    body.location.cell_id && {
+                        "location.cell_id": ObjectId(body.location.cell_id),
+                    }),
+                ...(body.location &&
+                    body.location.village_id && {
+                        "location.village_id": ObjectId(body.location.village_id),
+                    }),
+                ...(body.reference && {reference: body.reference}),
+                ...(body.id && {_id: ObjectId(body.id)}),
+                ...{isDeleted: false},
+            },
         };
 
         const group = {
@@ -146,7 +205,6 @@ class GroupRepository extends BaseRepository {
                 _id: 0,
             },
         };
-
         return this.model.aggregate([filter, group, members]);
     }
 
@@ -173,9 +231,11 @@ class GroupRepository extends BaseRepository {
                     "location.village_id": ObjectId(body.location.village_id),
                 }),
             ...(body.reference && {reference: body.reference}),
+            ...(body.id && {_id: ObjectId(body.id)}),
         };
         return this.model
             .find(filter)
+            .lean()
             .populate("location.prov_id", "namek")
             .populate("location.dist_id", "name")
             .populate("location.sect_id", "name")

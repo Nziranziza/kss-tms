@@ -4,13 +4,125 @@ const ObjectId = require("mongodb").ObjectID;
 class EvaluationRepository extends BaseRepository {
   constructor(model) {
     super(model);
+    this.findSingle = this.findSingle.bind(this)
   }
 
   customFindAll(data) {
-    return this.model.find(data).populate("adoptionGaps", "name");
+    return super.find(data).populate("adoptionGaps", "gap_name");
+  }
+
+  findSingle(id){
+    return super.findOne(ObjectId(id));
   }
 
   findOne(id) {
+    const unwind = {
+      $unwind: {
+        path: "$schedules",
+        preserveNullAndEmptyArrays: true,
+      },
+    };
+
+    const match = {
+      $match: {
+        //'schedules.isDeleted': false
+      }
+    };
+
+    const locationPopulate = [
+      {
+        $lookup: {
+          from: "provinces",
+          localField: "schedules.location.prov_id",
+          foreignField: "_id",
+          as: "schedules.location.prov_id",
+        },
+      },
+      {
+        $addFields: {
+          "schedules.location.prov_id": {
+            $arrayElemAt: ["$schedules.location.prov_id", 0],
+          },
+        },
+      },
+      {
+        $lookup: {
+          from: "districts",
+          localField: "schedules.location.dist_id",
+          foreignField: "_id",
+          as: "schedules.location.dist_id",
+        },
+      },
+      {
+        $addFields: {
+          "schedules.location.dist_id": {
+            $arrayElemAt: ["$schedules.location.dist_id", 0],
+          },
+        },
+      },
+      {
+        $lookup: {
+          from: "sectors",
+          localField: "schedules.location.sect_id",
+          foreignField: "_id",
+          as: "schedules.location.sect_id",
+        },
+      },
+      {
+        $addFields: {
+          "schedules.location.sect_id": {
+            $arrayElemAt: ["$schedules.location.sect_id", 0],
+          },
+        },
+      },
+      {
+        $lookup: {
+          from: "cells",
+          localField: "schedules.location.cell_id",
+          foreignField: "_id",
+          as: "schedules.location.cell_id",
+        },
+      },
+      {
+        $addFields: {
+          "schedules.location.cell_id": {
+            $arrayElemAt: ["$schedules.location.cell_id", 0],
+          },
+        },
+      },
+      {
+        $lookup: {
+          from: "villages",
+          localField: "schedules.location.village_id",
+          foreignField: "_id",
+          as: "schedules.location.village_id",
+        },
+      },
+      {
+        $addFields: {
+          "schedules.location.village_id": {
+            $arrayElemAt: ["$schedules.location.village_id", 0],
+          },
+        },
+      },
+    ];
+
+    const group = {
+      $group: {
+        _id: "$_id",
+        trainingName: { $first: "$trainingName" },
+        adoptionGaps: { $first: "$adoptionGaps" },
+        description: { $first: "$description" },
+        materials: { $first: "$materials" },
+        status: { $first: "$status" },
+        createdAt: { $first: "$createdAt" },
+        updatedAt: { $first: "$updatedAt" },
+        schedules: {
+          $push: "$schedules",
+        },
+      },
+    };
+
     return this.model.aggregate([
       {
         $match: {
@@ -42,8 +154,11 @@ class EvaluationRepository extends BaseRepository {
           "adoptionGaps.applicationId": 0,
         },
       },
+      unwind,
+      match,
+      ...locationPopulate,
+      group,
     ]);
-    // return this.model.populate(schedules[0], {path: "adoptionGaps"});
   }
 }
 module.exports.trainingRepository = new EvaluationRepository(Training);

@@ -2,7 +2,6 @@ const responseWrapper = require('../helpers/responseWrapper');
 const asyncWrapper = require('../helpers/asyncWrapper');
 const CustomError = require('../helpers/customerError');
 const { statusCodes } = require('../../utils/constants/common');
-const {response} = require("express");
 
 class BaseController {
   constructor(repository) {
@@ -10,6 +9,7 @@ class BaseController {
     this.findOne = this.findOne.bind(this);
     this.create = this.create.bind(this);
     this.update = this.update.bind(this);
+    this.customUpdate = this.customUpdate.bind(this);
     this.remove = this.remove.bind(this);
     this.find = this.find.bind(this);
     this.findAll = this.findAll.bind(this);
@@ -88,6 +88,19 @@ class BaseController {
     });
   }
 
+  customUpdate(req, res) {
+    const { body, params } = req;
+    return asyncWrapper(res, async () => {
+      let data = await this.repository.customUpdate(params.id, body);
+      return responseWrapper({
+        res,
+        status: statusCodes.OK,
+        message: "Record successfully updated",
+        data
+      });
+    });
+  }
+
   remove(req, res) {
     const { params } = req;
     return asyncWrapper(res, async () => {
@@ -95,7 +108,7 @@ class BaseController {
       return responseWrapper({
         res,
         status: statusCodes.OK,
-        message: "Success",
+        message: "Record successfully removed",
       });
     });
   }
