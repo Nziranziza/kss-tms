@@ -13,14 +13,12 @@ const CustomError = require("../../../../core/helpers/customerError");
 const {
   scheduleStatus,
   receptionStatus,
-  attendanceStatus,
   trainingStatus
 } = require("../../../../tools/constants");
 const moment = require("moment");
 const ejs = require("ejs");
 const _path = require("path");
 const pdf = require("html-pdf");
-const { trainingRepository } = require('../../../../database/training/training.repository');
 const { Training } = require('../../../../database/training/training');
 
 class ScheduleController extends BaseController {
@@ -58,6 +56,8 @@ class ScheduleController extends BaseController {
   }
 
     findAllByRef(req, res) {
+
+        // Build find by date queries
         const {from, to} = req.query;
         let startDate = "";
         let endDate = "";
@@ -66,6 +66,7 @@ class ScheduleController extends BaseController {
             endDate = moment(to).endOf("day").toDate();
         }
 
+        // Filters
         const body = {
             referenceId: req.params.id,
             ...(from &&
@@ -75,6 +76,7 @@ class ScheduleController extends BaseController {
         };
         return asyncWrapper(res, async () => {
             const data = await this.repository.customFindAll(body);
+            // if Associated training is null remove object
             const filter = data.filter((schedule) => schedule.trainingId !== null);
             return responseWrapper({
                 res,
@@ -201,8 +203,6 @@ class ScheduleController extends BaseController {
                   callBack: body.callback,
                 };
         
-                console.log(data);
-        
                 const sms = await sendClientSMS(data);
         
                 if (sms.data) {
@@ -276,7 +276,6 @@ class ScheduleController extends BaseController {
         });
     }
 
-
     getFarmerAttendance(req, res) {
         return asyncWrapper(res, async () => {
             const {params} = req;
@@ -303,7 +302,6 @@ class ScheduleController extends BaseController {
             });
         });
     }
-
 
     downloadReport(req, res) {
         return asyncWrapper(res, async () => {

@@ -90,9 +90,6 @@ const claimToken = async () => {
 
   const token = await authenticateApp(data);
 
-
-  console.log(token.data)
-
   if (token.status == 200) {
     await RedisService.cacheData(
       "comm-token",

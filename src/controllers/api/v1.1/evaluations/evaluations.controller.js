@@ -12,6 +12,7 @@ class EvaluationController extends BaseController {
     this.findByApp = this.findByApp.bind(this);
     this.delete = this.delete.bind(this);
     this.evaluationStats = this.evaluationStats.bind(this);
+    this.computeBaseline = this.computeBaseline.bind(this);
   }
 
   findByApp(req, res) {
@@ -52,6 +53,29 @@ class EvaluationController extends BaseController {
           status: statusCodes.OK,
           message: "success",
           data: summary,
+        });
+        
+    });
+  }
+
+  /**
+   * 
+   * @param {*} req 
+   * @param {*} res 
+   * @description: This method computes the Baseline Score for the extension service pilot project
+   * N.B: This script is only run once at the start of the project
+   * The baseline is calculated by computing (N) number of visit scores and aggreting that
+   */
+
+  computeBaseline(req, res){
+    return asyncWrapper(res, async () => {
+      const data = await this.repository.computeBaseline();
+      if (data)
+        return responseWrapper({
+          res,
+          status: statusCodes.OK,
+          message: "success",
+          data,
         });
         
     });

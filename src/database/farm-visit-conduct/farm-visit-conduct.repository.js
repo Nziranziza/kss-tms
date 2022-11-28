@@ -36,6 +36,8 @@ class FarmVisitConductRepository extends BaseRepository {
             gap_id: conduct.gap,
             overall_weight: conduct.overall_weight,
             overall_score: conduct.overall_score,
+            conduct_id: conduct._id,
+            photos: conduct.photos
           },
         },
       }
@@ -290,7 +292,7 @@ class FarmVisitConductRepository extends BaseRepository {
     const filters = {
       $match: {
         ...(gapId && { gap: gapId }),
-        ...(referenceId && { referenceId: referenceId }),
+        ...(referenceId && { reference: referenceId }),
         ...(location && { [locSearchBy]: ObjectId(location.locationId) }),
         ...(date && {
           createdAt: { $gte: startDate, $lt: endDate },
@@ -307,6 +309,34 @@ class FarmVisitConductRepository extends BaseRepository {
       },
     };
     return this.model.aggregate([filters, group]);
+  }
+
+  calculateBaselineScore(data) {
+    const { gapId } = data;
+
+    const filters = {
+      $match: {
+        ...(gapId && { gap: ObjectId(gapId) }),
+        isDeleted: false
+      },
+    };
+
+    const sort = {
+      $sort:  { createdAt: 1 }
+    };
+
+    const limit = {
+      $limit: 100
+    };
+
+    const group = {
+      $group: {
+        _id: "",
+        overall_score: { $sum: "$overall_score" },
+        overall_weight: { $sum: "$overall_weight" },
+      },
+    };
+    return this.model.aggregate([filters, sort, limit, group]);
   }
 }
 

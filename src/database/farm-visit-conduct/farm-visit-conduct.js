@@ -43,8 +43,8 @@ const sectionSchema = new Schema({
 const farmSchema = new Schema({
     farmId: {type: Schema.Types.ObjectId},
     location: locationSchema,
-    upiNumber: {type: String},
-    owner: {type: ownerSchema}
+    upiNumber: { type: String },
+    owner: { type: ownerSchema }
 });
 
 // Farm visit schema
@@ -70,6 +70,7 @@ farmVisitConductSchema.plugin(timestamps, {
 });
 
 farmVisitConductSchema.plugin(softDelete);
+
 
 const FarmVisitConduct = mongoose.model('farm_visit_conduct', farmVisitConductSchema);
 module.exports.FarmVisitConduct = FarmVisitConduct;

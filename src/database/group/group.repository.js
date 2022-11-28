@@ -13,18 +13,18 @@ class GroupRepository extends BaseRepository {
     }
 
     async find(data) {
-        console.log(data);
         const groups = await super
-            .find()
+            .find(data)
+            .sort({createdAt: -1})
             .populate("location.prov_id", "namek")
             .populate("location.dist_id", "name")
             .populate("location.sect_id", "name")
             .populate("location.cell_id", "name")
             .populate("location.village_id", "name");
 
+        // Add attendance rate on every group
         return Promise.all(
             groups.map(async (group) => {
-                console.log(group._id);
                 const {
                     _id,
                     status,
@@ -103,7 +103,6 @@ class GroupRepository extends BaseRepository {
         // Find if group has already been invited for a training
 
         const members = group.members;
-
 
         // If group has a schedule then check past schedules and check whether members have attended at least once
         return Promise.all(

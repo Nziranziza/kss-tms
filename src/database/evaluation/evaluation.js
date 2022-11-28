@@ -26,6 +26,7 @@ const SECTIONS = new mongoose.Schema({
 
 // Evaluation schema
 const evaluationSchema = new Schema({
+  baselineRate: { type: Number },
   gap_name: { type: String, required: true },
   gap_weight: { type: Number, required: true },
   gap_score: { type: Number, required: true },

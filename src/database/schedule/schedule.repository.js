@@ -28,6 +28,7 @@ class ScheduleRepository extends BaseRepository {
   customFindAll(data) {
     return this.model
       .find(data)
+      .sort({createdAt: -1})
       .populate("trainingId", "trainingName")
       .populate("groupId", "groupName")
       .populate("location.prov_id", "namek")
@@ -537,7 +538,7 @@ class ScheduleRepository extends BaseRepository {
       },
     };
 
-    // Run query // Query will return 4 objects or less each containing stats for each gender
+    // Run query 
     const summary = await this.model.aggregate([
       unwind,
       filters,
@@ -558,7 +559,8 @@ class ScheduleRepository extends BaseRepository {
       }
     });
 
-    if (attended + absent === 0) return 100;
+    // If group has no presence or absence return an attendance rate of 0 by default
+    if (attended + absent === 0) return 0;
 
     return attended !== 0 ? ~~((attended * 100) / (attended + absent)) : 0;
   }
