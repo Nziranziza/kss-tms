@@ -14,7 +14,7 @@ class BaseController {
     this.find = this.find.bind(this);
     this.findAll = this.findAll.bind(this);
     this.findAll = this.findAll.bind(this);
-    this.cFindOne = this.cFindOne.bind(this);
+    this.customFindOne = this.customFindOne.bind(this);
     this.softDelete = this.softDelete.bind(this);
   }
 
@@ -58,10 +58,10 @@ class BaseController {
     });
   }
 
-  cFindOne(req, res) {
+  customFindOne(req, res) {
     const { body } = req;
     return asyncWrapper(res, async () => {
-      const data = await this.repository.cFindOne(body);
+      const data = await this.repository.customFindOne(body);
       return responseWrapper({
         res,
         status: statusCodes.OK,
@@ -74,7 +74,7 @@ class BaseController {
   update(req, res) {
     const { body, params } = req;
     return asyncWrapper(res, async () => {
-      let data = await this.repository.findOne({_id: params.id});
+      let data = await this.repository.findOne(params.id);
       if(data){
         body._id = params.id;
         data = await this.repository.update(body);

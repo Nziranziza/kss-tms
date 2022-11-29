@@ -106,7 +106,7 @@ class GroupController extends BaseController {
     findMemberGroup(req, res) {
         return asyncWrapper(res, async () => {
             const {params} = req;
-            const group = await this.repository.cFindOne({"members.userId": params.id});
+            const group = await this.repository.customFindOne({"members.userId": params.id});
             return responseWrapper({
                 res,
                 status: statusCodes.OK,
