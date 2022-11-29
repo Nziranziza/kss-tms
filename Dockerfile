@@ -1,5 +1,5 @@
 FROM ubuntu:20.04
-RUN apt-get update && apt-get install -y sudo
+RUN apt-get update --fix-missing && apt-get install -y sudo
 RUN DEBIAN_FRONTEND=noninteractive  apt-get upgrade -y sudo 
 RUN adduser --disabled-password \
 --gecos '' docker-deployer
