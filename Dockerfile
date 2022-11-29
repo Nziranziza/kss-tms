@@ -14,7 +14,7 @@ RUN DEBIAN_FRONTEND=noninteractive sudo apt-get install -y tzdata && \
     sudo apt-get install -y nodejs && \
     sudo apt-get update -y && sudo apt upgrade -y 
 
-RUN sudo apt-get update && \
+RUN sudo apt-get update --fix-missing && \
     sudo apt-get install fontconfig -y && \
     sudo apt-get install nginx -y && \
     sudo apt-get install -y dirmngr gnupg && \
