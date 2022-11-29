@@ -18,7 +18,7 @@ class CommController extends BaseController {
       const {body} = req;
       console.log("callback with called with body:", body);
 
-      const schedule = await scheduleRepository.cFindOne({'smsResponse.batch_id': body.batch_id});
+      const schedule = await scheduleRepository.customFindOne({'smsResponse.batch_id': body.batch_id});
 
       schedule.trainees.map(trainee => {
         trainee.smsStatus = body.status
