@@ -7,7 +7,7 @@ class BaseRepository {
         this.find = this.find.bind(this);
         this.findAll = this.findAll.bind(this);
         this.update = this.update.bind(this);
-        this.cFindOne = this.cFindOne.bind(this);
+        this.customFindOne = this.customFindOne.bind(this);
         this.update = this.update.bind(this);
         this.remove = this.remove.bind(this);
         this.create = this.create.bind(this);
@@ -27,7 +27,7 @@ class BaseRepository {
         });
     }
 
-    cFindOne(data) {
+    customFindOne(data) {
         return this.model.findOne(data);
     }
 

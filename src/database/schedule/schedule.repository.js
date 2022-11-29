@@ -11,7 +11,7 @@ class ScheduleRepository extends BaseRepository {
 
   findGroupSchedule(groupId, trainingId) {
     return super
-      .cFindOne({ "trainees.groupId": groupId, trainingId })
+      .customFindOne({ "trainees.groupId": groupId, trainingId })
       .populate("trainingId", "trainingName")
       .populate("groupId", "groupName")
       .populate("location.prov_id", "namek")
