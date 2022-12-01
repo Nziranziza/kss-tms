@@ -1,4 +1,4 @@
-const Router = require('express').Router;
+const Router = require("express").Router;
 const { applicationCtrl} = require('./application.controller');
 const validator = require('../../../../middlewares/validator');
 
