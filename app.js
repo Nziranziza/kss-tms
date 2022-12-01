@@ -1,13 +1,10 @@
 const express = require("express");
-const path = require("path");
 const config = require("config");
 const cors = require("cors");
 const logger = require("./src/utils/logging");
 const api = require("./src/routes");
 const app = express();
 const mongoCon = require("./src/startup/mongo");
-const client = require("./src/startup/redisconnection");
-const { claimToken } = require("./src/services/comm.service");
 require("./src/cron");
 const appRoot = require('app-root-path');
 const fs = require('fs');
@@ -18,27 +15,29 @@ if (!fs.existsSync(dir)){
   fs.mkdirSync(dir, { recursive: true });
 }
 
-// Disable Powered By Header
-app.disable("x-powered-by");
+app.disable('x-powered-by');
 
-app.use(
-  express.json({
-    limit: "5mb",
-  })
-);
-app.use(express.urlencoded({ extended: true }));
+app.use(cors());
 
-app.use(express.static(path.join(__dirname, "public")));
+app.use((req, res, next) => {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader(
+      'Access-Control-Allow-Headers',
+      'Origin,X-Requested-With,Content-Type,Accept'
+  );
+  res.setHeader('Access-Control-Allow-Methods', 'PUT, POST, GET, DELETE');
+  return next();
+});
 
 mongoCon();
 
-api.mountRoutes(app);
+app.use(
+    express.json({
+      limit: '1000mb'
+    })
+);
 
-// Allow cors from dev environment
-if (config.get("app.node_env") === "development") {
-  //allowing cors policies
-  app.use(cors());
-}
+api.mountRoutes(app);
 
 app.use((req, res, next) => {
   res.status(404).send({
@@ -53,17 +52,13 @@ app.use(
     })
 );
 
-app.listen(config.get("app.port"), () => {
-  logger.info(
-    `${config.get("app.name")} service is listening on port ${config.get(
-      "app.port"
-    )}!`
-  );
 
-  client.on("connect", () => {
-    console.log("Skipped claiming token")
-    claimToken();
-  });
-});
+app.listen(config.get('app.port'), () =>
+    logger.info(
+        `${config.get('app.name')} service is listening on port ${config.get(
+            'app.port'
+        )}!`
+    )
+);
 
 module.exports = app;
