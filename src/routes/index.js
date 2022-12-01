@@ -1,5 +1,5 @@
 const v1_1 = require('../controllers/api/v1.1/index.routes');
-const logger = require('../utils/logging');
+const logger = require("../logging");
 
 const mountRoutes = app => {
     // Intercept body JSON error to overwrite the existing error message
@@ -13,7 +13,6 @@ const mountRoutes = app => {
             next();
         } else next();
     });
-    // V 1.1
     app.use('/api/v1.1', v1_1);
 }
 

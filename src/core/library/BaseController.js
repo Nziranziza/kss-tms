@@ -23,6 +23,9 @@ class BaseController {
     return asyncWrapper(res, async () => {
       body.applicationId = req.headers['tms-app-id'];
       const data = await this.repository.create(body);
+      if (!data) {
+        throw new CustomError("Can not create the record", statusCodes.SERVER_ERROR);
+      }
       const response = await this.repository.findOne(data._id);
       return responseWrapper({
         res,
@@ -37,6 +40,9 @@ class BaseController {
     const { body } = req;
     return asyncWrapper(res, async () => {
       const data = await this.repository.find(body);
+      if (!data) {
+        throw new CustomError("Record not found", statusCodes.NOT_FOUND);
+      }
       return responseWrapper({
         res,
         status: statusCodes.OK,
@@ -49,6 +55,9 @@ class BaseController {
   findAll(req, res) {
     return asyncWrapper(res, async () => {
       const data = await this.repository.findAll();
+      if (!data) {
+        throw new CustomError("Data not found", statusCodes.NOT_FOUND);
+      }
       return responseWrapper({
         res,
         status: statusCodes.OK,
@@ -62,6 +71,9 @@ class BaseController {
     const { body } = req;
     return asyncWrapper(res, async () => {
       const data = await this.repository.customFindOne(body);
+      if (!data) {
+        throw new CustomError("Record not found", statusCodes.NOT_FOUND);
+      }
       return responseWrapper({
         res,
         status: statusCodes.OK,
@@ -75,6 +87,9 @@ class BaseController {
     const { body, params } = req;
     return asyncWrapper(res, async () => {
       let data = await this.repository.findOne(params.id);
+      if (!data) {
+        throw new CustomError("Can not update the record", statusCodes.SERVER_ERROR);
+      }
       if(data){
         body._id = params.id;
         data = await this.repository.update(body);
@@ -91,7 +106,10 @@ class BaseController {
   customUpdate(req, res) {
     const { body, params } = req;
     return asyncWrapper(res, async () => {
-      let data = await this.repository.customUpdate(params.id, body);
+      const data = await this.repository.customUpdate(params.id, body);
+      if (!data) {
+        throw new CustomError("Can not update the record", statusCodes.SERVER_ERROR);
+      }
       return responseWrapper({
         res,
         status: statusCodes.OK,
@@ -104,7 +122,10 @@ class BaseController {
   remove(req, res) {
     const { params } = req;
     return asyncWrapper(res, async () => {
-      await this.repository.remove(params.id);
+      const data = await this.repository.remove(params.id);
+      if (!data) {
+        throw new CustomError("Can not remove the record", statusCodes.SERVER_ERROR);
+      }
       return responseWrapper({
         res,
         status: statusCodes.OK,

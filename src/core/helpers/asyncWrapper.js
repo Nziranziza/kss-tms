@@ -6,12 +6,20 @@ const asyncWrapper = async (res, callback) => {
   try {
     await callback();
   } catch (error) {
-    console.log(error.errors);
+    console.log('----------------------error----------------------------------');
     logger.error(error.message, error);
+    let message;
+    if(error.message)
+      message = error.message;
+    else if(error._message)
+      message = error._message;
+    else
+      message = 'Something abnormal happen!';
+
     return responseWrapper({
       res,
-      status: error.status,
-      message: error.message
+      status: statusCodes.SERVER_ERROR,
+      message
     });
   }
 };

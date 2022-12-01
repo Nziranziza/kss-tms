@@ -20,7 +20,6 @@ class EvaluationController extends BaseController {
     return asyncWrapper(res, async () => {
       const data = await this.repository.customFindAll(body);
       const gaps = await this.repository.calculateScore(data);
-
       return responseWrapper({
         res,
         status: statusCodes.OK,
@@ -77,7 +76,6 @@ class EvaluationController extends BaseController {
           message: "success",
           data,
         });
-        
     });
   }
 }
