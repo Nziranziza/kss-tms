@@ -70,8 +70,8 @@ const validateFarmVisitConduct = visitData => {
                     )
                 })
             })
-        )
-
+        ),
+        observation: Joi.string()
     });
     const {error, value} = schema.validate(visitData);
     if (error) {
