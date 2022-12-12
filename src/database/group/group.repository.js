@@ -138,8 +138,17 @@ class GroupRepository extends BaseRepository {
     }
 
 
-    getSingleMember(grpId, mbrId) {
-        return this.model.findOne({_id: grpId, "members.userId": mbrId});
+    getSingleMember(memberId, groupId) {
+        let filters = {
+            "members.userId": memberId
+        }
+        if (groupId) {
+            filters = {
+                ...filters,
+                _id: groupId
+            }
+        }
+        return this.model.findOne(filters);
     }
 
     updateMemberPhone(id, body) {
