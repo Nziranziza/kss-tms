@@ -1,14 +1,14 @@
-const BaseController = require('../../../../core/library/BaseController');
+const BaseController = require('core/library/BaseController');
 const {
     farmVisitConductRepository
-} = require('../../../../database/farm-visit-conduct/farm-visit-conduct.repository');
-const asyncWrapper = require("../../../../core/helpers/asyncWrapper");
-const responseWrapper = require("../../../../core/helpers/responseWrapper");
-const {statusCodes} = require("../../../../utils/constants/common");
+} = require('database/farm-visit-conduct/farm-visit-conduct.repository');
+const asyncWrapper = require("core/helpers/asyncWrapper");
+const responseWrapper = require("core/helpers/responseWrapper");
+const {statusCodes} = require("utils/constants/common");
 const excelJS = require("exceljs");
 const appRoot = require("app-root-path");
 const fs = require("fs");
-const CustomError = require("../../../../core/helpers/customerError");
+const CustomError = require("core/helpers/customerError");
 const ejs = require("ejs");
 const _path = require("path");
 const pdf = require("html-pdf");

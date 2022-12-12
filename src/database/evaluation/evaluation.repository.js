@@ -1,7 +1,7 @@
-const BaseRepository = require("../../core/library/BaseRepository");
+const BaseRepository = require("core/library/BaseRepository");
 const {
   farmVisitConductRepository,
-} = require("../farm-visit-conduct/farm-visit-conduct.repository");
+} = require("database/farm-visit-conduct/farm-visit-conduct.repository");
 const { Evaluation } = require("./evaluation");
 class EvaluationRepository extends BaseRepository {
   constructor(model) {

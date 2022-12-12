@@ -1,8 +1,8 @@
 const { ObjectId } = require("mongodb");
-const BaseRepository = require("../../core/library/BaseRepository");
+const BaseRepository = require("core/library/BaseRepository");
 const {
   FarmVisitSchedule,
-} = require("../farm-visit-schedule/farm-visit-schedule");
+} = require("database/farm-visit-schedule/farm-visit-schedule");
 const moment = require("moment");
 
 class FarmVisitScheduleRepository extends BaseRepository {

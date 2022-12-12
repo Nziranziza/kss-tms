@@ -1,5 +1,5 @@
-const BaseRepository = require("../../core/library/BaseRepository");
-const { sendAppSMS } = require("../../services/comm.service");
+const BaseRepository = require("core/library/BaseRepository");
+const { sendAppSMS } = require("services/comm.service");
 const { Communication } = require("./communication");
 class CommunicationRepository extends BaseRepository {
   constructor(model) {

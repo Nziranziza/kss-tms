@@ -1,7 +1,7 @@
-const responseWrapper = require('../helpers/responseWrapper');
-const asyncWrapper = require('../helpers/asyncWrapper');
-const CustomError = require('../helpers/customerError');
-const { statusCodes } = require('../../utils/constants/common');
+const responseWrapper = require('core/helpers/responseWrapper');
+const asyncWrapper = require('core/helpers/asyncWrapper');
+const CustomError = require('core/helpers/customerError');
+const { statusCodes } = require('utils/constants/common');
 
 class BaseController {
   constructor(repository) {

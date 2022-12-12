@@ -1,11 +1,11 @@
 const {
   applicationRepository
-} = require('../../../../database/application/application.repository');
-const BaseController = require('../../../../core/library/BaseController');
-const asyncWrapper = require("../../../../core/helpers/asyncWrapper");
-const responseWrapper = require("../../../../core/helpers/responseWrapper");
-const {statusCodes} = require("../../../../utils/constants/common");
-const CustomError = require("../../../../core/helpers/customerError");
+} = require('database/application/application.repository');
+const BaseController = require('core/library/BaseController');
+const asyncWrapper = require("core/helpers/asyncWrapper");
+const responseWrapper = require("core/helpers/responseWrapper");
+const {statusCodes} = require("utils/constants/common");
+const CustomError = require("core/helpers/customerError");
 
 class ApplicationController extends BaseController {
   constructor(repository) {

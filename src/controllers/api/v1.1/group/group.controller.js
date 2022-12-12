@@ -1,17 +1,17 @@
 const {
   groupRepository,
-} = require("../../../../database/group/group.repository");
-const BaseController = require("../../../../core/library/BaseController");
-const asyncWrapper = require("../../../../core/helpers/asyncWrapper");
-const responseWrapper = require("../../../../core/helpers/responseWrapper");
-const { statusCodes } = require("../../../../utils/constants/common");
+} = require("database/group/group.repository");
+const BaseController = require("core/library/BaseController");
+const asyncWrapper = require("core/helpers/asyncWrapper");
+const responseWrapper = require("core/helpers/responseWrapper");
+const { statusCodes } = require("utils/constants/common");
 const excelJS = require("exceljs");
 const appRoot = require("app-root-path");
 const fs = require("fs");
 let ejs = require('ejs');
 const pdf = require('html-pdf');
 const _path = require('path');
-const CustomError = require("../../../../core/helpers/customerError");
+const CustomError = require("core/helpers/customerError");
 
 class GroupController extends BaseController {
     constructor(repository) {

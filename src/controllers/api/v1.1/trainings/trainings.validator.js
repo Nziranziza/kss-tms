@@ -1,5 +1,5 @@
 const Joi = require("joi");
-const { trainingStatus } = require("../../../../tools/constants");
+const { trainingStatus } = require("tools/constants");
 Joi.objectId = require("joi-objectid")(Joi);
 
 module.exports.validateTraining = Joi.object({

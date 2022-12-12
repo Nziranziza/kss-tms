@@ -1,6 +1,6 @@
-const logger = require('../../utils/logging');
+const logger = require('utils/logging');
 const responseWrapper = require("./responseWrapper");
-const {statusCodes} = require("../../utils/constants/common");
+const {statusCodes} = require("utils/constants/common");
 
 const asyncWrapper = async (res, callback) => {
   try {
