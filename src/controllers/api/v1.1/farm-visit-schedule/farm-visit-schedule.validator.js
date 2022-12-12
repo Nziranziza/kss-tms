@@ -18,71 +18,53 @@ const ownerSchema = Joi.object({
   organisationName: Joi.string().label("organisation name"),
 });
 
-const validateFarmVisitSchedule = (scheduleData) => {
-  const schema = Joi.object({
-    description: Joi.string().required().trim(),
-    expectedDuration: Joi.object({
-      from: Joi.string(),
-      to: Joi.string(),
-    }),
-    observation: Joi.string(),
-    date: Joi.date(),
-    farms: Joi.array()
-      .min(1)
-      .max(35)
-      .items(
-        Joi.object({
-          farmId: Joi.objectId().required().label("farm id"),
-          location: Joi.object({
-            prov_id: Joi.objectId().required().label("province"),
-            dist_id: Joi.objectId().required().label("district"),
-            sect_id: Joi.objectId().required().label("sector"),
-            cell_id: Joi.objectId().required().label("cell"),
-            village_id: Joi.objectId().required().label("village"),
-          }).required(),
-          upiNumber: Joi.string().allow(null, ""),
-          owner: ownerSchema,
-        })
-      ),
-    visitor: ownerSchema,
-    gaps: Joi.array()
-      .min(1)
-      .max(35)
-      .items(Joi.objectId().required().label("gap"))
-      .unique(),
-    reference: Joi.string().trim(),
-    groupId: Joi.objectId().required().label("group"),
-  });
-  const { error, value } = schema.validate(scheduleData);
-  if (error) {
-    throw error;
-  } else {
-    return value;
-  }
-};
+module.exports.validateFarmVisitSchedule = Joi.object({
+  description: Joi.string().required().trim(),
+  expectedDuration: Joi.object({
+    from: Joi.string(),
+    to: Joi.string(),
+  }),
+  observation: Joi.string(),
+  date: Joi.date(),
+  farms: Joi.array()
+    .min(1)
+    .max(35)
+    .items(
+      Joi.object({
+        farmId: Joi.objectId().required().label("farm id"),
+        location: Joi.object({
+          prov_id: Joi.objectId().required().label("province"),
+          dist_id: Joi.objectId().required().label("district"),
+          sect_id: Joi.objectId().required().label("sector"),
+          cell_id: Joi.objectId().required().label("cell"),
+          village_id: Joi.objectId().required().label("village"),
+        }).required(),
+        upiNumber: Joi.string().allow(null, ""),
+        owner: ownerSchema,
+      })
+    ),
+  visitor: ownerSchema,
+  gaps: Joi.array()
+    .min(1)
+    .max(35)
+    .items(Joi.objectId().required().label("gap"))
+    .unique(),
+  reference: Joi.string().trim(),
+  groupId: Joi.objectId().required().label("group"),
+});
 
-const validateVisitStats = (data) => {
-  const schema = Joi.object({
-    referenceId: Joi.objectId(),
-    visitorId: Joi.objectId(),
-    location: Joi.object({
-      searchBy: Joi.string()
-        .valid("prov_id", "dist_id", "sect_id", "cell_id", "village_id")
-        .required(),
-      locationId: Joi.objectId().required(),
-    }),
-    date: Joi.object({
-      from: Joi.date().format("YYYY-MM-DD").required(),
-      to: Joi.date().format("YYYY-MM-DD").required(),
-    }),
-  });
-  const { error, value } = schema.validate(data);
-  if (error) {
-    throw error;
-  } else {
-    return value;
-  }
-};
+module.exports.validateVisitStats = Joi.object({
+  referenceId: Joi.objectId(),
+  visitorId: Joi.objectId(),
+  location: Joi.object({
+    searchBy: Joi.string()
+      .valid("prov_id", "dist_id", "sect_id", "cell_id", "village_id")
+      .required(),
+    locationId: Joi.objectId().required(),
+  }),
+  date: Joi.object({
+    from: Joi.date().format("YYYY-MM-DD").required(),
+    to: Joi.date().format("YYYY-MM-DD").required(),
+  }),
+});
 
-module.exports.validateFarmVisitSchedule = validateFarmVisitSchedule;
-module.exports.validateVisitStats = validateVisitStats;
