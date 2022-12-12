@@ -5,17 +5,24 @@ const { statusCodes } = require("../utils/constants/common");
 
 module.exports = function (validator) {
   // If validator is not exist, throw err
-  if (!Validators.hasOwnProperty(validator))
+  if (!Validators.hasOwnProperty(validator)) {
     throw new Error(`'${validator}' validator is not exist`);
+  }
 
-  return async function (req, res, next) {
+  if (typeof Validators[validator]?.validate !== "function") {
+    throw new Error(`'${validator}' validator is not valid`);
+  }
+
+  return function (req, res, next) {
     try {
-      await Validators[validator](req.body);
+      const { error } = Validators[validator].validate(req.body);
+      if (error) {
+        throw error;
+      }
       next();
     } catch (err) {
       //* Pass err to next
       //! If validation error occurs call next with HTTP 422. Otherwise HTTP 500
-      console.log(err);
       if (err.isJoi)
         return responseWrapper({
           res,

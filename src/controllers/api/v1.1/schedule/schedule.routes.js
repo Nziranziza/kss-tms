@@ -29,4 +29,5 @@ routes.post('/report', scheduleCtrl.report);
 routes.post('/report/download/:type', scheduleCtrl.downloadReport);
 routes.post('/statistics', scheduleCtrl.statistics);
 routes.get('/farmer/attendancerate/:id', scheduleCtrl.getFarmerAttendance)
+
 module.exports.schedules = routes;

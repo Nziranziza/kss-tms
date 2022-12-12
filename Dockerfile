@@ -1,5 +1,5 @@
 FROM ubuntu:20.04
-RUN apt-get update && apt-get install -y sudo
+RUN apt-get update --fix-missing && apt-get install -y sudo
 RUN DEBIAN_FRONTEND=noninteractive  apt-get upgrade -y sudo 
 RUN adduser --disabled-password \
 --gecos '' docker-deployer
@@ -15,7 +15,6 @@ RUN DEBIAN_FRONTEND=noninteractive sudo apt-get install -y tzdata && \
     sudo apt-get update -y && sudo apt upgrade -y 
 
 RUN sudo apt-get update --fix-missing && \
-    sudo apt-get update && \
     sudo apt-get install fontconfig -y && \
     sudo apt-get install nginx -y && \
     sudo apt-get install -y dirmngr gnupg && \
