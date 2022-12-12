@@ -16,4 +16,19 @@ const statusCodes = {
     CONFLICT: 409
 };
 
+module.exports.serverMessages = {
+    NOT_FOUND: 'Record not found',
+    SERVER_ERROR: 'Something abnormal happened!',
+    DELETE_SUCCESS: 'Record successfully deleted!',
+    CREATE_SUCCESS: 'Record successfully created!',
+    UPDATE_SUCCESS: 'Record successfully updated!',
+    UPDATE_FAILURE: 'Can not update the record!',
+    CREATE_FAILURE: 'Can not create the record!',
+    REMOVE_SUCCESS: 'Record successfully removed!',
+    REMOVE_FAILURE: 'Can not remove the record!',
+    SUCCESS: 'Success',
+    APP_ID_REQUIRED: 'App id is required',
+    UNAUTHORIZED: 'Not authorized'
+}
+
 module.exports.statusCodes = statusCodes;

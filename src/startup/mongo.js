@@ -9,7 +9,7 @@ module.exports = () => {
 
   // set up default mongoose connection
 
-  mongoose.connect(`${config.get('db.url')}`, options).then(() => console.log('mongoDB connected...'));
+  mongoose.connect(`${config.get('db.url')}`, options).then(() => logger.info('mongoDB connected...'));
 
   // get default connection
 

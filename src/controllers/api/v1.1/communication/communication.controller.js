@@ -1,7 +1,7 @@
 const asyncWrapper = require("../../../../core/helpers/asyncWrapper");
 const BaseController = require("../../../../core/library/BaseController");
 const responseWrapper = require("../../../../core/helpers/responseWrapper");
-const { statusCodes } = require("../../../../utils/constants/common");
+const { statusCodes, serverMessages } = require("../../../../utils/constants/common");
 const {
   commRepo,
 } = require("../../../../database/communication/communication.repository");
@@ -15,17 +15,19 @@ class CommController extends BaseController {
 
   callback(req, res) {
     return asyncWrapper(res, async () => {
-      const {body} = req;
-      console.log("callback with called with body:", body);
-
-      const schedule = await scheduleRepository.customFindOne({'smsResponse.batch_id': body.batch_id});
-
-      schedule.trainees.map(trainee => {
+      const { body } = req;
+      const schedule = await scheduleRepository.findOne({ 'smsResponse.batch_id': body.batch_id });
+      if(!schedule) {
+        return responseWrapper({
+          res,
+          status: statusCodes.NOT_FOUND,
+          message: serverMessages.NOT_FOUND
+        })
+      }
+      schedule.trainees.forEach(trainee => {
         trainee.smsStatus = body.status
       });
-
       await schedule.save();
-
       return responseWrapper({
         res,
         status: statusCodes.OK,

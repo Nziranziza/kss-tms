@@ -121,7 +121,6 @@ class FarmVisitConductController extends BaseController {
                 {visits:visits },
                 (err, data) => {
                     if (err) {
-                        console.log(err);
                         return err;
                     } else {
                         let options = {
@@ -135,13 +134,11 @@ class FarmVisitConductController extends BaseController {
                             }
                         };
                         const fileName = `${path}/${Date.now()}-schedules_report.pdf`;
-                        pdf.create(data, options).toFile(fileName, function (err, data) {
+                        pdf.create(data, options).toFile(fileName, function (err) {
                             if (err) {
-                                console.log(err)
                                 return err;
                             } else {
                                 const str = fs.readFileSync(fileName, {encoding: "base64"});
-                                console.log(str);
                                 return responseWrapper({
                                     res,
                                     status: statusCodes.OK,

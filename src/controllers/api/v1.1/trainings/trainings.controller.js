@@ -4,8 +4,7 @@ const responseWrapper = require("../../../../core/helpers/responseWrapper");
 const {
   trainingRepository,
 } = require("../../../../database/training/training.repository");
-const { statusCodes } = require("../../../../utils/constants/common");
-const { ObjectId } = require('mongodb');
+const { statusCodes, serverMessages } = require("../../../../utils/constants/common");
 
 class TrainingController extends BaseController {
   constructor(repository) {
@@ -17,29 +16,24 @@ class TrainingController extends BaseController {
   findByApp(req, res) {
     const body = { applicationId: req.params.id };
     return asyncWrapper(res, async () => {
-      const data = await this.repository.customFindAll(body);
+      const data = await this.repository.find(body);
       return responseWrapper({
         res,
         status: statusCodes.OK,
-        message: "Success",
+        message: serverMessages.SUCCESS,
         data,
       });
     });
   }
 
   update(req, res){
-    const {body, params} = req;
+    const { body, params } = req;
     return asyncWrapper(res, async () => {
-      body.adoptionGaps.map((data) => ObjectId(data));
-      const toUpdate = {
-        _id: ObjectId(params.id),
-        ...body
-      };
-      const data = await this.repository.update(toUpdate);
+      const data = await this.repository.update(params.id, body);
       return responseWrapper({
         res,
         status: statusCodes.OK,
-        message: "Success",
+        message: serverMessages.SUCCESS,
         data,
       });
     });
@@ -47,11 +41,11 @@ class TrainingController extends BaseController {
 
   findOne(req, res) {
     return asyncWrapper(res, async () => {
-      const data = await this.repository.findOne(req.params.id);
+      const data = await this.repository.findById(req.params.id);
       return responseWrapper({
         res,
         status: statusCodes.OK,
-        message: "Success",
+        message: serverMessages.SUCCESS,
         data: data[0],
       });
     });
@@ -60,11 +54,11 @@ class TrainingController extends BaseController {
   delete(req, res) {
     return asyncWrapper(res, async () => {
       const data = await this.repository.findSingle(req.params.id);
-      const isDeleted = await data.softDelete();
+      await data.softDelete();
       return responseWrapper({
         res,
         status: statusCodes.OK,
-        message: "Removed successfully",
+        message: serverMessages.DELETE_SUCCESS,
       });
     });
   }

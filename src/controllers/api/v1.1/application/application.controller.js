@@ -4,7 +4,7 @@ const {
 const BaseController = require('../../../../core/library/BaseController');
 const asyncWrapper = require("../../../../core/helpers/asyncWrapper");
 const responseWrapper = require("../../../../core/helpers/responseWrapper");
-const {statusCodes} = require("../../../../utils/constants/common");
+const { statusCodes, serverMessages } = require("../../../../utils/constants/common");
 const CustomError = require("../../../../core/helpers/customerError");
 
 class ApplicationController extends BaseController {
@@ -18,12 +18,11 @@ class ApplicationController extends BaseController {
       if (!data) {
         throw new CustomError("Can not create the application", statusCodes.SERVER_ERROR);
       }
-      const response = await this.repository.findOne(data._id);
       return responseWrapper({
         res,
-        message: "Record successfully created",
+        message: serverMessages.CREATE_SUCCESS,
         status: statusCodes.OK,
-        data: response
+        data,
       });
     });
   }

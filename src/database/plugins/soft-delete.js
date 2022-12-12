@@ -1,3 +1,6 @@
+const CustomError = require("../../core/helpers/customerError");
+const { statusCodes } = require("../../utils/constants/common");
+
 module.exports = function(schema) {
     schema.add({
       isDeleted: {
@@ -22,10 +25,14 @@ module.exports = function(schema) {
       next();
     });
   
-    schema.methods.softDelete = function(callback) {
+    schema.methods.softDelete = async function(callback) {
       this.isDeleted = true;
       this.deletedAt = new Date();
-      this.save(callback);
+      try {
+        await this.save(callback);
+      } catch(error) {
+        throw new CustomError('Record can not be deleted', statusCodes.SERVER_ERROR)
+      }
     };
   
     schema.methods.restore = function(callback) {

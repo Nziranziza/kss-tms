@@ -9,7 +9,7 @@ class EvaluationRepository extends BaseRepository {
   }
 
   async evaluationStats(body) {
-    const evaluations = await this.model.find({});
+    const evaluations = await this.find();
     return Promise.all(
       evaluations.map(async (element) => {
         const { _id, gap_name, baselineRate, isDeleted } = element;
@@ -62,13 +62,12 @@ class EvaluationRepository extends BaseRepository {
 
   async computeBaseline() {
     // Fetch all gaps
-    const gaps = await this.model.find({});
+    const gaps = await this.find();
     Promise.all(
       gaps.map(async gap => {
         const score = await farmVisitConductRepository.calculateBaselineScore({gapId: gap._id});
         gap.baselineRate = score.length > 0 ? score[0].overall_score : 0;
         await gap.save();
-
       })
     );
     return gaps;

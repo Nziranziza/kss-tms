@@ -55,7 +55,7 @@ class GroupController extends BaseController {
     updateMembers(req, res) {
         return asyncWrapper(res, async () => {
             const { body, params } = req;
-            let group = await this.repository.findOne(params.id);
+            let group = await this.repository.findById(params.id);
             if (!group) {
                 return responseWrapper({
                     res,
@@ -81,10 +81,7 @@ class GroupController extends BaseController {
                     }
                 }
             }
-            group = await this.repository.update({
-                ...body,
-                _id: params.id
-            });
+            group = await this.repository.update(params.id, body);
             group.save();
             return responseWrapper({
                 res,
@@ -155,7 +152,7 @@ class GroupController extends BaseController {
     findMemberGroup(req, res) {
         return asyncWrapper(res, async () => {
             const {params} = req;
-            const group = await this.repository.customFindOne({"members.userId": params.id});
+            const group = await this.repository.findOne({"members.userId": params.id});
             return responseWrapper({
                 res,
                 status: statusCodes.OK,
@@ -168,10 +165,9 @@ class GroupController extends BaseController {
     updateProfile(req, res) {
         return asyncWrapper(res, async () => {
             const {body, params} = req;
-            let group = await this.repository.findOne(params.id);
+            let group = await this.repository.findById(params.id);
             if (group) {
-                body._id = params.id;
-                group = await this.repository.update(body);
+                group = await this.repository.update(params.id, body);
             }
             return responseWrapper({
                 res,
@@ -185,7 +181,7 @@ class GroupController extends BaseController {
     groupAttendance(req, res) {
         return asyncWrapper(res, async () => {
             const {params, body} = req;
-            const group = await this.repository.findOne(params.id);
+            const group = await this.repository.findById(params.id);
             if (!group)
                 return responseWrapper({
                     res,
@@ -303,7 +299,6 @@ class GroupController extends BaseController {
                     {groups: groups},
                     (err, data) => {
                         if (err) {
-                          console.log(err);
                             return err;
                         } else {
                             let options = {
@@ -317,13 +312,11 @@ class GroupController extends BaseController {
                                 }
                             };
                             const fileName = `${path}/${Date.now()}-groups_report.pdf`;
-                            pdf.create(data, options).toFile(fileName, function (err, data) {
+                            pdf.create(data, options).toFile(fileName, function (err) {
                                     if (err) {
-                                      console.log(err)
                                         return err;
                                     } else {
                                         const str = fs.readFileSync(fileName, {encoding: "base64"});
-                                        console.log(str);
                                         return responseWrapper({
                                             res,
                                             status: statusCodes.OK,
