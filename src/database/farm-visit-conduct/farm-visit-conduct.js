@@ -61,7 +61,8 @@ const farmVisitConductSchema = new Schema({
     groupId: {type: Schema.Types.ObjectId, ref: "group"},
     evaluation: {type: [sectionSchema]},
     status: {type: Number},
-    photos: {type: [String]}
+    photos: {type: [String]},
+    observation: { type: String }
 });
 
 farmVisitConductSchema.plugin(timestamps, {
