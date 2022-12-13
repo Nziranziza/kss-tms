@@ -21,8 +21,18 @@ class BaseController {
   create(req, res) {
     const { body } = req;
     return asyncWrapper(res, async () => {
-      body.applicationId = req.headers['tms-app-id'];
-      const data = await this.repository.create(body);
+      const applicationId = req.headers['tms-app-id'];
+      if(!applicationId) {
+        return responseWrapper({
+          res,
+          message: 'Application id is required',
+          status: statusCodes.BAD_REQUEST
+        })
+      }
+      const data = await this.repository.create({
+        ...body,
+        applicationId
+      });
       if (!data) {
         throw new CustomError("Can not create the record", statusCodes.SERVER_ERROR);
       }
