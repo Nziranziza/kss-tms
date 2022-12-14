@@ -2,7 +2,7 @@ const { ObjectId } = require("mongodb");
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 const timestamps = require("mongoose-timestamp");
-const softDelete = require("../plugins/soft-delete");
+const softDelete = require("database/plugins/soft-delete");
 
 const RECIPIENT = new mongoose.Schema({
   status: { type: String },

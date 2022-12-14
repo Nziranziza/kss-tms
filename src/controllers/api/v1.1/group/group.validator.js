@@ -40,7 +40,6 @@ module.exports.validateGroup = Joi.object({
     .required()
     .trim(),
   reference: Joi.string(),
-  applicationId: Joi.number().required(),
   members: Joi.array().items(memberSchema).min(1)
 });
 

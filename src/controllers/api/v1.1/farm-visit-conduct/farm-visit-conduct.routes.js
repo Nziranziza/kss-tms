@@ -1,5 +1,5 @@
 const Router = require('express').Router;
-const validator = require('../../../../middlewares/validator');
+const validator = require('middlewares/validator');
 const { farmVisitConductCtrl } = require('./farm-visit-conduct.controller');
 
 const router = Router();

@@ -1,7 +1,7 @@
-const responseWrapper = require('../helpers/responseWrapper');
-const asyncWrapper = require('../helpers/asyncWrapper');
-const CustomError = require('../helpers/customerError');
-const { statusCodes, serverMessages } = require('../../utils/constants/common');
+const responseWrapper = require('core/helpers/responseWrapper');
+const asyncWrapper = require('core/helpers/asyncWrapper');
+const CustomError = require('core/helpers/customerError');
+const { statusCodes } = require('utils/constants/common');
 
 class BaseController {
   constructor(repository) {
@@ -18,8 +18,18 @@ class BaseController {
   create(req, res) {
     const { body } = req;
     return asyncWrapper(res, async () => {
-      body.applicationId = req.headers["tms-app-id"];
-      const data = await this.repository.create(body);
+      const applicationId = req.headers['tms-app-id'];
+      if(!applicationId) {
+        return responseWrapper({
+          res,
+          message: 'Application id is required',
+          status: statusCodes.BAD_REQUEST
+        })
+      }
+      const data = await this.repository.create({
+        ...body,
+        applicationId
+      });
       if (!data) {
         throw new CustomError(
           serverMessages.CREATE_FAILURE,

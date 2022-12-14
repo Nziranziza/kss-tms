@@ -1,9 +1,9 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 const timestamps = require("mongoose-timestamp");
-const softDelete = require("../plugins/soft-delete");
-const locationSchema = require("../../utils/schemas/location");
-const { scheduleStatus, receptionStatus } = require("../../tools/constants");
+const softDelete = require("database/plugins/soft-delete");
+const locationSchema = require("utils/schemas/location");
+const { scheduleStatus, receptionStatus } = require("tools/constants");
 
 const TRAINEE = new mongoose.Schema({
   userId: { type: String, required: true },

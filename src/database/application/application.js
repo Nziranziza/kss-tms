@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const timestamps = require("mongoose-timestamp");
 const uniqueValidator = require("mongoose-unique-validator");
-const softDelete = require("../plugins/soft-delete");
+const softDelete = require("database/plugins/soft-delete");
 const Schema = mongoose.Schema;
 
 // Application schema

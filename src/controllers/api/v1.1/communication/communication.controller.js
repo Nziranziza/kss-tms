@@ -1,12 +1,12 @@
-const asyncWrapper = require("../../../../core/helpers/asyncWrapper");
-const BaseController = require("../../../../core/library/BaseController");
-const responseWrapper = require("../../../../core/helpers/responseWrapper");
-const { statusCodes, serverMessages } = require("../../../../utils/constants/common");
+const asyncWrapper = require("core/helpers/asyncWrapper");
+const BaseController = require("core/library/BaseController");
+const responseWrapper = require("core/helpers/responseWrapper");
+const { statusCodes } = require("utils/constants/common");
 const {
   commRepo,
-} = require("../../../../database/communication/communication.repository");
-const { getBalance, orderSMS, getOrders } = require("../../../../services/comm.service");
-const { scheduleRepository } = require('../../../../database/schedule/schedule.repository');
+} = require("database/communication/communication.repository");
+const { getBalance, orderSMS, getOrders } = require("services/comm.service");
+const { scheduleRepository } = require('database/schedule/schedule.repository');
 
 class CommController extends BaseController {
   constructor(repository) {

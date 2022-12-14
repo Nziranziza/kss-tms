@@ -1,25 +1,25 @@
-const asyncWrapper = require("../../../../core/helpers/asyncWrapper");
-const BaseController = require("../../../../core/library/BaseController");
-const responseWrapper = require("../../../../core/helpers/responseWrapper");
+const asyncWrapper = require("core/helpers/asyncWrapper");
+const BaseController = require("core/library/BaseController");
+const responseWrapper = require("core/helpers/responseWrapper");
 const {
     scheduleRepository,
-} = require("../../../../database/schedule/schedule.repository");
-const {statusCodes, serverMessages} = require("../../../../utils/constants/common");
-const {sendClientSMS} = require("../../../../services/comm.service");
+} = require("database/schedule/schedule.repository");
+const {statusCodes} = require("utils/constants/common");
+const {sendClientSMS} = require("services/comm.service");
 const excelJS = require("exceljs");
 const appRoot = require("app-root-path");
 const fs = require("fs");
-const CustomError = require("../../../../core/helpers/customerError");
+const CustomError = require("core/helpers/customerError");
 const {
   scheduleStatus,
   receptionStatus,
   trainingStatus
-} = require("../../../../tools/constants");
+} = require("tools/constants");
 const moment = require("moment");
 const ejs = require("ejs");
 const _path = require("path");
 const pdf = require("html-pdf");
-const { Training } = require('../../../../database/training/training');
+const { Training } = require('database/training/training');
 
 class ScheduleController extends BaseController {
   constructor(repository) {

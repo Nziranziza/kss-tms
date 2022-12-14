@@ -1,14 +1,14 @@
-const asyncWrapper = require("../../../../core/helpers/asyncWrapper");
-const BaseController = require("../../../../core/library/BaseController");
-const responseWrapper = require("../../../../core/helpers/responseWrapper");
-const { statusCodes } = require("../../../../utils/constants/common");
+const asyncWrapper = require("core/helpers/asyncWrapper");
+const BaseController = require("core/library/BaseController");
+const responseWrapper = require("core/helpers/responseWrapper");
+const { statusCodes } = require("utils/constants/common");
 
 const {
   scheduleRepository,
-} = require("../../../../database/schedule/schedule.repository");
+} = require("database/schedule/schedule.repository");
 const {
   groupRepository,
-} = require("../../../../database/group/group.repository");
+} = require("database/group/group.repository");
 const { ObjectId } = require("mongodb");
 
 class DashboardController extends BaseController {

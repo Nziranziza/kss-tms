@@ -1,10 +1,10 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
-const locationSchema = require('../../utils/schemas/location');
+const locationSchema = require('utils/schemas/location');
 const timestamps = require("mongoose-timestamp");
-const softDelete = require("../plugins/soft-delete");
+const softDelete = require("database/plugins/soft-delete");
 const uniqueValidator = require('mongoose-unique-validator');
-const {groupStatus} = require("../../tools/constants");
+const {groupStatus} = require("tools/constants");
 
 const meetingScheduleSchema = new Schema({
     meetingDay: {type: Number, enum: [1, 2, 3, 4, 5, 6]},

@@ -1,11 +1,11 @@
-const asyncWrapper = require("../../../../core/helpers/asyncWrapper");
-const responseWrapper = require("../../../../core/helpers/responseWrapper");
-const BaseController = require("../../../../core/library/BaseController");
+const asyncWrapper = require("core/helpers/asyncWrapper");
+const responseWrapper = require("core/helpers/responseWrapper");
+const BaseController = require("core/library/BaseController");
 const {
   farmVisitScheduleRepository,
-} = require("../../../../database/farm-visit-schedule/farm-visit-schedule.repository");
-const { statusCodes } = require("../../../../utils/constants/common");
-const { sendAppSMS } = require("../../../../services/comm.service");
+} = require("database/farm-visit-schedule/farm-visit-schedule.repository");
+const { statusCodes } = require("utils/constants/common");
+const { sendAppSMS } = require("services/comm.service");
 
 class FarmVisitScheduleController extends BaseController {
   constructor(repository) {

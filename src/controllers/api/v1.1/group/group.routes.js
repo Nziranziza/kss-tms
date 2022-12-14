@@ -1,6 +1,6 @@
 const Router = require("express").Router;
 const { groupCtrl } = require("./group.controller");
-const validator = require("../../../../middlewares/validator");
+const validator = require("middlewares/validator");
 
 const routes = Router();
 routes.post("/", validator("validateGroup"), groupCtrl.create);

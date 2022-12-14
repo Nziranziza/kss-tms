@@ -1,6 +1,6 @@
 const Router = require("express").Router;
 const { applicationCtrl} = require('./application.controller');
-const validator = require('../../../../middlewares/validator');
+const validator = require('middlewares/validator');
 
 const routes = Router();
 
