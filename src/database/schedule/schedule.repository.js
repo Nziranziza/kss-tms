@@ -1,6 +1,6 @@
 const { ObjectId } = require("mongodb");
-const BaseRepository = require("../../core/library/BaseRepository");
-const { scheduleStatus } = require("../../tools/constants");
+const BaseRepository = require("core/library/BaseRepository");
+const { scheduleStatus } = require("tools/constants");
 const { Schedule } = require("./schedule");
 const moment = require("moment");
 
@@ -11,7 +11,7 @@ class ScheduleRepository extends BaseRepository {
 
   findGroupSchedule(groupId, trainingId) {
     return super
-      .customFindOne({ "trainees.groupId": groupId, trainingId })
+      .findOne({ "trainees.groupId": groupId, trainingId })
       .populate("trainingId", "trainingName")
       .populate("groupId", "groupName")
       .populate("location.prov_id", "namek")
@@ -22,25 +22,12 @@ class ScheduleRepository extends BaseRepository {
   }
 
   findMemberAttendance(userId, trainingId) {
-    return super.customFindAll({ "trainees.userId": userId, trainingId });
+    return super.find({ "trainees.userId": userId, trainingId });
   }
 
-  customFindAll(data) {
-    return this.model
-      .find(data)
-      .sort({createdAt: -1})
-      .populate("trainingId", "trainingName")
-      .populate("groupId", "groupName")
-      .populate("location.prov_id", "namek")
-      .populate("location.dist_id", "name")
-      .populate("location.sect_id", "name")
-      .populate("location.cell_id", "name")
-      .populate("location.village_id", "name");
-  }
-
-  findOne(id) {
-    return this.model
-      .findOne({ _id: id })
+  findById(id) {
+    return super
+      .findById(id)
       .populate("trainingId", "trainingName")
       .populate("groupId", "groupName")
       .populate("location.prov_id", "namek")

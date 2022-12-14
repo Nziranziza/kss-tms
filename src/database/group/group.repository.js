@@ -1,7 +1,7 @@
-const BaseRepository = require("../../core/library/BaseRepository");
+const BaseRepository = require("core/library/BaseRepository");
 const {Group} = require("./group");
-const {scheduleRepository} = require("../schedule/schedule.repository");
-const {attendanceStatus, scheduleStatus} = require("../../tools/constants");
+const {scheduleRepository} = require("database/schedule/schedule.repository");
+const {attendanceStatus, scheduleStatus} = require("tools/constants");
 const ObjectId = require("mongodb").ObjectID;
 
 class GroupRepository extends BaseRepository {
@@ -15,7 +15,7 @@ class GroupRepository extends BaseRepository {
     async find(data) {
         const groups = await super
             .find(data)
-            .sort({createdAt: -1})
+            .sort({ createdAt: -1 })
             .populate("location.prov_id", "namek")
             .populate("location.dist_id", "name")
             .populate("location.sect_id", "name")
@@ -65,16 +65,6 @@ class GroupRepository extends BaseRepository {
         );
     }
 
-    findAll() {
-        return super
-            .findAll()
-            .populate("location.prov_id", "namek")
-            .populate("location.dist_id", "name")
-            .populate("location.sect_id", "name")
-            .populate("location.cell_id", "name")
-            .populate("location.village_id", "name");
-    }
-
     findOne(data) {
         return super
             .findOne(data)
@@ -107,7 +97,7 @@ class GroupRepository extends BaseRepository {
         // If group has a schedule then check past schedules and check whether members have attended at least once
         return Promise.all(
             members.map(async (member) => {
-                const {userId, firstName, lastName, phoneNumber} = member;
+                const { userId, firstName, lastName, phoneNumber } = member;
 
                 const traineeSchedules = await scheduleRepository.findMemberAttendance(
                     userId,
@@ -117,11 +107,11 @@ class GroupRepository extends BaseRepository {
                 let attendance = attendanceStatus.NOT_INVITED;
                 for (const schedule of traineeSchedules) {
                     schedule.trainees.forEach((trainee) => {
-                        if (trainee.userId === userId.toString() && trainee.attended && schedule.status === scheduleStatus.HAPPENED ) {
+                        if (trainee.userId === userId.toString() && trainee.attended && schedule.status === scheduleStatus.HAPPENED) {
                             attendance = attendanceStatus.ATTENDED;
-                        }else if(trainee.userId === userId.toString() && !trainee.attended && schedule.status === scheduleStatus.HAPPENED ){
+                        } else if (trainee.userId === userId.toString() && !trainee.attended && schedule.status === scheduleStatus.HAPPENED) {
                             attendance = attendanceStatus.ABSENT
-                        }else if(schedule.status === scheduleStatus.PENDING) attendance = attendanceStatus.PENDING
+                        } else if (schedule.status === scheduleStatus.PENDING) attendance = attendanceStatus.PENDING
                     });
                 }
 
@@ -153,7 +143,7 @@ class GroupRepository extends BaseRepository {
 
     updateMemberPhone(id, body) {
         return this.model.update(
-            {_id: id, "members.userId": body.userId},
+            { _id: id, "members.userId": body.userId },
             {
                 $set: {
                     "members.$.phoneNumber": body.phoneNumber,
@@ -167,39 +157,39 @@ class GroupRepository extends BaseRepository {
             $match: {
                 ...(body.location &&
                     body.location.prov_id && {
-                        "location.prov_id": ObjectId(body.location.prov_id),
-                    }),
+                    "location.prov_id": ObjectId(body.location.prov_id),
+                }),
                 ...(body.location &&
                     body.location.dist_id && {
-                        "location.dist_id": ObjectId(body.location.dist_id),
-                    }),
+                    "location.dist_id": ObjectId(body.location.dist_id),
+                }),
                 ...(body.location &&
                     body.location.sect_id && {
-                        "location.sect_id": ObjectId(body.location.sect_id),
-                    }),
+                    "location.sect_id": ObjectId(body.location.sect_id),
+                }),
                 ...(body.location &&
                     body.location.cell_id && {
-                        "location.cell_id": ObjectId(body.location.cell_id),
-                    }),
+                    "location.cell_id": ObjectId(body.location.cell_id),
+                }),
                 ...(body.location &&
                     body.location.village_id && {
-                        "location.village_id": ObjectId(body.location.village_id),
-                    }),
-                ...(body.reference && {reference: body.reference}),
-                ...(body.id && {_id: ObjectId(body.id)}),
-                ...{isDeleted: false},
+                    "location.village_id": ObjectId(body.location.village_id),
+                }),
+                ...(body.reference && { reference: body.reference }),
+                ...(body.id && { _id: ObjectId(body.id) }),
+                ...{ isDeleted: false },
             },
         };
 
         const group = {
             $group: {
                 _id: null,
-                numberOfGroups: {$sum: 1},
+                numberOfGroups: { $sum: 1 },
                 numberOfMembers: {
                     $sum: {
                         $cond: {
-                            if: {$isArray: "$members"},
-                            then: {$size: "$members"},
+                            if: { $isArray: "$members" },
+                            then: { $size: "$members" },
                             else: 0,
                         },
                     },
@@ -221,26 +211,26 @@ class GroupRepository extends BaseRepository {
         const filter = {
             ...(body.location &&
                 body.location.prov_id && {
-                    "location.prov_id": ObjectId(body.location.prov_id),
-                }),
+                "location.prov_id": ObjectId(body.location.prov_id),
+            }),
             ...(body.location &&
                 body.location.dist_id && {
-                    "location.dist_id": ObjectId(body.location.dist_id),
-                }),
+                "location.dist_id": ObjectId(body.location.dist_id),
+            }),
             ...(body.location &&
                 body.location.sect_id && {
-                    "location.sect_id": ObjectId(body.location.sect_id),
-                }),
+                "location.sect_id": ObjectId(body.location.sect_id),
+            }),
             ...(body.location &&
                 body.location.cell_id && {
-                    "location.cell_id": ObjectId(body.location.cell_id),
-                }),
+                "location.cell_id": ObjectId(body.location.cell_id),
+            }),
             ...(body.location &&
                 body.location.village_id && {
-                    "location.village_id": ObjectId(body.location.village_id),
-                }),
-            ...(body.reference && {reference: body.reference}),
-            ...(body.id && {_id: ObjectId(body.id)}),
+                "location.village_id": ObjectId(body.location.village_id),
+            }),
+            ...(body.reference && { reference: body.reference }),
+            ...(body.id && { _id: ObjectId(body.id) }),
         };
         return this.model
             .find(filter)

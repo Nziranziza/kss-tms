@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const config = require('config');
-const logger = require('../utils/logging');
+const logger = require('utils/logging');
 
 module.exports = () => {
 
@@ -9,7 +9,7 @@ module.exports = () => {
 
   // set up default mongoose connection
 
-  mongoose.connect(`${config.get('db.url')}`, options).then(() => console.log('mongoDB connected...'));
+  mongoose.connect(`${config.get('db.url')}`, options).then(() => logger.info('mongoDB connected...'));
 
   // get default connection
 

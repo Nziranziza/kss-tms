@@ -1,21 +1,21 @@
 const Router = require('express').Router;
-const validator = require('../../../../middlewares/validator');
+const validator = require('middlewares/validator');
 const { farmVisitConductCtrl } = require('./farm-visit-conduct.controller');
 
-const routes = Router();
+const router = Router();
 
-routes.post(
+router.post(
     '/',
     validator('validateFarmVisitConduct'),
     farmVisitConductCtrl.create
 );
-routes.put("/:id", farmVisitConductCtrl.update);
-routes.put("/custom/:id", farmVisitConductCtrl.customUpdate);
-routes.get("/:id", farmVisitConductCtrl.findOne);
-routes.post("/reference", farmVisitConductCtrl.find);
-routes.delete("/:id", farmVisitConductCtrl.softDelete);
-routes.post('/report', farmVisitConductCtrl.report);
-routes.post('/report/download/:type', farmVisitConductCtrl.downloadReport);
-routes.post('/statistics', farmVisitConductCtrl.statistics);
+router.put("/:id", farmVisitConductCtrl.update);
+router.put("/custom/:id", farmVisitConductCtrl.update);
+router.get("/:id", farmVisitConductCtrl.findById);
+router.post("/reference", farmVisitConductCtrl.find);
+router.delete("/:id", farmVisitConductCtrl.softDelete);
+router.post('/report', farmVisitConductCtrl.report);
+router.post('/report/download/:type', farmVisitConductCtrl.downloadReport);
+router.post('/statistics', farmVisitConductCtrl.statistics);
 
-module.exports.farmVisitConducts = routes;
+module.exports.farmVisitConducts = router;

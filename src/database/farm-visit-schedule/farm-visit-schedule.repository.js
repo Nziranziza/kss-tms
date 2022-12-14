@@ -1,8 +1,8 @@
 const { ObjectId } = require("mongodb");
-const BaseRepository = require("../../core/library/BaseRepository");
+const BaseRepository = require("core/library/BaseRepository");
 const {
   FarmVisitSchedule,
-} = require("../farm-visit-schedule/farm-visit-schedule");
+} = require("database/farm-visit-schedule/farm-visit-schedule");
 const moment = require("moment");
 
 class FarmVisitScheduleRepository extends BaseRepository {
@@ -10,10 +10,10 @@ class FarmVisitScheduleRepository extends BaseRepository {
     super(model);
   }
 
-  find(data) {
+  find(data = {}) {
     return super
       .find(data)
-      .sort({createdAt: -1})
+      .sort({ createdAt: -1 })
       .populate("farms.location.prov_id", "namek")
       .populate("farms.location.dist_id", "name")
       .populate("farms.location.sect_id", "name")
@@ -23,20 +23,9 @@ class FarmVisitScheduleRepository extends BaseRepository {
       .populate("groupId", "groupName");
   }
 
-  findAll() {
+  findById(id) {
     return super
-      .findAll()
-      .populate("farms.location.prov_id", "namek")
-      .populate("farms.location.dist_id", "name")
-      .populate("farms.location.sect_id", "name")
-      .populate("farms.location.cell_id", "name")
-      .populate("gaps")
-      .populate("groupId", "groupName");
-  }
-
-  findOne(id) {
-    return super
-      .findOne(id)
+      .findById(id)
       .populate("farms.location.prov_id", "namek")
       .populate("farms.location.dist_id", "name")
       .populate("farms.location.sect_id", "name")
@@ -454,8 +443,8 @@ class FarmVisitScheduleRepository extends BaseRepository {
 
     const group = {
       $group: {
-        _id: "null" ,
-        visits: {$addToSet: "$_id"}
+        _id: "null",
+        visits: { $addToSet: "$_id" }
       }
     }
     return this.model.aggregate([

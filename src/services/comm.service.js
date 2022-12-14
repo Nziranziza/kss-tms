@@ -1,6 +1,6 @@
 /* APIS for communicating with the common communication service */
 
-const { CommService, Axios } = require("../httpConfig/comm");
+const { CommService, Axios } = require("httpConfig/comm");
 const config = require("config");
 const { RedisService } = require("./redis.service");
 const appId = config.get("apiEndPoints.commService.appId");
@@ -16,7 +16,6 @@ const authenticateApp = async (data) => {
       token: "",
     });
   } catch (error) {
-    console.log(error)
     return error;
   }
 };

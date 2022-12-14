@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "nodemon ./app.js"
+    "start": "export NODE_PATH=./src && nodemon ./app.js"
   },
   "dependencies": {
     "@joi/date": "^2.1.0",
@@ -35,5 +35,8 @@
     "nodemon": "^2.0.16",
     "redis": "^2.8.0",
     "winston": "^3.7.2"
+  },
+  "devDependencies": {
+    "eslint": "^8.29.0"
   }
 }

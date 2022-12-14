@@ -1,5 +1,5 @@
-const BaseRepository = require("../../core/library/BaseRepository");
-const { sendAppSMS } = require("../../services/comm.service");
+const BaseRepository = require("core/library/BaseRepository");
+const { sendAppSMS } = require("services/comm.service");
 const { Communication } = require("./communication");
 class CommunicationRepository extends BaseRepository {
   constructor(model) {
@@ -32,7 +32,7 @@ class CommunicationRepository extends BaseRepository {
 
     const sms = await sendAppSMS(data);
     if (sms.data) {
-      await this.model.create({
+      await super.create({
         ...comm,
         batch_id: sms.data.data.batch_id,
       });

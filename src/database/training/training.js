@@ -1,8 +1,8 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 const timestamps = require("mongoose-timestamp");
-const { trainingStatus } = require('../../tools/constants');
-const softDelete = require("../plugins/soft-delete");
+const { trainingStatus } = require('tools/constants');
+const softDelete = require("database/plugins/soft-delete");
 
 const MATERIAL = new mongoose.Schema({
   fileName: { type: String, required: true },

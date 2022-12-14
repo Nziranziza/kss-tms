@@ -1,6 +1,6 @@
 const axios = require("axios");
 const config = require("config");
-const logger = require("../logging");
+const logger = require("logging");
 const url = config.get("apiEndPoints.commService.url");
 
 /* Axios instance for the communication service */
