@@ -1,4 +1,4 @@
-const BaseRepository = require("../../core/library/BaseRepository");
+const BaseRepository = require("core/library/BaseRepository");
 const { Training } = require("./training");
 const ObjectId = require("mongodb").ObjectID;
 class EvaluationRepository extends BaseRepository {

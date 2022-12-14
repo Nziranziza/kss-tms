@@ -1,6 +1,6 @@
 const { ObjectId } = require("mongodb");
-const BaseRepository = require("../../core/library/BaseRepository");
-const { scheduleStatus } = require("../../tools/constants");
+const BaseRepository = require("core/library/BaseRepository");
+const { scheduleStatus } = require("tools/constants");
 const { Schedule } = require("./schedule");
 const moment = require("moment");
 

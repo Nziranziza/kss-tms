@@ -1,10 +1,10 @@
-const asyncWrapper = require("../../../../core/helpers/asyncWrapper");
-const BaseController = require("../../../../core/library/BaseController");
-const responseWrapper = require("../../../../core/helpers/responseWrapper");
+const asyncWrapper = require("core/helpers/asyncWrapper");
+const BaseController = require("core/library/BaseController");
+const responseWrapper = require("core/helpers/responseWrapper");
 const {
   trainingRepository,
-} = require("../../../../database/training/training.repository");
-const { statusCodes } = require("../../../../utils/constants/common");
+} = require("database/training/training.repository");
+const { statusCodes } = require("utils/constants/common");
 const { ObjectId } = require('mongodb');
 
 class TrainingController extends BaseController {

@@ -1,6 +1,6 @@
 const Router = require("express").Router;
 const { trainingCtrl } = require("./trainings.controller");
-const validator = require("../../../../middlewares/validator");
+const validator = require("middlewares/validator");
 
 const routes = Router();
 

@@ -1,10 +1,10 @@
-const asyncWrapper = require("../../../../core/helpers/asyncWrapper");
-const BaseController = require("../../../../core/library/BaseController");
-const responseWrapper = require("../../../../core/helpers/responseWrapper");
+const asyncWrapper = require("core/helpers/asyncWrapper");
+const BaseController = require("core/library/BaseController");
+const responseWrapper = require("core/helpers/responseWrapper");
 const {
   evaluationRepository,
-} = require("../../../../database/evaluation/evaluation.repository");
-const { statusCodes } = require("../../../../utils/constants/common");
+} = require("database/evaluation/evaluation.repository");
+const { statusCodes } = require("utils/constants/common");
 
 class EvaluationController extends BaseController {
   constructor(repository) {

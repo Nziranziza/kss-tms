@@ -1,7 +1,7 @@
-const BaseRepository = require("../../core/library/BaseRepository");
+const BaseRepository = require("core/library/BaseRepository");
 const {Group} = require("./group");
-const {scheduleRepository} = require("../schedule/schedule.repository");
-const {attendanceStatus, scheduleStatus} = require("../../tools/constants");
+const {scheduleRepository} = require("database/schedule/schedule.repository");
+const {attendanceStatus, scheduleStatus} = require("tools/constants");
 const ObjectId = require("mongodb").ObjectID;
 
 class GroupRepository extends BaseRepository {
