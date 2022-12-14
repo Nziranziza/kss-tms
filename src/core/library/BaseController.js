@@ -6,16 +6,13 @@ const { statusCodes } = require('utils/constants/common');
 class BaseController {
   constructor(repository) {
     this.repository = repository;
-    this.findOne = this.findOne.bind(this);
-    this.create = this.create.bind(this);
-    this.update = this.update.bind(this);
-    this.customUpdate = this.customUpdate.bind(this);
-    this.remove = this.remove.bind(this);
-    this.find = this.find.bind(this);
-    this.findAll = this.findAll.bind(this);
-    this.findAll = this.findAll.bind(this);
-    this.customFindOne = this.customFindOne.bind(this);
-    this.softDelete = this.softDelete.bind(this);
+    this.create = this.create.bind(this)
+    this.find = this.find.bind(this)
+    this.update = this.update.bind(this)
+    this.remove = this.remove.bind(this)
+    this.checkOne = this.checkOne.bind(this)
+    this.findById = this.findById.bind(this)
+    this.softDelete = this.softDelete.bind(this)
   }
 
   create(req, res) {
@@ -34,14 +31,16 @@ class BaseController {
         applicationId
       });
       if (!data) {
-        throw new CustomError("Can not create the record", statusCodes.SERVER_ERROR);
+        throw new CustomError(
+          serverMessages.CREATE_FAILURE,
+          statusCodes.SERVER_ERROR
+        );
       }
-      const response = await this.repository.findOne(data._id);
       return responseWrapper({
         res,
-        message: "Record successfully created",
+        message: serverMessages.CREATE_SUCCESS,
         status: statusCodes.OK,
-        data: response
+        data,
       });
     });
   }
@@ -51,43 +50,12 @@ class BaseController {
     return asyncWrapper(res, async () => {
       const data = await this.repository.find(body);
       if (!data) {
-        throw new CustomError("Record not found", statusCodes.NOT_FOUND);
+        throw new CustomError(serverMessages.NOT_FOUND, statusCodes.NOT_FOUND);
       }
       return responseWrapper({
         res,
         status: statusCodes.OK,
-        message: "Success",
-        data,
-      });
-    });
-  }
-
-  findAll(req, res) {
-    return asyncWrapper(res, async () => {
-      const data = await this.repository.findAll();
-      if (!data) {
-        throw new CustomError("Data not found", statusCodes.NOT_FOUND);
-      }
-      return responseWrapper({
-        res,
-        status: statusCodes.OK,
-        message: "Success",
-        data,
-      });
-    });
-  }
-
-  customFindOne(req, res) {
-    const { body } = req;
-    return asyncWrapper(res, async () => {
-      const data = await this.repository.customFindOne(body);
-      if (!data) {
-        throw new CustomError("Record not found", statusCodes.NOT_FOUND);
-      }
-      return responseWrapper({
-        res,
-        status: statusCodes.OK,
-        message: "Success",
+        message: serverMessages.SUCCESS,
         data,
       });
     });
@@ -96,35 +64,18 @@ class BaseController {
   update(req, res) {
     const { body, params } = req;
     return asyncWrapper(res, async () => {
-      let data = await this.repository.findOne(params.id);
+      const data = await this.repository.update(params.id, body);
       if (!data) {
-        throw new CustomError("Can not update the record", statusCodes.SERVER_ERROR);
-      }
-      if(data){
-        body._id = params.id;
-        data = await this.repository.update(body);
+        throw new CustomError(
+          serverMessages.NOT_FOUND,
+          statusCodes.NOT_FOUND
+        );
       }
       return responseWrapper({
         res,
         status: statusCodes.OK,
-        message: "Record successfully updated",
-        data
-      });
-    });
-  }
-
-  customUpdate(req, res) {
-    const { body, params } = req;
-    return asyncWrapper(res, async () => {
-      const data = await this.repository.customUpdate(params.id, body);
-      if (!data) {
-        throw new CustomError("Can not update the record", statusCodes.SERVER_ERROR);
-      }
-      return responseWrapper({
-        res,
-        status: statusCodes.OK,
-        message: "Record successfully updated",
-        data
+        message: serverMessages.UPDATE_SUCCESS,
+        data,
       });
     });
   }
@@ -134,37 +85,44 @@ class BaseController {
     return asyncWrapper(res, async () => {
       const data = await this.repository.remove(params.id);
       if (!data) {
-        throw new CustomError("Can not remove the record", statusCodes.SERVER_ERROR);
+        throw new CustomError(
+          serverMessages.REMOVE_FAILURE,
+          statusCodes.SERVER_ERROR
+        );
       }
       return responseWrapper({
         res,
         status: statusCodes.OK,
-        message: "Record successfully removed",
+        message: serverMessages.REMOVE_SUCCESS,
       });
     });
   }
 
   checkOne(req, res, next) {
     return asyncWrapper(res, async () => {
-      const data = await this.repository.findOne(req.params.id);
+      const data = await this.repository.findById(req.params.id);
       if (!data) {
-        throw new CustomError("Record not found", statusCodes.NOT_FOUND);
+        throw new CustomError(serverMessages.NOT_FOUND, statusCodes.NOT_FOUND);
       }
       req.currentRecord = data;
       return next();
     });
   }
 
-  findOne(req, res) {
+  findById(req, res) {
     return asyncWrapper(res, async () => {
-      const data = await this.repository.findOne(req.params.id);
+      const data = await this.repository.findById(req.params.id);
       if (!data) {
-        throw new CustomError("Record not found", statusCodes.NOT_FOUND);
+        return responseWrapper({
+          res,
+          status: statusCodes.NOT_FOUND,
+          message: serverMessages.NOT_FOUND,
+        });
       }
       return responseWrapper({
         res,
         status: statusCodes.OK,
-        message: "Success",
+        message: serverMessages.SUCCESS,
         data: data,
       });
     });
@@ -172,15 +130,15 @@ class BaseController {
 
   softDelete(req, res) {
     return asyncWrapper(res, async () => {
-      const data = await this.repository.findOne(req.params.id);
+      const data = await this.repository.findById(req.params.id);
       if (!data) {
-        throw new CustomError("Record not found", statusCodes.NOT_FOUND);
+        throw new CustomError(serverMessages.NOT_FOUND, statusCodes.NOT_FOUND);
       }
-      const isDeleted = await data.softDelete();
+      await data.softDelete();
       return responseWrapper({
         res,
         status: statusCodes.OK,
-        message: "Record successfully deleted!",
+        message: serverMessages.DELETE_SUCCESS,
         data,
       });
     });

@@ -32,7 +32,7 @@ class CommunicationRepository extends BaseRepository {
 
     const sms = await sendAppSMS(data);
     if (sms.data) {
-      await this.model.create({
+      await super.create({
         ...comm,
         batch_id: sms.data.data.batch_id,
       });

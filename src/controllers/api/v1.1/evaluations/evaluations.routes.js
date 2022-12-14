@@ -6,7 +6,7 @@ const routes = Router();
 
 routes.post("/", validator("validateEvaluation"), evaluationCtrl.create);
 routes.get('/computeBaseline', evaluationCtrl.computeBaseline);
-routes.get("/:id", evaluationCtrl.findOne);
+routes.get("/:id", evaluationCtrl.findById);
 routes.put("/:id", evaluationCtrl.update);
 routes.get("/app/:id", evaluationCtrl.findByApp);
 routes.delete("/:id", evaluationCtrl.delete);

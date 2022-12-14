@@ -1,18 +1,14 @@
 const BaseRepository = require("core/library/BaseRepository");
 const { Training } = require("./training");
 const ObjectId = require("mongodb").ObjectID;
-class EvaluationRepository extends BaseRepository {
+class TrainingRepository extends BaseRepository {
   constructor(model) {
     super(model);
     this.findSingle = this.findSingle.bind(this)
   }
 
-  customFindAll(data) {
-    return super.find(data).populate("adoptionGaps", "gap_name");
-  }
-
   findSingle(id){
-    return super.findOne(ObjectId(id));
+    return super.findById(id);
   }
 
   findOne(id) {
@@ -161,4 +157,4 @@ class EvaluationRepository extends BaseRepository {
     ]);
   }
 }
-module.exports.trainingRepository = new EvaluationRepository(Training);
+module.exports.trainingRepository = new TrainingRepository(Training);

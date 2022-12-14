@@ -49,7 +49,7 @@ class FarmVisitScheduleController extends BaseController {
   sendSMS(req, res) {
     const { params } = req;
     return asyncWrapper(res, async () => {
-      const schedule = await this.repository.findOne(params.id);
+      const schedule = await this.repository.findById(params.id);
       if (schedule) {
         for (const farm of schedule.farms) {
           let recipients = [];

@@ -24,7 +24,7 @@ class DashboardController extends BaseController {
       const filters = await Promise.all(
         trainings.map(async (training) => {
           const ids = training.groups.map((id) => ObjectId(id));
-          const groups = await groupRepository.customFindAll({
+          const groups = await groupRepository.find({
             _id: { $in: ids },
           });
 

@@ -16,7 +16,6 @@ const authenticateApp = async (data) => {
       token: "",
     });
   } catch (error) {
-    console.log(error)
     return error;
   }
 };

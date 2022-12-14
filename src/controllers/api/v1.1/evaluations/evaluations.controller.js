@@ -18,7 +18,7 @@ class EvaluationController extends BaseController {
   findByApp(req, res) {
     const body = { applicationId: req.params.id };
     return asyncWrapper(res, async () => {
-      const data = await this.repository.customFindAll(body);
+      const data = await this.repository.find(body);
       const gaps = await this.repository.calculateScore(data);
       return responseWrapper({
         res,
@@ -31,8 +31,15 @@ class EvaluationController extends BaseController {
 
   delete(req, res) {
     return asyncWrapper(res, async () => {
-      const data = await this.repository.findOne(req.params.id);
-      const isDeleted = await data.softDelete();
+      const data = await this.repository.findById(req.params.id);
+      if(!data) {
+        return responseWrapper({
+          res,
+          status: statusCodes.NOT_FOUND,
+          message: 'Record not found!'
+        });
+      }
+      await data.softDelete();
       return responseWrapper({
         res,
         status: statusCodes.OK,
