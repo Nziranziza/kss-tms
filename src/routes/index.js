@@ -1,5 +1,6 @@
-const v1_1 = require('controllers/api/v1.1/index.routes');
+const router = require('controllers/api/v1.1/index.routes');
 const logger = require("logging");
+const auth = require('../middlewares/auth')
 
 
 const mountRoutes = (app) => {
