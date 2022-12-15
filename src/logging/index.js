@@ -1,7 +1,6 @@
 const { transports, createLogger, format } = require('winston');
 const appRoot = require('app-root-path');
 const config = require('config');
-const isJSON = require('is-json');
 
 const MESSAGE = Symbol.for('message');
 

@@ -4,8 +4,7 @@ const responseWrapper = require("core/helpers/responseWrapper");
 const {
   trainingRepository,
 } = require("database/training/training.repository");
-const { statusCodes } = require("utils/constants/common");
-const { ObjectId } = require('mongodb');
+const { statusCodes, serverMessages } = require("utils/constants/common");
 
 class TrainingController extends BaseController {
   constructor(repository) {
