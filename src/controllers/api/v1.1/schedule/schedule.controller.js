@@ -4,7 +4,7 @@ const responseWrapper = require("core/helpers/responseWrapper");
 const {
     scheduleRepository,
 } = require("database/schedule/schedule.repository");
-const {statusCodes} = require("utils/constants/common");
+const { statusCodes, serverMessages } = require("utils/constants/common");
 const {sendClientSMS} = require("services/comm.service");
 const excelJS = require("exceljs");
 const appRoot = require("app-root-path");
