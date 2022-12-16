@@ -1,6 +1,5 @@
 const router = require('controllers/api/v1.1/index.routes');
 const logger = require("logging");
-const auth = require('../middlewares/auth')
 
 
 const mountRoutes = (app) => {
@@ -15,7 +14,7 @@ const mountRoutes = (app) => {
     }
     next();
   });
-  app.use("/api/v1.1", auth, router);
+  app.use("/api/v1.1", router);
 };
 
 module.exports = {

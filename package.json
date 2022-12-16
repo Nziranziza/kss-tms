@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "export NODE_PATH=./src && nodemon ./app.js"
+    "start": "nodemon ./app.js"
   },
   "dependencies": {
     "@joi/date": "^2.1.0",

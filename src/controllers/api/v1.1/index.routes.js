@@ -13,10 +13,12 @@ const {
 } = require("./farm-visit-conduct/farm-visit-conduct.routes");
 const { communication } = require("./communication/communication.routes");
 const { dashboard } = require("./dashboard/dashboard.routes");
+const auth = require("middlewares/auth");
 
 const router = express.Router();
 
 router.use("/applications", applications);
+router.use(auth)
 router.use("/groups", groups);
 router.use("/evaluations", evaluations);
 router.use("/trainings", trainings);
