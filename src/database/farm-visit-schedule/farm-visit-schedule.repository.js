@@ -4,6 +4,7 @@ const {
   FarmVisitSchedule,
 } = require("database/farm-visit-schedule/farm-visit-schedule");
 const moment = require("moment");
+const populate = require('./farm-visit-schedule.populate')
 
 class FarmVisitScheduleRepository extends BaseRepository {
   constructor(model) {
@@ -14,25 +15,20 @@ class FarmVisitScheduleRepository extends BaseRepository {
     return super
       .find(data)
       .sort({ createdAt: -1 })
-      .populate("farms.location.prov_id", "namek")
-      .populate("farms.location.dist_id", "name")
-      .populate("farms.location.sect_id", "name")
-      .populate("farms.location.cell_id", "name")
-      .populate("farms.location.village_id", "name")
-      .populate("gaps")
-      .populate("groupId", "groupName");
+      .populate(populate)
+  }
+
+  findOne(data = {}) {
+    return super
+      .findOne(data)
+      .sort({ createdAt: -1 })
+      .populate(populate);
   }
 
   findById(id) {
     return super
       .findById(id)
-      .populate("farms.location.prov_id", "namek")
-      .populate("farms.location.dist_id", "name")
-      .populate("farms.location.sect_id", "name")
-      .populate("farms.location.cell_id", "name")
-      .populate("farms.location.village_id", "name")
-      .populate("gaps")
-      .populate("groupId", "groupName");
+      .populate(populate);
   }
 
   async schedulesStats(body) {
