@@ -3,6 +3,7 @@ const { groupCtrl } = require("./group.controller");
 const validator = require("middlewares/validator");
 
 const routes = Router();
+
 routes.post("/", validator("validateGroup"), groupCtrl.create);
 routes.put("/:id", groupCtrl.update);
 routes.get("/:id", groupCtrl.findById);
