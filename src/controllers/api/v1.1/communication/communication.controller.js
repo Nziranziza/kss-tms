@@ -1,7 +1,7 @@
 const asyncWrapper = require("core/helpers/asyncWrapper");
 const BaseController = require("core/library/BaseController");
 const responseWrapper = require("core/helpers/responseWrapper");
-const { statusCodes } = require("utils/constants/common");
+const { statusCodes, serverMessages } = require("utils/constants/common");
 const {
   commRepo,
 } = require("database/communication/communication.repository");

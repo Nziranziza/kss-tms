@@ -1,3 +1,5 @@
+process.env.NODE_PATH = __dirname + '/src';
+require('module').Module._initPaths();
 const express = require("express");
 const config = require("config");
 const cors = require("cors");
