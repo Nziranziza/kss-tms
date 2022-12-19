@@ -8,8 +8,9 @@ const {
 const { ObjectId } = require("mongodb");
 const { Evaluation } = require("database/evaluation/evaluation");
 const moment = require("moment/moment");
-const CustomError = require("../../core/helpers/customerError");
-const { statusCodes } = require("../../utils/constants/common");
+const CustomError = require("core/helpers/customerError");
+const { statusCodes } = require("utils/constants/common");
+const populate = require('./farm-visit-conduct.populate');
 
 class FarmVisitConductRepository extends BaseRepository {
   constructor(model) {
@@ -53,27 +54,19 @@ class FarmVisitConductRepository extends BaseRepository {
   find = (data = {}) => {
     return super
       .find(data)
-      .populate("farm.location.prov_id", "namek")
-      .populate("farm.location.dist_id", "name")
-      .populate("farm.location.sect_id", "name")
-      .populate("farm.location.cell_id", "name")
-      .populate("farm.location.village_id", "name")
-      .populate("gap")
-      .populate("groupId")
-      .populate("scheduleId");
+      .populate(populate);
+  }
+
+  findOne = (data = {}) => {
+    return super
+      .findOne(data)
+      .populate(populate);
   }
 
   findById = (id) => {
     return super
       .findById(id)
-      .populate("farm.location.prov_id", "namek")
-      .populate("farm.location.dist_id", "name")
-      .populate("farm.location.sect_id", "name")
-      .populate("farm.location.cell_id", "name")
-      .populate("farm.location.village_id", "name")
-      .populate("gap")
-      .populate("groupId")
-      .populate("scheduleId");
+      .populate(populate);
   }
 
   statistics = (body) => {
