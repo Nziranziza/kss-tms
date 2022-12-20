@@ -4,6 +4,7 @@ const { scheduleRepository } = require("database/schedule/schedule.repository");
 const { attendanceStatus, scheduleStatus } = require("tools/constants");
 const { ObjectId } = require("mongodb");
 const populate = require('./group.populate')
+const { pickBy, identity } = require('lodash')
 
 
 class GroupRepository extends BaseRepository {
@@ -15,8 +16,23 @@ class GroupRepository extends BaseRepository {
   }
 
   async find(data) {
+    const {
+      location: { dist_id, sect_id, cell_id, village_id, prov_id } = {},
+      ...filters
+    } = data;
+    const query = pickBy(
+      {
+        ...filters,
+        "location.dist_id": dist_id,
+        "location.sect_id": sect_id,
+        "location.village_id": village_id,
+        "location.cell_id": cell_id,
+        "location.prov_id": prov_id,
+      },
+      identity
+    );
     const groups = await super
-      .find(data)
+      .find(query)
       .sort({ createdAt: -1 })
       .populate(populate);
 
@@ -64,24 +80,19 @@ class GroupRepository extends BaseRepository {
   }
 
   findOne(data) {
-    return super
-      .findOne(data)
-      .populate(populate);
+    return super.findOne(data).populate(populate);
   }
 
   findById(id) {
-    return super
-      .findById(id)
-      .populate(populate);
+    return super.findById(id).populate(populate);
   }
 
   searchGroup(name) {
     const regex = new RegExp(["^", name, "$"].join(""), "i");
-    return this
-      .findOne({
-        groupName: regex,
-        isDeleted: false,
-      });
+    return this.findOne({
+      groupName: regex,
+      isDeleted: false,
+    });
   }
 
   async membersAttendance(group, trainingId) {
@@ -235,10 +246,7 @@ class GroupRepository extends BaseRepository {
       ...(body.reference && { reference: body.reference }),
       ...(body.id && { _id: ObjectId(body.id) }),
     };
-    return this.model
-      .find(filter)
-      .lean()
-      .populate(populate);
+    return this.model.find(filter).lean().populate(populate);
   }
 }
 
