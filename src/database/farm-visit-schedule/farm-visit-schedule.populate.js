@@ -13,17 +13,17 @@ module.exports = [
   },
   {
     path: "farms.location.cell_id",
-    name: "name",
+    select: "name",
   },
   {
     path: "farms.location.village_id",
-    name: "name",
+    select: "name",
   },
   {
     path: "gaps",
   },
   {
     path: "groupId",
-    name: "groupName",
+    select: "groupName",
   },
 ];
