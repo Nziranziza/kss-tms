@@ -50,7 +50,7 @@ const farmSchema = new Schema({
 // Farm visit schema
 const farmVisitConductSchema = new Schema({
     gap: {type: Schema.Types.ObjectId,  ref: "evaluation"},
-    scheduleId: {type: Schema.Types.ObjectId,  ref: "farm_visit_schedule"},
+    scheduleId: { type: Schema.Types.ObjectId,  ref: "farm_visit_schedule"},
     visitor: {type: ownerSchema},
     applicationId: {type: Number, required: true},
     overall_score: {type: Number, required: true},

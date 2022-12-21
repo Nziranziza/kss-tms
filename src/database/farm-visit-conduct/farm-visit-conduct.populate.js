@@ -27,5 +27,8 @@ module.exports = [
   },
   {
     path: "scheduleId",
+    populate: {
+      path: 'gaps'
+    }
   },
 ];
