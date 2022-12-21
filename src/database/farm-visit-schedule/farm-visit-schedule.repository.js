@@ -9,6 +9,21 @@ const populate = require('./farm-visit-schedule.populate')
 const lookups = [
   {
     $lookup: {
+      from: "districts",
+      localField: "farms.location.dist_id",
+      foreignField: "_id",
+      as: "farms.location.dist_id",
+    },
+  },
+  {
+    $addFields: {
+      "farms.location.dist_id": {
+        $arrayElemAt: ["$farms.location.dist_id", 0],
+      },
+    },
+  },
+  {
+    $lookup: {
       from: "provinces",
       localField: "farms.location.prov_id",
       foreignField: "_id",
@@ -19,21 +34,6 @@ const lookups = [
     $addFields: {
       "farms.location.prov_id": {
         $arrayElemAt: ["$farms.location.prov_id", 0],
-      },
-    },
-  },
-  {
-    $lookup: {
-      from: "districts",
-      localField: "farms.location.dist_id",
-      foreignField: "_id",
-      as: "farms.location.dist_id",
-    },
-  },
-  {
-    $addFields: {
-      "farm.location.dist_id": {
-        $arrayElemAt: ["$farm.location.dist_id", 0],
       },
     },
   },
