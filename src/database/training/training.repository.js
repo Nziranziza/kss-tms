@@ -1,6 +1,6 @@
 const BaseRepository = require("core/library/BaseRepository");
 const { Training } = require("./training");
-const ObjectId = require("mongodb").ObjectID;
+const ObjectId = require("mongodb").ObjectId;
 class TrainingRepository extends BaseRepository {
   constructor(model) {
     super(model);

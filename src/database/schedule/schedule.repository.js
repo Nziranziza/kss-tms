@@ -3,22 +3,29 @@ const BaseRepository = require("core/library/BaseRepository");
 const { scheduleStatus } = require("tools/constants");
 const { Schedule } = require("./schedule");
 const moment = require("moment");
+const populate = require('./schedule.populate')
 
 class ScheduleRepository extends BaseRepository {
   constructor(model) {
     super(model);
   }
 
+  find(data = {}) {
+    return super
+    .find(data)
+    .populate(populate)
+  }
+
+  findOne(data = {}) {
+    return super
+    .findOne(data)
+    .populate(populate)
+  }
+
   findGroupSchedule(groupId, trainingId) {
     return super
       .findOne({ "trainees.groupId": groupId, trainingId })
-      .populate("trainingId", "trainingName")
-      .populate("groupId", "groupName")
-      .populate("location.prov_id", "namek")
-      .populate("location.dist_id", "name")
-      .populate("location.sect_id", "name")
-      .populate("location.cell_id", "name")
-      .populate("location.village_id", "name");
+      .populate(populate)
   }
 
   findMemberAttendance(userId, trainingId) {
@@ -28,13 +35,7 @@ class ScheduleRepository extends BaseRepository {
   findById(id) {
     return super
       .findById(id)
-      .populate("trainingId", "trainingName")
-      .populate("groupId", "groupName")
-      .populate("location.prov_id", "namek")
-      .populate("location.dist_id", "name")
-      .populate("location.sect_id", "name")
-      .populate("location.cell_id", "name")
-      .populate("location.village_id", "name");
+      .populate(populate);
   }
 
   // Record Attendance scheduled training

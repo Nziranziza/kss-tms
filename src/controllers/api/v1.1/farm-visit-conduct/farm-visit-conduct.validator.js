@@ -56,4 +56,5 @@ module.exports.validateFarmVisitConduct = Joi.object({
       }),
     })
   ),
+  observation: Joi.string(),
 });
