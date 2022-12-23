@@ -41,7 +41,7 @@ const farmSchema = new Schema({
 
 // Farm visit schema
 const farmVisitScheduleSchema = new Schema({
-    gaps: {type: [Schema.Types.ObjectId],  ref: "evaluation"},
+    gaps: [{type: Schema.Types.ObjectId,  ref: "evaluation"}],
     description: {type: String, required: true},
     date: {type: Date, required: true},
     visitor:  {type: ownerSchema},

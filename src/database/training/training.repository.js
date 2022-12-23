@@ -1,14 +1,19 @@
 const BaseRepository = require("core/library/BaseRepository");
 const { Training } = require("./training");
-const ObjectId = require("mongodb").ObjectID;
+const ObjectId = require("mongodb").ObjectId;
+const populate = require('./training.populate');
+
 class TrainingRepository extends BaseRepository {
   constructor(model) {
     super(model);
-    this.findSingle = this.findSingle.bind(this)
   }
 
-  findSingle(id){
-    return super.findById(id);
+  find() {
+    return super.find().populate(populate)
+  }
+
+  findById(id){
+    return super.findById(id).populate(populate);
   }
 
   findOne(id) {

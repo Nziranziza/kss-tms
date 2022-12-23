@@ -7,15 +7,17 @@ class BaseRepository {
     this.create = this.create.bind(this);
     this.update = this.update.bind(this);
     this.remove = this.remove.bind(this);
+    this.aggregate = this.aggregate.bind(this);
   }
 
   /**
    * @description retrive all data with corresponding filters
+   * with default sort function(newest to oldest)
    * @param {Object<string, any>} filters
    * @returns {Promise<Object<string, any>[]>} data
    */
   find(filters = {}) {
-    return this.model.find(filters);
+    return this.model.find(filters).sort({ createdAt: -1 });
   }
 
   /**
@@ -62,6 +64,24 @@ class BaseRepository {
    */
   remove(id) {
     return this.model.findByIdAndRemove(id);
+  }
+
+  /**
+   * @description extends default model aggregate function
+   * and add sort function, the data returned sorted by newest to
+   * oldest { createdAt: -1 }
+   * @param {any[]} query 
+   * @returns 
+   */
+  aggregate(query = []) {
+    return this.model.aggregate([
+      ...query,
+      {
+        $sort: {
+          createdAt: -1
+        }
+      }
+    ])
   }
 }
 
