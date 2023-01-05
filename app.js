@@ -12,9 +12,14 @@ const appRoot = require('app-root-path');
 const fs = require('fs');
 const dir = `${appRoot}/files/downloads`;
 const fileUpload = require('express-fileupload');
+const morgan = require('morgan')
 
 if (!fs.existsSync(dir)){
   fs.mkdirSync(dir, { recursive: true });
+}
+
+if(process.env.NODE_ENV === 'development') {
+  app.use(morgan('dev'))
 }
 
 app.disable('x-powered-by');
