@@ -9,7 +9,7 @@ class TrainingRepository extends BaseRepository {
   }
 
   find() {
-    return super.find().populate(populate)
+    return super.find(null, { trainingName: 1 }).populate(populate)
   }
 
   findById(id){
