@@ -94,7 +94,7 @@ class FarmVisitConductRepository extends BaseRepository {
           }),
         ...(body.reference && { reference: body.reference }),
         ...(body.scheduleId && { scheduleId: body.scheduleId }),
-        ...(body.groupId && { groupId: body.groupId }),
+        ...(body.groupId && { groupId: ObjectId(body.groupId) }),
         ...(body.date && { createdAt: { $gte:moment(body.date.from)
                   .startOf('day')
                   .toDate() , $lt:  moment(body.date.to)
