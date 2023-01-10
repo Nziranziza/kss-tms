@@ -5,7 +5,7 @@ const { statusCodes, serverMessages } = require("utils/constants/common");
 const {
   commRepo,
 } = require("database/communication/communication.repository");
-const { getBalance, orderSMS, getOrders } = require("services/comm.service");
+const { getBalance, orderSMS, getOrders, smsHistory } = require("services/comm.service");
 const { scheduleRepository } = require('database/schedule/schedule.repository');
 
 class CommController extends BaseController {
@@ -77,6 +77,28 @@ class CommController extends BaseController {
           data: orders.data.data,
         });
     });
+  }
+
+  getSmsHistory(req, res) {
+    const { query } = req;
+    return asyncWrapper(res, async () => {
+      const history = await smsHistory(query)
+      if(history.data) {
+        return responseWrapper({
+          res,
+          status: history?.data?.status,
+          message: history?.data?.message,
+          data: history?.data
+        })
+      } else {
+        const { response } = history;
+        return responseWrapper({
+          res, 
+          status: response.status,
+          message: response.message
+        })
+      }
+    })
   }
 }
 
