@@ -14,7 +14,7 @@ module.exports = function (req, res, next) {
         statusCodes.BAD_REQUEST
       );
     }
-    const app = await applicationRepository.findOne({ applicationId});
+    const app = await applicationRepository.findOne({ applicationId });
     if (!app) {
       throw new CustomError(
         serverMessages.UNAUTHORIZED,
