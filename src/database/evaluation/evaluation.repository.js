@@ -8,6 +8,10 @@ class EvaluationRepository extends BaseRepository {
     super(model);
   }
 
+  find() {
+    return super.find(null, { gap_name: 1 });
+  }
+
   async evaluationStats(body) {
     const evaluations = await this.find();
     return Promise.all(

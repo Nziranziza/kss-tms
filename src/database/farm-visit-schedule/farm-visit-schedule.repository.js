@@ -103,7 +103,7 @@ class FarmVisitScheduleRepository extends BaseRepository {
   };
 
   find(data = {}) {
-    return super.find(data).populate(populate);
+    return super.find(data, { date: -1 }).populate(populate);
   }
 
   findOne(data = {}) {

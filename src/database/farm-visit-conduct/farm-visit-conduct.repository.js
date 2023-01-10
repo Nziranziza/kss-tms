@@ -11,6 +11,7 @@ const moment = require("moment/moment");
 const CustomError = require("core/helpers/customerError");
 const { statusCodes } = require("utils/constants/common");
 const populate = require('./farm-visit-conduct.populate');
+const toObjectId = require('utils/toObjectId')
 
 class FarmVisitConductRepository extends BaseRepository {
   constructor(model) {
@@ -68,6 +69,7 @@ class FarmVisitConductRepository extends BaseRepository {
       .findById(id)
       .populate(populate);
   }
+  
 
   statistics = (body) => {
     const filter = {
@@ -94,7 +96,7 @@ class FarmVisitConductRepository extends BaseRepository {
           }),
         ...(body.reference && { reference: body.reference }),
         ...(body.scheduleId && { scheduleId: body.scheduleId }),
-        ...(body.groupId && { groupId: body.groupId }),
+        ...(body.groupId && { groupId: ObjectId(body.groupId) }),
         ...(body.date && { createdAt: { $gte:moment(body.date.from)
                   .startOf('day')
                   .toDate() , $lt:  moment(body.date.to)
