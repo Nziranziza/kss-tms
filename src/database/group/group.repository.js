@@ -2,9 +2,10 @@ const BaseRepository = require("core/library/BaseRepository");
 const { Group } = require("./group");
 const { scheduleRepository } = require("database/schedule/schedule.repository");
 const { attendanceStatus, scheduleStatus } = require("tools/constants");
-const { ObjectId } = require("mongodb");
 const populate = require('./group.populate')
-const { pickBy, identity } = require('lodash')
+const { omitBy, isNil } = require('lodash');
+const toObjectId = require("utils/toObjectId");
+const removeNilProps = require("utils/removeNilProps");
 
 
 class GroupRepository extends BaseRepository {
@@ -20,20 +21,17 @@ class GroupRepository extends BaseRepository {
       location: { dist_id, sect_id, cell_id, village_id, prov_id } = {},
       ...filters
     } = data;
-    const query = pickBy(
-      {
+    const query = removeNilProps({
         ...filters,
         "location.dist_id": dist_id,
         "location.sect_id": sect_id,
         "location.village_id": village_id,
         "location.cell_id": cell_id,
         "location.prov_id": prov_id,
-      },
-      identity
+      }
     );
     const groups = await super
-      .find(query)
-      .sort({ createdAt: -1 })
+      .find(query, { groupName: 1 })
       .populate(populate);
 
     // Add attendance rate on every group
@@ -167,33 +165,17 @@ class GroupRepository extends BaseRepository {
   }
 
   statistics(body) {
-    const filter = {
-      $match: {
-        ...(body.location &&
-          body.location.prov_id && {
-            "location.prov_id": ObjectId(body.location.prov_id),
-          }),
-        ...(body.location &&
-          body.location.dist_id && {
-            "location.dist_id": ObjectId(body.location.dist_id),
-          }),
-        ...(body.location &&
-          body.location.sect_id && {
-            "location.sect_id": ObjectId(body.location.sect_id),
-          }),
-        ...(body.location &&
-          body.location.cell_id && {
-            "location.cell_id": ObjectId(body.location.cell_id),
-          }),
-        ...(body.location &&
-          body.location.village_id && {
-            "location.village_id": ObjectId(body.location.village_id),
-          }),
-        ...(body.reference && { reference: body.reference }),
-        ...(body.id && { _id: ObjectId(body.id) }),
-        ...{ isDeleted: false },
-      },
-    };
+    const filters = removeNilProps({
+        "location.prov_id": toObjectId(body.location.prov_id),
+        "location.dist_id": toObjectId(body.location.dist_id),
+        "location.sect_id": toObjectId(body.location.sect_id),
+        "location.cell_id": toObjectId(body.location.cell_id),
+        "location.village_id": toObjectId(body.location.village_id),
+        reference: body.reference,
+        _id: toObjectId(body.id),
+        isDeleted: false,
+      }
+    );
 
     const group = {
       $group: {
@@ -218,34 +200,19 @@ class GroupRepository extends BaseRepository {
         _id: 0,
       },
     };
-    return this.model.aggregate([filter, group, members]);
+    return this.model.aggregate([filters, group, members]);
   }
 
   report(body) {
-    const filter = {
-      ...(body.location &&
-        body.location.prov_id && {
-          "location.prov_id": ObjectId(body.location.prov_id),
-        }),
-      ...(body.location &&
-        body.location.dist_id && {
-          "location.dist_id": ObjectId(body.location.dist_id),
-        }),
-      ...(body.location &&
-        body.location.sect_id && {
-          "location.sect_id": ObjectId(body.location.sect_id),
-        }),
-      ...(body.location &&
-        body.location.cell_id && {
-          "location.cell_id": ObjectId(body.location.cell_id),
-        }),
-      ...(body.location &&
-        body.location.village_id && {
-          "location.village_id": ObjectId(body.location.village_id),
-        }),
-      ...(body.reference && { reference: body.reference }),
-      ...(body.id && { _id: ObjectId(body.id) }),
-    };
+    const filter = removeNilProps({
+      "location.prov_id": toObjectId(body.location.prov_id),
+      "location.dist_id": toObjectId(body.location.dist_id),
+      "location.sect_id": toObjectId(body.location.sect_id),
+      "location.cell_id": toObjectId(body.location.cell_id),
+      "location.village_id": toObjectId(body.location.village_id),
+      reference: body.reference,
+      _id: toObjectId(body.id),
+    });
     return this.model.find(filter).lean().populate(populate);
   }
 }

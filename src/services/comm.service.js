@@ -81,6 +81,21 @@ const getOrders = async (id) => {
   }
 };
 
+const smsHistory = async (filters = {}) => {
+  try {
+    const token = await RedisService.getCachedData("comm-token");
+    return CommService.get("/messages/getMessages", {
+      token: token.replace(/['"]+/g, ""),
+      params: {
+        type: 'SMS',
+        ...filters
+      }
+    })
+  } catch(error) {
+    return error
+  }
+}
+
 const claimToken = async () => {
   const data = {
     app_id: appId,
@@ -106,3 +121,4 @@ module.exports.getBalance = getBalance;
 module.exports.orderSMS = orderSMS;
 module.exports.getOrders = getOrders;
 module.exports.sendClientSMS = sendClientSMS;
+module.exports.smsHistory = smsHistory;

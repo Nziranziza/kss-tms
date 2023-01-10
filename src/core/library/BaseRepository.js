@@ -14,10 +14,11 @@ class BaseRepository {
    * @description retrive all data with corresponding filters
    * with default sort function(newest to oldest)
    * @param {Object<string, any>} filters
+   * @param {Object<string, number>} sortOptions
    * @returns {Promise<Object<string, any>[]>} data
    */
-  find(filters = {}) {
-    return this.model.find(filters).sort({ createdAt: -1 });
+  find(filters = {}, sortOptions = { createdAt: -1 }) {
+    return this.model.find(filters).sort(sortOptions);
   }
 
   /**
