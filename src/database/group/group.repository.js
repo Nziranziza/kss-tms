@@ -165,17 +165,18 @@ class GroupRepository extends BaseRepository {
   }
 
   statistics(body) {
-    const filters = removeNilProps({
-        "location.prov_id": toObjectId(body.location.prov_id),
-        "location.dist_id": toObjectId(body.location.dist_id),
-        "location.sect_id": toObjectId(body.location.sect_id),
-        "location.cell_id": toObjectId(body.location.cell_id),
-        "location.village_id": toObjectId(body.location.village_id),
-        reference: body.reference,
-        _id: toObjectId(body.id),
+    const filters = {
+      $match: removeNilProps({
+        "location.prov_id": toObjectId(body?.location?.prov_id),
+        "location.dist_id": toObjectId(body?.location?.dist_id),
+        "location.sect_id": toObjectId(body?.location?.sect_id),
+        "location.cell_id": toObjectId(body?.location?.cell_id),
+        "location.village_id": toObjectId(body?.location?.village_id),
+        reference: body?.reference,
+        _id: toObjectId(body?.id),
         isDeleted: false,
-      }
-    );
+      }),
+    };
 
     const group = {
       $group: {
@@ -205,13 +206,13 @@ class GroupRepository extends BaseRepository {
 
   report(body) {
     const filter = removeNilProps({
-      "location.prov_id": toObjectId(body.location.prov_id),
-      "location.dist_id": toObjectId(body.location.dist_id),
-      "location.sect_id": toObjectId(body.location.sect_id),
-      "location.cell_id": toObjectId(body.location.cell_id),
-      "location.village_id": toObjectId(body.location.village_id),
-      reference: body.reference,
-      _id: toObjectId(body.id),
+      "location.prov_id": toObjectId(body?.location?.prov_id),
+      "location.dist_id": toObjectId(body?.location?.dist_id),
+      "location.sect_id": toObjectId(body?.location?.sect_id),
+      "location.cell_id": toObjectId(body?.location?.cell_id),
+      "location.village_id": toObjectId(body?.location?.village_id),
+      reference: body?.reference,
+      _id: toObjectId(body?.id),
     });
     return this.model.find(filter).lean().populate(populate);
   }
