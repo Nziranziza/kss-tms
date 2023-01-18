@@ -39,12 +39,12 @@ class TrainingController extends BaseController {
 
   findById = (req, res) => {
     return asyncWrapper(res, async () => {
-      const data = await this.repository.findById(req.params.id);
+      const data = await this.repository.findOne(req.params.id);
       return responseWrapper({
         res,
         status: statusCodes.OK,
         message: serverMessages.SUCCESS,
-        data: data,
+        data: data[0],
       });
     });
   }
