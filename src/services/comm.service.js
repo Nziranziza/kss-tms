@@ -1,6 +1,6 @@
 /* APIS for communicating with the common communication service */
 
-const { CommService, Axios } = require("../httpConfig/comm");
+const { CommService } = require("httpConfig/comm");
 const config = require("config");
 const { RedisService } = require("./redis.service");
 const appId = config.get("apiEndPoints.commService.appId");
@@ -16,7 +16,6 @@ const authenticateApp = async (data) => {
       token: "",
     });
   } catch (error) {
-    console.log(error)
     return error;
   }
 };
@@ -82,6 +81,21 @@ const getOrders = async (id) => {
   }
 };
 
+const smsHistory = async (filters = {}) => {
+  try {
+    const token = await RedisService.getCachedData("comm-token");
+    return CommService.get("/messages/getMessages", {
+      token: token.replace(/['"]+/g, ""),
+      params: {
+        type: 'SMS',
+        ...filters
+      }
+    })
+  } catch(error) {
+    return error
+  }
+}
+
 const claimToken = async () => {
   const data = {
     app_id: appId,
@@ -107,3 +121,4 @@ module.exports.getBalance = getBalance;
 module.exports.orderSMS = orderSMS;
 module.exports.getOrders = getOrders;
 module.exports.sendClientSMS = sendClientSMS;
+module.exports.smsHistory = smsHistory;

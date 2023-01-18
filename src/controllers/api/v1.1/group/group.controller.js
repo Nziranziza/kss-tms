@@ -1,18 +1,17 @@
 const {
-    groupRepository,
-} = require("../../../../database/group/group.repository");
-const BaseController = require("../../../../core/library/BaseController");
-const asyncWrapper = require("../../../../core/helpers/asyncWrapper");
-const responseWrapper = require("../../../../core/helpers/responseWrapper");
-const {statusCodes} = require("../../../../utils/constants/common");
+  groupRepository,
+} = require("database/group/group.repository");
+const BaseController = require("core/library/BaseController");
+const asyncWrapper = require("core/helpers/asyncWrapper");
+const responseWrapper = require("core/helpers/responseWrapper");
+const { statusCodes } = require("utils/constants/common");
 const excelJS = require("exceljs");
 const appRoot = require("app-root-path");
 const fs = require("fs");
 let ejs = require('ejs');
 const pdf = require('html-pdf');
 const _path = require('path');
-const CustomError = require("../../../../core/helpers/customerError");
-
+const CustomError = require("core/helpers/customerError");
 
 class GroupController extends BaseController {
     constructor(repository) {
@@ -28,15 +27,62 @@ class GroupController extends BaseController {
         this.findMemberGroup = this.findMemberGroup.bind(this);
     }
 
+    create(req, res) {
+        return asyncWrapper(res, async () => {
+            const { body } = req;
+            const { members } = body;
+            /**
+             * Check if the user does not
+             * already have a group already
+             */
+            if (members?.length) {
+                for await (const member of members) {
+                    const group = await this.repository.getSingleMember(member.userId);
+                    if (group) {
+                        return responseWrapper({
+                            res,
+                            status: statusCodes.CONFLICT,
+                            message: `Member with id: ${member.userId} already belongs to a group`,
+                            data: group
+                        })
+                    }
+                }
+            }
+            return super.create(req, res)
+        });
+    }
+
     updateMembers(req, res) {
         return asyncWrapper(res, async () => {
-            const {body, params} = req;
-            let group = await this.repository.findOne(params.id);
-            if (group) {
-                body._id = params.id;
-                group = await this.repository.update(body);
-                group.save();
+            const { body, params } = req;
+            let group = await this.repository.findById(params.id);
+            if (!group) {
+                return responseWrapper({
+                    res,
+                    status: statusCodes.NOT_FOUND,
+                    message: 'Can not update members, group not found'
+                })
             }
+            const { members } = body;
+            /**
+             * Check if the user does not
+             * already have a group already
+             */
+            if (members?.length) {
+                for await (const member of members) {
+                    const group = await this.repository.getSingleMember(member.userId);
+                    if (group) {
+                        return responseWrapper({
+                            res,
+                            status: statusCodes.CONFLICT,
+                            message: `Member with id: ${member.userId} already belongs to a group`,
+                            data: group
+                        })
+                    }
+                }
+            }
+            group = await this.repository.update(params.id, body);
+            group.save();
             return responseWrapper({
                 res,
                 status: statusCodes.OK,
@@ -106,7 +152,7 @@ class GroupController extends BaseController {
     findMemberGroup(req, res) {
         return asyncWrapper(res, async () => {
             const {params} = req;
-            const group = await this.repository.customFindOne({"members.userId": params.id});
+            const group = await this.repository.findOne({"members.userId": params.id});
             return responseWrapper({
                 res,
                 status: statusCodes.OK,
@@ -119,10 +165,9 @@ class GroupController extends BaseController {
     updateProfile(req, res) {
         return asyncWrapper(res, async () => {
             const {body, params} = req;
-            let group = await this.repository.findOne(params.id);
+            let group = await this.repository.findById(params.id);
             if (group) {
-                body._id = params.id;
-                group = await this.repository.update(body);
+                group = await this.repository.update(params.id, body);
             }
             return responseWrapper({
                 res,
@@ -136,7 +181,7 @@ class GroupController extends BaseController {
     groupAttendance(req, res) {
         return asyncWrapper(res, async () => {
             const {params, body} = req;
-            const group = await this.repository.findOne(params.id);
+            const group = await this.repository.findById(params.id);
             if (!group)
                 return responseWrapper({
                     res,
@@ -254,7 +299,6 @@ class GroupController extends BaseController {
                     {groups: groups},
                     (err, data) => {
                         if (err) {
-                          console.log(err);
                             return err;
                         } else {
                             let options = {
@@ -268,13 +312,11 @@ class GroupController extends BaseController {
                                 }
                             };
                             const fileName = `${path}/${Date.now()}-groups_report.pdf`;
-                            pdf.create(data, options).toFile(fileName, function (err, data) {
+                            pdf.create(data, options).toFile(fileName, function (err) {
                                     if (err) {
-                                      console.log(err)
                                         return err;
                                     } else {
                                         const str = fs.readFileSync(fileName, {encoding: "base64"});
-                                        console.log(str);
                                         return responseWrapper({
                                             res,
                                             status: statusCodes.OK,

@@ -1,11 +1,11 @@
 const Router = require("express").Router;
 const { scheduleCtrl } = require("./schedule.controller");
-const validator = require("../../../../middlewares/validator");
+const validator = require("middlewares/validator");
 
 const routes = Router();
 
 routes.post("/", validator("validateSchedule"), scheduleCtrl.create);
-routes.get("/:id", scheduleCtrl.findOne);
+routes.get("/:id", scheduleCtrl.findById);
 routes.put("/:id", validator("validateUpdateSchedule"), scheduleCtrl.update);
 routes.post(
   "/attendance/:id",
@@ -29,4 +29,5 @@ routes.post('/report', scheduleCtrl.report);
 routes.post('/report/download/:type', scheduleCtrl.downloadReport);
 routes.post('/statistics', scheduleCtrl.statistics);
 routes.get('/farmer/attendancerate/:id', scheduleCtrl.getFarmerAttendance)
+
 module.exports.schedules = routes;

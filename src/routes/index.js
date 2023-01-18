@@ -1,21 +1,22 @@
-const v1_1 = require('../controllers/api/v1.1/index.routes');
-const logger = require("../logging");
+const router = require('controllers/api/v1.1/index.routes');
+const logger = require("logging");
 
-const mountRoutes = app => {
-    // Intercept body JSON error to overwrite the existing error message
-    app.use((error, req, res, next) => {
-        if (
-            error instanceof SyntaxError &&
-            error.status === 400 &&
-            'body' in error
-        ) {
-            logger.error(error);
-            next();
-        } else next();
-    });
-    app.use('/api/v1.1', v1_1);
-}
+
+const mountRoutes = (app) => {
+  // Intercept body JSON error to overwrite the existing error message
+  app.use((error, req, res, next) => {
+    if (
+      error instanceof SyntaxError &&
+      error.status === 400 &&
+      "body" in error
+    ) {
+      logger.error(error);
+    }
+    next();
+  });
+  app.use("/api/v1.1", router);
+};
 
 module.exports = {
-    mountRoutes
+  mountRoutes,
 };

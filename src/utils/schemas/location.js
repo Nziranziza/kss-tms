@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const { provinces, districts, sectors, cells, villages } = require('../../database/location/location');
+const { provinces, districts, sectors, cells, villages } = require('database/location/location');
 const Schema = mongoose.Schema;
 
 const locationSchema = new Schema({

@@ -1,8 +1,8 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 const timestamps = require("mongoose-timestamp");
-const locationSchema  = require('../../utils/schemas/location');
-const softDelete = require("../plugins/soft-delete");
+const locationSchema  = require('utils/schemas/location');
+const softDelete = require("database/plugins/soft-delete");
 
 const ownerSchema = new Schema({
     userId: {type: Schema.Types.ObjectId},
@@ -50,7 +50,7 @@ const farmSchema = new Schema({
 // Farm visit schema
 const farmVisitConductSchema = new Schema({
     gap: {type: Schema.Types.ObjectId,  ref: "evaluation"},
-    scheduleId: {type: Schema.Types.ObjectId,  ref: "farm_visit_schedule"},
+    scheduleId: { type: Schema.Types.ObjectId,  ref: "farm_visit_schedule"},
     visitor: {type: ownerSchema},
     applicationId: {type: Number, required: true},
     overall_score: {type: Number, required: true},
@@ -61,7 +61,8 @@ const farmVisitConductSchema = new Schema({
     groupId: {type: Schema.Types.ObjectId, ref: "group"},
     evaluation: {type: [sectionSchema]},
     status: {type: Number},
-    photos: {type: [String]}
+    photos: {type: [String]},
+    observation: { type: String }
 });
 
 farmVisitConductSchema.plugin(timestamps, {

@@ -1,18 +1,19 @@
 const Router = require("express").Router;
 const { groupCtrl } = require("./group.controller");
-const validator = require("../../../../middlewares/validator");
+const validator = require("middlewares/validator");
 
 const routes = Router();
+
 routes.post("/", validator("validateGroup"), groupCtrl.create);
 routes.put("/:id", groupCtrl.update);
-routes.get("/:id", groupCtrl.findOne);
+routes.get("/:id", groupCtrl.findById);
 routes.delete("/:id", groupCtrl.softDelete);
 routes.post("/reference", groupCtrl.find);
 routes.post('/search', groupCtrl.searchGroup);
 routes.post('/report', groupCtrl.report);
 routes.post('/report/download/:type', groupCtrl.downloadReport);
 routes.post('/statistics', groupCtrl.statistics);
-routes.get('/', groupCtrl.findAll);
+routes.get('/', groupCtrl.find);
 routes.get('/member/:id', groupCtrl.findMemberGroup);
 routes.put(
   "/members/:id",

@@ -1,12 +1,12 @@
-const asyncWrapper = require("../../../../core/helpers/asyncWrapper");
-const BaseController = require("../../../../core/library/BaseController");
-const responseWrapper = require("../../../../core/helpers/responseWrapper");
-const { statusCodes } = require("../../../../utils/constants/common");
+const asyncWrapper = require("core/helpers/asyncWrapper");
+const BaseController = require("core/library/BaseController");
+const responseWrapper = require("core/helpers/responseWrapper");
+const { statusCodes, serverMessages } = require("utils/constants/common");
 const {
   commRepo,
-} = require("../../../../database/communication/communication.repository");
-const { getBalance, orderSMS, getOrders } = require("../../../../services/comm.service");
-const { scheduleRepository } = require('../../../../database/schedule/schedule.repository');
+} = require("database/communication/communication.repository");
+const { getBalance, orderSMS, getOrders, smsHistory } = require("services/comm.service");
+const { scheduleRepository } = require('database/schedule/schedule.repository');
 
 class CommController extends BaseController {
   constructor(repository) {
@@ -15,17 +15,19 @@ class CommController extends BaseController {
 
   callback(req, res) {
     return asyncWrapper(res, async () => {
-      const {body} = req;
-      console.log("callback with called with body:", body);
-
-      const schedule = await scheduleRepository.customFindOne({'smsResponse.batch_id': body.batch_id});
-
-      schedule.trainees.map(trainee => {
+      const { body } = req;
+      const schedule = await scheduleRepository.findOne({ 'smsResponse.batch_id': body.batch_id });
+      if(!schedule) {
+        return responseWrapper({
+          res,
+          status: statusCodes.NOT_FOUND,
+          message: serverMessages.NOT_FOUND
+        })
+      }
+      schedule.trainees.forEach(trainee => {
         trainee.smsStatus = body.status
       });
-
       await schedule.save();
-
       return responseWrapper({
         res,
         status: statusCodes.OK,
@@ -75,6 +77,28 @@ class CommController extends BaseController {
           data: orders.data.data,
         });
     });
+  }
+
+  getSmsHistory(req, res) {
+    const { query } = req;
+    return asyncWrapper(res, async () => {
+      const history = await smsHistory(query)
+      if(history.data) {
+        return responseWrapper({
+          res,
+          status: history?.data?.status,
+          message: history?.data?.message,
+          data: history?.data
+        })
+      } else {
+        const { response } = history;
+        return responseWrapper({
+          res, 
+          status: response.status,
+          message: response.message
+        })
+      }
+    })
   }
 }
 

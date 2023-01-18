@@ -1,14 +1,14 @@
-const BaseController = require('../../../../core/library/BaseController');
+const BaseController = require('core/library/BaseController');
 const {
     farmVisitConductRepository
-} = require('../../../../database/farm-visit-conduct/farm-visit-conduct.repository');
-const asyncWrapper = require("../../../../core/helpers/asyncWrapper");
-const responseWrapper = require("../../../../core/helpers/responseWrapper");
-const {statusCodes} = require("../../../../utils/constants/common");
+} = require('database/farm-visit-conduct/farm-visit-conduct.repository');
+const asyncWrapper = require("core/helpers/asyncWrapper");
+const responseWrapper = require("core/helpers/responseWrapper");
+const {statusCodes} = require("utils/constants/common");
 const excelJS = require("exceljs");
 const appRoot = require("app-root-path");
 const fs = require("fs");
-const CustomError = require("../../../../core/helpers/customerError");
+const CustomError = require("core/helpers/customerError");
 const ejs = require("ejs");
 const _path = require("path");
 const pdf = require("html-pdf");
@@ -121,7 +121,6 @@ class FarmVisitConductController extends BaseController {
                 {visits:visits },
                 (err, data) => {
                     if (err) {
-                        console.log(err);
                         return err;
                     } else {
                         let options = {
@@ -135,13 +134,11 @@ class FarmVisitConductController extends BaseController {
                             }
                         };
                         const fileName = `${path}/${Date.now()}-schedules_report.pdf`;
-                        pdf.create(data, options).toFile(fileName, function (err, data) {
+                        pdf.create(data, options).toFile(fileName, function (err) {
                             if (err) {
-                                console.log(err)
                                 return err;
                             } else {
                                 const str = fs.readFileSync(fileName, {encoding: "base64"});
-                                console.log(str);
                                 return responseWrapper({
                                     res,
                                     status: statusCodes.OK,

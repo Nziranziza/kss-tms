@@ -1,4 +1,4 @@
-const cache = require("../startup/redisconnection");
+const cache = require("startup/redisconnection");
 
 class RedisService {
   cacheData(key, data, time) {

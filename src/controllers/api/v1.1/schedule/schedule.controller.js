@@ -1,25 +1,25 @@
-const asyncWrapper = require("../../../../core/helpers/asyncWrapper");
-const BaseController = require("../../../../core/library/BaseController");
-const responseWrapper = require("../../../../core/helpers/responseWrapper");
+const asyncWrapper = require("core/helpers/asyncWrapper");
+const BaseController = require("core/library/BaseController");
+const responseWrapper = require("core/helpers/responseWrapper");
 const {
     scheduleRepository,
-} = require("../../../../database/schedule/schedule.repository");
-const {statusCodes} = require("../../../../utils/constants/common");
-const {sendClientSMS} = require("../../../../services/comm.service");
+} = require("database/schedule/schedule.repository");
+const { statusCodes, serverMessages } = require("utils/constants/common");
+const {sendClientSMS} = require("services/comm.service");
 const excelJS = require("exceljs");
 const appRoot = require("app-root-path");
 const fs = require("fs");
-const CustomError = require("../../../../core/helpers/customerError");
+const CustomError = require("core/helpers/customerError");
 const {
   scheduleStatus,
   receptionStatus,
   trainingStatus
-} = require("../../../../tools/constants");
+} = require("tools/constants");
 const moment = require("moment");
 const ejs = require("ejs");
 const _path = require("path");
 const pdf = require("html-pdf");
-const { Training } = require('../../../../database/training/training');
+const { Training } = require('database/training/training');
 
 class ScheduleController extends BaseController {
   constructor(repository) {
@@ -40,7 +40,7 @@ class ScheduleController extends BaseController {
     return asyncWrapper(res, async () => {
       req.body.applicationId = req.headers['tms-app-id'];
       const data = await this.repository.create(req.body);
-      const response = await this.repository.findOne(data._id);
+      const response = await this.repository.findById(data._id);
 
       const training = await Training.findOne(req.params.id);
       training.status = trainingStatus.SCHEDULED;
@@ -48,7 +48,7 @@ class ScheduleController extends BaseController {
 
       return responseWrapper({
         res,
-        message: "Record successfully created",
+        message: serverMessages.CREATE_SUCCESS,
         status: statusCodes.OK,
         data: response
       });
@@ -75,7 +75,7 @@ class ScheduleController extends BaseController {
                 }),
         };
         return asyncWrapper(res, async () => {
-            const data = await this.repository.customFindAll(body);
+            const data = await this.repository.find(body);
             // if Associated training is null remove object
             const filter = data.filter((schedule) => schedule.trainingId !== null);
             return responseWrapper({
@@ -90,7 +90,7 @@ class ScheduleController extends BaseController {
 
     delete(req, res) {
         return asyncWrapper(res, async () => {
-            const data = await this.repository.findOne(req.params.id);
+            const data = await this.repository.findById(req.params.id);
             if (data.status === scheduleStatus.HAPPENED)
                 return responseWrapper({
                     res,
@@ -98,11 +98,11 @@ class ScheduleController extends BaseController {
                     message: "Cannot delete a conducted training.",
                 });
 
-            const isDeleted = await data.softDelete();
+            await data.softDelete();
             return responseWrapper({
                 res,
                 status: statusCodes.OK,
-                message: "Removed successfully",
+                message: serverMessages.DELETE_SUCCESS,
                 data,
             });
         });
@@ -112,7 +112,7 @@ class ScheduleController extends BaseController {
     recordAtt(req, res) {
         const {params, body} = req;
         return asyncWrapper(res, async () => {
-            const schedule = await this.repository.findOne(params.id);
+            const schedule = await this.repository.findById(params.id);
             if (schedule && schedule.status === scheduleStatus.PENDING) {
                 const attendance = await this.repository.recordAtt(schedule, body);
                 if (attendance)
@@ -141,7 +141,7 @@ class ScheduleController extends BaseController {
     editAtt(req, res) {
         const {params, body} = req;
         return asyncWrapper(res, async () => {
-            const schedule = await this.repository.findOne(params.id);
+            const schedule = await this.repository.findById(params.id);
             if (schedule) {
                 const attendance = await this.repository.editAtt(schedule, body);
                 if (attendance)
@@ -170,15 +170,15 @@ class ScheduleController extends BaseController {
     sendSMS(req, res) {
         const {params, body} = req;
         return asyncWrapper(res, async () => {
-            const schedule = await this.repository.findOne(params.id);
+            const schedule = await this.repository.findById(params.id);
 
             if (schedule) {
                 // Build SMS body
                 const message = `Uruganda ${
                   schedule.trainer.organisationName
-                } rubatumiye mu mahugurwa ya \"${
+                } rubatumiye mu mahugurwa ya "${
                   schedule.trainingId.trainingName
-                }\". Azaba ku itariki ${schedule.startTime.toLocaleDateString()}, guhera ${schedule.startTime.toLocaleTimeString()} - kuri:${
+                }". Azaba ku itariki ${schedule.startTime.toLocaleDateString()}, guhera ${schedule.startTime.toLocaleTimeString()} - kuri:${
                   schedule.venueName
                 }`;
         
@@ -223,14 +223,12 @@ class ScheduleController extends BaseController {
                     data: sms.data.data,
                   });
                 } else if (sms.response.data) {
-                  console.log(sms.response.data);
                   return responseWrapper({
                     res,
                     status: sms.response.data.status,
                     message: sms.response.data.message,
                   });
                 } else {
-                  console.log(sms);
                   return responseWrapper({
                     res,
                     status: statusCodes.SERVER_ERROR,
@@ -257,7 +255,7 @@ class ScheduleController extends BaseController {
                 return responseWrapper({
                     res,
                     status: statusCodes.OK,
-                    message: "success",
+                    message: serverMessages.SUCCESS,
                     data: summary,
                 });
         });
@@ -270,7 +268,7 @@ class ScheduleController extends BaseController {
             return responseWrapper({
                 res,
                 status: statusCodes.OK,
-                message: "Success",
+                message: serverMessages.SUCCESS,
                 data: schedules,
             });
         });
@@ -280,11 +278,10 @@ class ScheduleController extends BaseController {
         return asyncWrapper(res, async () => {
             const {params} = req;
             const schedules = await this.repository.farmerAttendance(params);
-            console.log(schedules);
             return responseWrapper({
                 res,
                 status: statusCodes.OK,
-                message: "Success",
+                message: serverMessages.SUCCESS,
                 data: schedules,
             });
         });
@@ -297,7 +294,7 @@ class ScheduleController extends BaseController {
             return responseWrapper({
                 res,
                 status: statusCodes.OK,
-                message: "Success",
+                message: serverMessages.SUCCESS,
                 data: schedules,
             });
         });
@@ -347,7 +344,7 @@ class ScheduleController extends BaseController {
                         return responseWrapper({
                             res,
                             status: statusCodes.OK,
-                            message: "Success",
+                            message: serverMessages.SUCCESS,
                             data: {
                                 file: str,
                                 type: 'xlsx'
@@ -362,7 +359,7 @@ class ScheduleController extends BaseController {
                         return responseWrapper({
                             res,
                             status: statusCodes.OK,
-                            message: "Success",
+                            message: serverMessages.SUCCESS,
                             data: {
                                 file: str,
                                 type: 'csv'
@@ -375,7 +372,6 @@ class ScheduleController extends BaseController {
                     {schedules: schedules},
                     (err, data) => {
                         if (err) {
-                            console.log(err);
                             return err;
                         } else {
                             let options = {
@@ -389,16 +385,15 @@ class ScheduleController extends BaseController {
                                 }
                             };
                             const fileName = `${path}/${Date.now()}-schedules_report.pdf`;
-                            pdf.create(data, options).toFile(fileName, function (err, data) {
+                            pdf.create(data, options).toFile(fileName, function (err) {
                                 if (err) {
-                                    console.log(err)
                                     return err;
                                 } else {
                                     const str = fs.readFileSync(fileName, {encoding: "base64"});
                                     return responseWrapper({
                                         res,
                                         status: statusCodes.OK,
-                                        message: "Success",
+                                        message: serverMessages.SUCCESS,
                                         data: {
                                             file: str,
                                             type: "pdf",

@@ -1,27 +1,34 @@
-const BaseRepository = require("../../core/library/BaseRepository");
+const BaseRepository = require("core/library/BaseRepository");
 const {
   FarmVisitConduct,
-} = require("../farm-visit-conduct/farm-visit-conduct");
+} = require("database/farm-visit-conduct/farm-visit-conduct");
 const {
   FarmVisitSchedule,
-} = require("../farm-visit-schedule/farm-visit-schedule");
+} = require("database/farm-visit-schedule/farm-visit-schedule");
 const { ObjectId } = require("mongodb");
-const { Evaluation } = require("../evaluation/evaluation");
+const { Evaluation } = require("database/evaluation/evaluation");
 const moment = require("moment/moment");
+const CustomError = require("core/helpers/customerError");
+const { statusCodes } = require("utils/constants/common");
+const populate = require('./farm-visit-conduct.populate');
+const toObjectId = require('utils/toObjectId')
 
 class FarmVisitConductRepository extends BaseRepository {
   constructor(model) {
     super(model);
   }
 
-  async create(entity) {
+  create = async (entity) => {
+    const gap = await Evaluation.findById(entity.gap);
+    if(!gap) {
+      throw new CustomError('Gap with such id is not found', statusCodes.NOT_FOUND);
+    }
     let score = 0;
     entity.evaluation.forEach((evaluation) => {
       evaluation.questions.forEach((question) => {
         score = score + question.score;
       });
     });
-    const gap = await Evaluation.findById(entity.gap);
     entity.overall_score = (gap.gap_weight / 100) * score;
     entity.overall_weight = gap.gap_weight;
     const conduct = await this.model.create(entity);
@@ -44,46 +51,27 @@ class FarmVisitConductRepository extends BaseRepository {
     );
     return conduct;
   }
-  find(data) {
+
+  find = (data = {}) => {
     return super
       .find(data)
-      .populate("farm.location.prov_id", "namek")
-      .populate("farm.location.dist_id", "name")
-      .populate("farm.location.sect_id", "name")
-      .populate("farm.location.cell_id", "name")
-      .populate("farm.location.village_id", "name")
-      .populate("gap")
-      .populate("groupId")
-      .populate("scheduleId");
+      .populate(populate);
   }
 
-  findAll() {
+  findOne = (data = {}) => {
     return super
-      .findAll()
-      .populate("farm.location.prov_id", "namek")
-      .populate("farm.location.dist_id", "name")
-      .populate("farm.location.sect_id", "name")
-      .populate("farm.location.cell_id", "name")
-      .populate("farm.location.village_id", "name")
-      .populate("gap")
-      .populate("groupId")
-      .populate("scheduleId");
+      .findOne(data)
+      .populate(populate);
   }
 
-  findOne(id) {
+  findById = (id) => {
     return super
-      .findOne(id)
-      .populate("farm.location.prov_id", "namek")
-      .populate("farm.location.dist_id", "name")
-      .populate("farm.location.sect_id", "name")
-      .populate("farm.location.cell_id", "name")
-      .populate("farm.location.village_id", "name")
-      .populate("gap")
-      .populate("groupId")
-      .populate("scheduleId");
+      .findById(id)
+      .populate(populate);
   }
+  
 
-  statistics(body) {
+  statistics = (body) => {
     const filter = {
       $match: {
         ...(body.location &&
@@ -108,7 +96,7 @@ class FarmVisitConductRepository extends BaseRepository {
           }),
         ...(body.reference && { reference: body.reference }),
         ...(body.scheduleId && { scheduleId: body.scheduleId }),
-        ...(body.groupId && { groupId: body.groupId }),
+        ...(body.groupId && { groupId: ObjectId(body.groupId) }),
         ...(body.date && { createdAt: { $gte:moment(body.date.from)
                   .startOf('day')
                   .toDate() , $lt:  moment(body.date.to)
@@ -132,7 +120,7 @@ class FarmVisitConductRepository extends BaseRepository {
     return this.model.aggregate([filter, group, visits]);
   }
 
-  report(body) {
+  report = (body) => {
     const lookup = [
       {
         $lookup: {
@@ -276,7 +264,7 @@ class FarmVisitConductRepository extends BaseRepository {
     return this.model.aggregate([filter].concat(lookup));
   }
 
-  calculateAdoptionScore(data) {
+  calculateAdoptionScore = (data) => {
     const { gapId, referenceId, location, date } = data;
 
     let locSearchBy = "";
@@ -311,7 +299,7 @@ class FarmVisitConductRepository extends BaseRepository {
     return this.model.aggregate([filters, group]);
   }
 
-  calculateBaselineScore(data) {
+  calculateBaselineScore = (data) => {
     const { gapId } = data;
 
     const filters = {

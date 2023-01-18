@@ -1,23 +1,31 @@
-const {applications} = require("./application/application.routes");
-const {groups} = require("./group/group.routes");
-const {evaluations} = require("./evaluations/evaluations.routes");
-const {trainings} = require("./trainings/trainings.routes");
-const {schedules} = require("./schedule/schedule.routes");
-const {farmVisitSchedules} = require("./farm-visit-schedule/farm-visit-schedule.routes");
-const {farmVisitConducts} = require("./farm-visit-conduct/farm-visit-conduct.routes");
-const { communication } = require('./communication/communication.routes');
-const {dashboard} = require('./dashboard/dashboard.routes');
 const express = require("express");
-const v1_1 = express.Router();
 
-v1_1.use("/applications", applications);
-v1_1.use("/groups", groups);
-v1_1.use("/evaluations", evaluations);
-v1_1.use("/trainings", trainings);
-v1_1.use("/schedules", schedules);
-v1_1.use("/farm-visit-schedules", farmVisitSchedules);
-v1_1.use("/farm-visit-conducts", farmVisitConducts);
-v1_1.use("/sms", communication);
-v1_1.use("/dashboard", dashboard);
+const { applications } = require("./application/application.routes");
+const { groups } = require("./group/group.routes");
+const { evaluations } = require("./evaluations/evaluations.routes");
+const { trainings } = require("./trainings/trainings.routes");
+const { schedules } = require("./schedule/schedule.routes");
+const {
+  farmVisitSchedules,
+} = require("./farm-visit-schedule/farm-visit-schedule.routes");
+const {
+  farmVisitConducts,
+} = require("./farm-visit-conduct/farm-visit-conduct.routes");
+const { communication } = require("./communication/communication.routes");
+const { dashboard } = require("./dashboard/dashboard.routes");
+const auth = require("middlewares/auth");
 
-module.exports = v1_1;
+const router = express.Router();
+
+router.use("/applications", applications);
+router.use(auth)
+router.use("/groups", groups);
+router.use("/evaluations", evaluations);
+router.use("/trainings", trainings);
+router.use("/schedules", schedules);
+router.use("/farm-visit-schedules", farmVisitSchedules);
+router.use("/farm-visit-conducts", farmVisitConducts);
+router.use("/sms", communication);
+router.use("/dashboard", dashboard);
+
+module.exports = router;
