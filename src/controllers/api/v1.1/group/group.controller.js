@@ -36,7 +36,7 @@ class GroupController extends BaseController {
              * already have a group already
              */
             if (members?.length) {
-                for await (const member of members) {
+                for (const member of members) {
                     const group = await this.repository.getSingleMember(member.userId);
                     if (group) {
                         return responseWrapper({

@@ -3,7 +3,6 @@ const { Group } = require("./group");
 const { scheduleRepository } = require("database/schedule/schedule.repository");
 const { attendanceStatus, scheduleStatus } = require("tools/constants");
 const populate = require('./group.populate')
-const { omitBy, isNil } = require('lodash');
 const toObjectId = require("utils/toObjectId");
 const removeNilProps = require("utils/removeNilProps");
 
@@ -142,7 +141,7 @@ class GroupRepository extends BaseRepository {
 
   getSingleMember(memberId, groupId) {
     let filters = {
-      "members.userId": memberId,
+      "members.userId": toObjectId(memberId),
     };
     if (groupId) {
       filters = {
