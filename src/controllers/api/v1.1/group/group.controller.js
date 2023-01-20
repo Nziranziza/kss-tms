@@ -41,7 +41,7 @@ class GroupController extends BaseController {
                     if (group) {
                         return responseWrapper({
                             res,
-                            status: statusCodes.CONFLICT,
+                            status: statusCodes.BAD_REQUEST,
                             message: `Member with id: ${member.userId} already belongs to a group`,
                             data: group
                         })
@@ -74,7 +74,7 @@ class GroupController extends BaseController {
                     if (group) {
                         return responseWrapper({
                             res,
-                            status: statusCodes.CONFLICT,
+                            status: statusCodes.BAD_REQUEST,
                             message: `Member with id: ${member.userId} already belongs to a group`,
                             data: group
                         })
