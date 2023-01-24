@@ -15,7 +15,6 @@ router.get("/:id", farmVisitConductCtrl.findById);
 router.post("/reference", farmVisitConductCtrl.find);
 router.delete("/:id", farmVisitConductCtrl.softDelete);
 router.post('/report', farmVisitConductCtrl.report);
-router.post('/report/download/:type', farmVisitConductCtrl.downloadReport);
 router.post('/statistics', farmVisitConductCtrl.statistics);
 
 module.exports.farmVisitConducts = router;
