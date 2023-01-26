@@ -1,9 +1,10 @@
-const { ObjectId } = require("mongodb");
 const BaseRepository = require("core/library/BaseRepository");
 const { scheduleStatus } = require("tools/constants");
 const { Schedule } = require("./schedule");
 const moment = require("moment");
 const populate = require('./schedule.populate')
+const removeNilProps = require('utils/removeNilProps')
+const toObjectId = require('utils/toObjectId')
 
 class ScheduleRepository extends BaseRepository {
   constructor(model) {
@@ -94,17 +95,15 @@ class ScheduleRepository extends BaseRepository {
 
     // Filter statistics by different values
     const filter = {
-      $match: {
-        ...(trainingId && { trainingId: ObjectId(trainingId) }),
-        ...(trainerId && { "trainer.userId": ObjectId(trainerId) }),
-        ...(scheduleId && { _id: ObjectId(scheduleId) }),
-        ...(referenceId && { referenceId: ObjectId(referenceId) }),
-        ...(location && { [locSearchBy]: ObjectId(location.locationId) }),
-        ...(date && {
-          startTime: { $gte: startDate, $lt: endDate },
-        }),
+      $match: removeNilProps({
+        trainingId: toObjectId(trainingId),
+        "trainer.userId": toObjectId(trainerId),
+        _id: toObjectId(scheduleId),
+        referenceId: toObjectId(referenceId),
+        [locSearchBy]: toObjectId(location.locationId),
+        startTime: date ? { $gte: startDate, $lt: endDate } : undefined,
         isDeleted: false,
-      },
+      }),
     };
 
     // Unwind all trainees so we can compute data
@@ -113,9 +112,9 @@ class ScheduleRepository extends BaseRepository {
     };
 
     const filterGroups = {
-      $match: {
-        ...(groupId && { "trainees.groupId": groupId }),
-      },
+      $match: removeNilProps({
+        "trainees.groupId": groupId,
+      }),
     };
 
     // Group by each gender and attendance
@@ -180,11 +179,9 @@ class ScheduleRepository extends BaseRepository {
   statistics(body) {
     const preFilter = [
       {
-        $match: {
-          ...(body.groupId && {
-            groupId: ObjectId(body.groupId),
-          }),
-        },
+        $match: removeNilProps({
+          groupId: toObjectId(body.groupId),
+        }),
       },
       {
         $lookup: {
@@ -222,40 +219,23 @@ class ScheduleRepository extends BaseRepository {
     ];
 
     const filter = {
-      $match: {
-        ...(body.location &&
-          body.location.prov_id && {
-            "groupId.location.prov_id": ObjectId(body.location.prov_id),
-          }),
-        ...(body.location &&
-          body.location.dist_id && {
-            "groupId.location.dist_id": ObjectId(body.location.dist_id),
-          }),
-        ...(body.location &&
-          body.location.sect_id && {
-            "groupId.location.sect_id": ObjectId(body.location.sect_id),
-          }),
-        ...(body.location &&
-          body.location.cell_id && {
-            "groupId.location.cell_id": ObjectId(body.location.cell_id),
-          }),
-        ...(body.location &&
-          body.location.village_id && {
-            "groupId.location.village_id": ObjectId(body.location.village_id),
-          }),
-        ...(body.reference && { referenceId: ObjectId(body.reference) }),
-        ...(body.trainingId && { "trainingId._id": ObjectId(body.trainingId) }),
-        ...(body.trainerId && { "trainer.userId": ObjectId(body.trainerId) }),
-        ...(body.status && { status: body.status }),
-        ...(body.gender && { "trainees.gender": body.gender }),
-        ...(body.date && {
-          createdAt: {
+      $match: removeNilProps({
+        "groupId.location.prov_id": toObjectId(body.location.prov_id),
+        "groupId.location.dist_id": toObjectId(body.location.dist_id),
+        "groupId.location.sect_id": toObjectId(body.location.sect_id),
+        "groupId.location.cell_id": toObjectId(body.location.cell_id),
+        "groupId.location.village_id": toObjectId(body.location.village_id),
+        referenceId: toObjectId(body.reference),
+        "trainingId._id": toObjectId(body.trainingId),
+        "trainer.userId": toObjectId(body.trainerId),
+        status: body.status,
+        "trainees.gender": body.gender,
+          createdAt: body.date ? {
             $gte: moment(body.date.from).startOf("day").toDate(),
             $lt: moment(body.date.to).endOf("day").toDate(),
-          },
-        }),
-        ...{ isDeleted: false },
-      },
+          } : undefined,
+        isDeleted: false,
+      }),
     };
 
     const group = {
@@ -288,11 +268,9 @@ class ScheduleRepository extends BaseRepository {
   report(body) {
     const preFilter = [
       {
-        $match: {
-          ...(body.groupId && {
-            groupId: ObjectId(body.groupId),
-          }),
-        },
+        $match: removeNilProps({
+          groupId: toObjectId(body.groupId),
+        }),
       },
       {
         $lookup: {
@@ -404,41 +382,26 @@ class ScheduleRepository extends BaseRepository {
       },
     ];
     const filter = {
-      $match: {
-        ...(body.location &&
-          body.location.prov_id && {
-            "groupId.location.prov_id": ObjectId(body.location.prov_id),
-          }),
-        ...(body.location &&
-          body.location.dist_id && {
-            "groupId.location.dist_id": ObjectId(body.location.dist_id),
-          }),
-        ...(body.location &&
-          body.location.sect_id && {
-            "groupId.location.sect_id": ObjectId(body.location.sect_id),
-          }),
-        ...(body.location &&
-          body.location.cell_id && {
-            "groupId.location.cell_id": ObjectId(body.location.cell_id),
-          }),
-        ...(body.location &&
-          body.location.village_id && {
-            "groupId.location.village_id": ObjectId(body.location.village_id),
-          }),
-        ...(body.reference && { referenceId: ObjectId(body.reference) }),
-        ...(body.trainingId && { "trainingId._id": ObjectId(body.trainingId) }),
-        ...(body.trainerId && { "trainer.userId": ObjectId(body.trainerId) }),
-        ...(body.groupId && { groupId: body.groupId }),
-        ...(body.status && { status: body.status }),
-        ...(body.gender && { "trainees.gender": body.gender }),
-        ...(body.date && { startTime: { $gte:moment(body.date.from)
-                .startOf('day')
-                .toDate() , $lt:  moment(body.date.to)
-                .endOf('day')
-                .toDate() }}),
-
-        ...{ isDeleted: false },
-      },
+      $match: removeNilProps({
+        "groupId.location.prov_id": toObjectId(body.location.prov_id),
+        "groupId.location.dist_id": toObjectId(body.location.dist_id),
+        "groupId.location.sect_id": toObjectId(body.location.sect_id),
+        "groupId.location.cell_id": toObjectId(body.location.cell_id),
+        "groupId.location.village_id": toObjectId(body.location.village_id),
+        referenceId: toObjectId(body.reference),
+        "trainingId._id": toObjectId(body.trainingId),
+        "trainer.userId": toObjectId(body.trainerId),
+        groupId: body.groupId,
+        status: body.status,
+        "trainees.gender": body.gender,
+        startTime: body.date
+          ? {
+              $gte: moment(body.date.from).startOf("day").toDate(),
+              $lt: moment(body.date.to).endOf("day").toDate(),
+            }
+          : undefined,
+        isDeleted: false,
+      }),
     };
     return this.model.aggregate(preFilter.concat([filter]));
   }
@@ -485,11 +448,11 @@ class ScheduleRepository extends BaseRepository {
     const { reference, groupId } = input;
 
     const filters = {
-      $match: {
-        ...(reference && { referenceId: ObjectId(reference) }),
-        ...(groupId && { "trainees.groupId": groupId }),
+      $match: removeNilProps({
+        referenceId: toObjectId(reference),
+        "trainees.groupId": groupId,
         status: scheduleStatus.HAPPENED,
-      },
+      }),
     };
 
     // Unwind all trainees so we can compute data
@@ -569,14 +532,12 @@ class ScheduleRepository extends BaseRepository {
 
     // Filter statistics by different values
     const filter = {
-      $match: {
-        ...(referenceId && { referenceId: ObjectId(referenceId) }),
-        ...(location && { [locSearchBy]: ObjectId(location.locationId) }),
-        ...(date && {
-          startTime: { $gte: startDate, $lt: endDate },
-        }),
+      $match: removeNilProps({
+        referenceId: toObjectId(referenceId),
+        [locSearchBy]: toObjectId(location.locationId),
+        startTime: date ? { $gte: startDate, $lt: endDate } : undefined,
         isDeleted: false,
-      },
+      }),
     };
 
     // Lookup Trainings

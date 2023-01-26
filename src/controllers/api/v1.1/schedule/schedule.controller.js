@@ -6,20 +6,14 @@ const {
 } = require("database/schedule/schedule.repository");
 const { statusCodes, serverMessages } = require("utils/constants/common");
 const {sendClientSMS} = require("services/comm.service");
-const excelJS = require("exceljs");
-const appRoot = require("app-root-path");
-const fs = require("fs");
-const CustomError = require("core/helpers/customerError");
 const {
   scheduleStatus,
   receptionStatus,
   trainingStatus
 } = require("tools/constants");
 const moment = require("moment");
-const ejs = require("ejs");
-const _path = require("path");
-const pdf = require("html-pdf");
 const { Training } = require('database/training/training');
+const removeNilProps = require("utils/removeNilProps");
 
 class ScheduleController extends BaseController {
   constructor(repository) {
@@ -29,7 +23,6 @@ class ScheduleController extends BaseController {
     this.recordAtt = this.recordAtt.bind(this);
     this.sendSMS = this.sendSMS.bind(this);
     this.report = this.report.bind(this);
-    this.downloadReport = this.downloadReport.bind(this);
     this.statistics = this.statistics.bind(this);
     this.attendanceSummary = this.attendanceSummary.bind(this);
     this.getFarmerAttendance = this.getFarmerAttendance.bind(this);
@@ -67,13 +60,10 @@ class ScheduleController extends BaseController {
         }
 
         // Filters
-        const body = {
+        const body = removeNilProps({
             referenceId: req.params.id,
-            ...(from &&
-                to && {
-                    startTime: {$gte: startDate, $lt: endDate},
-                }),
-        };
+            startTime: to && from ? {$gte: startDate, $lt: endDate} : undefined,
+        });
         return asyncWrapper(res, async () => {
             const data = await this.repository.find(body);
             // if Associated training is null remove object
@@ -297,117 +287,6 @@ class ScheduleController extends BaseController {
                 message: serverMessages.SUCCESS,
                 data: schedules,
             });
-        });
-    }
-
-    downloadReport(req, res) {
-        return asyncWrapper(res, async () => {
-            const {body, params} = req;
-            const type = params.type;
-            const schedules = await this.repository.report(body);
-            const workbook = new excelJS.Workbook();
-            const worksheet = workbook.addWorksheet("Schedules");
-            const path = `${appRoot}/files/downloads`;
-            worksheet.columns = [
-                {header: "Date added", key: "created_at", width: 10},
-                {header: "Firstname", key: "forename", width: 10},
-                {header: "Lastname", key: "surname", width: 10},
-                {header: "Gender", key: "gender", width: 10},
-                {header: "Training title", key: "trainingName", width: 10},
-                {header: "Date of the training", key: "startTime", width: 10},
-                {header: "Venue", key: "venue", width: 10},
-                {header: "Attended", key: "attendance", width: 10},
-                {header: "Status", key: "status", width: 10}
-            ];
-            schedules.forEach((schedule) => {
-                worksheet.addRow({
-                    created_at: schedule.createdAt,
-                    forename: schedule.trainees.foreName,
-                    surname: schedule.trainees.surName,
-                    gender: schedule.trainees.gender,
-                    trainingName: schedule.trainingId.trainingName,
-                    startTime: schedule.startTime,
-                    venue: schedule.venueName,
-                    attendance: schedule.trainees.attended,
-                    status: schedule.status
-                });
-            });
-            worksheet.getRow(1).eachCell((cell) => {
-                cell.font = {bold: true};
-            });
-
-            if (type === 'xlsx') {
-                const fileName = `${path}/${Date.now()}-trainings.xlsx`;
-                await workbook.xlsx.writeFile(fileName)
-                    .then(() => {
-                        const str = fs.readFileSync(fileName, {encoding: 'base64'});
-                        return responseWrapper({
-                            res,
-                            status: statusCodes.OK,
-                            message: serverMessages.SUCCESS,
-                            data: {
-                                file: str,
-                                type: 'xlsx'
-                            }
-                        });
-                    });
-            } else if (type === 'csv') {
-                const fileName = `${path}/${Date.now()}-trainings.csv`;
-                await workbook.csv.writeFile(fileName)
-                    .then(() => {
-                        const str = fs.readFileSync(fileName, {encoding: 'base64'});
-                        return responseWrapper({
-                            res,
-                            status: statusCodes.OK,
-                            message: serverMessages.SUCCESS,
-                            data: {
-                                file: str,
-                                type: 'csv'
-                            }
-                        });
-                    });
-            } else if (type === 'pdf') {
-                ejs.renderFile(
-                    _path.join(__dirname, '/../../../../templates/', 'trainings_report.ejs'),
-                    {schedules: schedules},
-                    (err, data) => {
-                        if (err) {
-                            return err;
-                        } else {
-                            let options = {
-                                height: '11.25in',
-                                width: '10in',
-                                header: {
-                                    height: '20mm'
-                                },
-                                footer: {
-                                    height: '20mm'
-                                }
-                            };
-                            const fileName = `${path}/${Date.now()}-schedules_report.pdf`;
-                            pdf.create(data, options).toFile(fileName, function (err) {
-                                if (err) {
-                                    return err;
-                                } else {
-                                    const str = fs.readFileSync(fileName, {encoding: "base64"});
-                                    return responseWrapper({
-                                        res,
-                                        status: statusCodes.OK,
-                                        message: serverMessages.SUCCESS,
-                                        data: {
-                                            file: str,
-                                            type: "pdf",
-                                        },
-                                    });
-                                }
-                            });
-                        }
-                    }
-                );
-
-            } else {
-                throw new CustomError("File type not found", statusCodes.NOT_FOUND);
-            }
         });
     }
 }
