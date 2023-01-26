@@ -1,10 +1,12 @@
 const { ObjectId } = require("mongodb");
+const moment = require("moment");
 const BaseRepository = require("core/library/BaseRepository");
 const {
   FarmVisitSchedule,
 } = require("database/farm-visit-schedule/farm-visit-schedule");
-const moment = require("moment");
 const populate = require('./farm-visit-schedule.populate')
+const removeNilProps = require('utils/removeNilProps')
+const toObjectId = require('utils/toObjectId')
 
 const lookups = [
   {
@@ -129,13 +131,13 @@ class FarmVisitScheduleRepository extends BaseRepository {
 
     // Filter statistics by different values
     const filter = {
-      $match: {
-        ...(visitorId && { "visitor.userId": ObjectId(visitorId) }),
-        ...(location && { [locSearchBy]: ObjectId(location.locationId) }),
-        ...(referenceId && { reference: referenceId }),
-        ...(date && { date: { $gte: startDate, $lt: endDate } }),
+      $match: removeNilProps({
+        "visitor.userId": toObjectId(visitorId),
+        [locSearchBy]: toObjectId(location.locationId),
+        reference: referenceId,
+        date: date ? { $gte: startDate, $lt: endDate } : undefined,
         isDeleted: false,
-      },
+      }),
     };
 
     // Unwind all trainees so we can compute data
@@ -206,49 +208,41 @@ class FarmVisitScheduleRepository extends BaseRepository {
   farmScheduledVisits(body) {
     return this.aggregate([
       {
-        $match: {
-          ...(body.farmId && {
-            "farms.farmId": ObjectId(body.farmId),
-          }),
-          ...(body.scheduleId && {
-            _id: ObjectId(body.scheduleId),
-          }),
-          ...(body.created_at && {
-            created_at: {
-              $gte: body.created_at.from,
-              $lt: body.created_at.to,
-            },
-          }),
-        },
+        $match: removeNilProps({
+          "farms.farmId": toObjectId(body.farmId),
+          _id: toObjectId(body.scheduleId),
+          created_at: body.created_at
+            ? {
+                $gte: body.created_at.from,
+                $lt: body.created_at.to,
+              }
+            : undefined,
+        }),
       },
       {
         $unwind: "$farms",
       },
       {
-        $match: {
-          ...(body.farmId && {
-            "farms.farmId": ObjectId(body.farmId),
-          }),
-        },
+        $match: removeNilProps({
+          "farms.farmId": toObjectId(body.farmId),
+        }),
       },
-      ...lookups
+      ...lookups,
     ]);
   }
 
   farmsScheduledVisits(body) {
     const filter = {
-      $match: {
-        ...(body.reference && {
-          reference: body.reference,
-        }),
-      },
+      $match: removeNilProps({
+        reference: body.reference,
+      }),
     };
     return this.aggregate([
       filter,
       {
         $unwind: "$farms",
       },
-      ...lookups
+      ...lookups,
     ]);
   }
 
@@ -267,11 +261,11 @@ class FarmVisitScheduleRepository extends BaseRepository {
 
     // Filter statistics by different values
     const filter = {
-      $match: {
-        ...(location && { [locSearchBy]: ObjectId(location.locationId) }),
-        ...(referenceId && { reference: referenceId }),
-        ...(date && { date: { $gte: startDate, $lt: endDate } }),
-      },
+      $match: removeNilProps({
+        [locSearchBy]: toObjectId(location.locationId),
+        reference: referenceId,
+        date: date ? { $gte: startDate, $lt: endDate } : undefined,
+      }),
     };
 
     const unwind = {
