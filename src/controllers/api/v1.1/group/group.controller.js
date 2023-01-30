@@ -1,10 +1,11 @@
 const {
-  groupRepository,
+    groupRepository,
 } = require("database/group/group.repository");
 const BaseController = require("core/library/BaseController");
 const asyncWrapper = require("core/helpers/asyncWrapper");
 const responseWrapper = require("core/helpers/responseWrapper");
-const { statusCodes } = require("utils/constants/common");
+const {statusCodes} = require("utils/constants/common");
+
 
 class GroupController extends BaseController {
     constructor(repository) {
@@ -21,32 +22,20 @@ class GroupController extends BaseController {
 
     create(req, res) {
         return asyncWrapper(res, async () => {
-            const { body } = req;
-            const { members } = body;
-            /**
-             * Check if the user does not
-             * already have a group already
-             */
-            if (members?.length) {
-                for (const member of members) {
-                    const group = await this.repository.getSingleMember(member.userId);
-                    if (group) {
-                        return responseWrapper({
-                            res,
-                            status: statusCodes.BAD_REQUEST,
-                            message: `Member with id: ${member.userId} already belongs to a group`,
-                            data: group
-                        })
-                    }
-                }
-            }
             return super.create(req, res)
         });
     }
 
+    update(req, res) {
+        return asyncWrapper(res, async () => {
+            return super.update(req, res)
+        });
+    }
+
+
     updateMembers(req, res) {
         return asyncWrapper(res, async () => {
-            const { body, params } = req;
+            const {body, params} = req;
             let group = await this.repository.findById(params.id);
             if (!group) {
                 return responseWrapper({
@@ -54,24 +43,6 @@ class GroupController extends BaseController {
                     status: statusCodes.NOT_FOUND,
                     message: 'Can not update members, group not found'
                 })
-            }
-            const { members } = body;
-            /**
-             * Check if the user does not
-             * already have a group already
-             */
-            if (members?.length) {
-                for await (const member of members) {
-                    const group = await this.repository.getSingleMember(member.userId);
-                    if (group) {
-                        return responseWrapper({
-                            res,
-                            status: statusCodes.BAD_REQUEST,
-                            message: `Member with id: ${member.userId} already belongs to a group`,
-                            data: group
-                        })
-                    }
-                }
             }
             group = await this.repository.update(params.id, body);
             group.save();
