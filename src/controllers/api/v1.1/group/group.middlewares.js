@@ -1,10 +1,8 @@
-const asyncWrapper = require("../../../../core/helpers/asyncWrapper");
+const asyncWrapper = require("core/helpers/asyncWrapper");
 const {ObjectId} = require("mongodb");
-const {groupRepository} = require("../../../../database/group/group.repository");
-const responseWrapper = require("../../../../core/helpers/responseWrapper");
+const {groupRepository} = require("database/group/group.repository");
 const {statusCodes} = require("utils/constants/common");
-const CustomError = require("../../../../core/helpers/customerError");
-const {serverMessages} = require("../../../../utils/constants/common");
+const CustomError = require("core/helpers/customerError");
 
 module.exports.validateMembers = function (req, res, next) {
     return asyncWrapper(res, async () => {
@@ -12,7 +10,7 @@ module.exports.validateMembers = function (req, res, next) {
         const {members} = body;
         /**
          * Check if the user does not
-         * already have a group already
+         * have a group already
          */
         if (members?.length) {
             for (const member of members) {

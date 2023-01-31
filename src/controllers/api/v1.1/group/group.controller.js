@@ -20,19 +20,6 @@ class GroupController extends BaseController {
         this.findMemberGroup = this.findMemberGroup.bind(this);
     }
 
-    create(req, res) {
-        return asyncWrapper(res, async () => {
-            return super.create(req, res)
-        });
-    }
-
-    update(req, res) {
-        return asyncWrapper(res, async () => {
-            return super.update(req, res)
-        });
-    }
-
-
     updateMembers(req, res) {
         return asyncWrapper(res, async () => {
             const {body, params} = req;
@@ -151,7 +138,6 @@ class GroupController extends BaseController {
                     status: statusCodes.NOT_FOUND,
                     message: "Group not found",
                 });
-
             const attendance = await this.repository.membersAttendance(
                 group,
                 body.trainingId
