@@ -43,7 +43,7 @@ COPY --chown=docker-deployer:docker-deployer . .
 EXPOSE 7063
 
 RUN sudo npm install --location=global npm@latest
-RUN npm i --include=dev
+RUN npm i --include=dev --legacy-peer-deps
 #RUN npm run build
 RUN mkdir logs 
 
