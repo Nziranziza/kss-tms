@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 const locationSchema = require('utils/schemas/location');
 const timestamps = require("mongoose-timestamp");
