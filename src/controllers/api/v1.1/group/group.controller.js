@@ -1,17 +1,11 @@
 const {
-  groupRepository,
+    groupRepository,
 } = require("database/group/group.repository");
 const BaseController = require("core/library/BaseController");
 const asyncWrapper = require("core/helpers/asyncWrapper");
 const responseWrapper = require("core/helpers/responseWrapper");
-const { statusCodes } = require("utils/constants/common");
-const excelJS = require("exceljs");
-const appRoot = require("app-root-path");
-const fs = require("fs");
-let ejs = require('ejs');
-const pdf = require('html-pdf');
-const _path = require('path');
-const CustomError = require("core/helpers/customerError");
+const {statusCodes} = require("utils/constants/common");
+
 
 class GroupController extends BaseController {
     constructor(repository) {
@@ -21,40 +15,14 @@ class GroupController extends BaseController {
         this.groupAttendance = this.groupAttendance.bind(this);
         this.searchGroup = this.searchGroup.bind(this);
         this.report = this.report.bind(this);
-        this.downloadReport = this.downloadReport.bind(this);
         this.statistics = this.statistics.bind(this);
         this.updateSingleMember = this.updateSingleMember.bind(this);
         this.findMemberGroup = this.findMemberGroup.bind(this);
     }
 
-    create(req, res) {
-        return asyncWrapper(res, async () => {
-            const { body } = req;
-            const { members } = body;
-            /**
-             * Check if the user does not
-             * already have a group already
-             */
-            if (members?.length) {
-                for await (const member of members) {
-                    const group = await this.repository.getSingleMember(member.userId);
-                    if (group) {
-                        return responseWrapper({
-                            res,
-                            status: statusCodes.CONFLICT,
-                            message: `Member with id: ${member.userId} already belongs to a group`,
-                            data: group
-                        })
-                    }
-                }
-            }
-            return super.create(req, res)
-        });
-    }
-
     updateMembers(req, res) {
         return asyncWrapper(res, async () => {
-            const { body, params } = req;
+            const {body, params} = req;
             let group = await this.repository.findById(params.id);
             if (!group) {
                 return responseWrapper({
@@ -62,24 +30,6 @@ class GroupController extends BaseController {
                     status: statusCodes.NOT_FOUND,
                     message: 'Can not update members, group not found'
                 })
-            }
-            const { members } = body;
-            /**
-             * Check if the user does not
-             * already have a group already
-             */
-            if (members?.length) {
-                for await (const member of members) {
-                    const group = await this.repository.getSingleMember(member.userId);
-                    if (group) {
-                        return responseWrapper({
-                            res,
-                            status: statusCodes.CONFLICT,
-                            message: `Member with id: ${member.userId} already belongs to a group`,
-                            data: group
-                        })
-                    }
-                }
             }
             group = await this.repository.update(params.id, body);
             group.save();
@@ -188,7 +138,6 @@ class GroupController extends BaseController {
                     status: statusCodes.NOT_FOUND,
                     message: "Group not found",
                 });
-
             const attendance = await this.repository.membersAttendance(
                 group,
                 body.trainingId
@@ -225,115 +174,6 @@ class GroupController extends BaseController {
                 message: "Success",
                 data: groups,
             });
-        });
-    }
-
-    downloadReport(req, res) {
-        return asyncWrapper(res, async () => {
-            const {body, params} = req;
-            const type = params.type;
-            const groups = await this.repository.report(body);
-            const workbook = new excelJS.Workbook();
-            const worksheet = workbook.addWorksheet("Groups");
-            const path = `${appRoot}/files/downloads`;
-            worksheet.columns = [
-                {header: "Group name", key: "groupName", width: 10},
-                {header: "Leader names", key: "leaderNames", width: 10},
-                {header: "Leader phone number", key: "leaderPhoneNumber", width: 10},
-                {header: "Group size", key: "groupSize", width: 10},
-                {header: "Location", key: "location", width: 10},
-                {header: "Status", key: "status", width: 10},
-            ];
-            groups.forEach((group) => {
-                worksheet.addRow({
-                    groupName: group.groupName,
-                    leaderNames: group.leaderNames,
-                    leaderPhoneNumber: group.leaderPhoneNumber,
-                    groupSize: group.members.length,
-                    location:
-                        (group.location.prov_id.namek +
-                            " > " +
-                            group.location.dist_id.name +
-                            " > " +
-                            group.location.sect_id.name +
-                            " > " +
-                            group.location.cell_id.name).toLowerCase(),
-                    status: group.status,
-
-                });
-            });
-            worksheet.getRow(1).eachCell((cell) => {
-                cell.font = {bold: true};
-            });
-            if (type === "xlsx") {
-                const fileName = `${path}/${Date.now()}-groups.xlsx`;
-                await workbook.xlsx.writeFile(fileName).then(() => {
-                    const str = fs.readFileSync(fileName, {encoding: "base64"});
-                    return responseWrapper({
-                        res,
-                        status: statusCodes.OK,
-                        message: "Success",
-                        data: {
-                            file: str,
-                            type: "xlsx",
-                        },
-                    });
-                });
-            } else if (type === "csv") {
-                const fileName = `${path}/${Date.now()}-groups.csv`;
-                await workbook.csv.writeFile(fileName).then(() => {
-                    const str = fs.readFileSync(fileName, {encoding: "base64"});
-                    return responseWrapper({
-                        res,
-                        status: statusCodes.OK,
-                        message: "Success",
-                        data: {
-                            file: str,
-                            type: "csv",
-                        },
-                    });
-                });
-            } else if (type === "pdf") {
-                ejs.renderFile(
-                    _path.join(__dirname, '/../../../../templates/', 'groups_report.ejs'),
-                    {groups: groups},
-                    (err, data) => {
-                        if (err) {
-                            return err;
-                        } else {
-                            let options = {
-                                height: '11.25in',
-                                width: '10in',
-                                header: {
-                                    height: '20mm'
-                                },
-                                footer: {
-                                    height: '20mm'
-                                }
-                            };
-                            const fileName = `${path}/${Date.now()}-groups_report.pdf`;
-                            pdf.create(data, options).toFile(fileName, function (err) {
-                                    if (err) {
-                                        return err;
-                                    } else {
-                                        const str = fs.readFileSync(fileName, {encoding: "base64"});
-                                        return responseWrapper({
-                                            res,
-                                            status: statusCodes.OK,
-                                            message: "Success",
-                                            data: {
-                                                file: str,
-                                                type: "pdf",
-                                            },
-                                        });
-                                    }
-                                });
-                        }
-                    }
-                );
-            } else {
-                throw new CustomError("File type not found", statusCodes.NOT_FOUND);
-            }
         });
     }
 }

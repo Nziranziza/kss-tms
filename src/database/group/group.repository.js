@@ -3,10 +3,19 @@ const { Group } = require("./group");
 const { scheduleRepository } = require("database/schedule/schedule.repository");
 const { attendanceStatus, scheduleStatus } = require("tools/constants");
 const populate = require('./group.populate')
-const { omitBy, isNil } = require('lodash');
 const toObjectId = require("utils/toObjectId");
 const removeNilProps = require("utils/removeNilProps");
 
+function generateLocationFilters(location = {}) {
+  const { dist_id, sect_id, cell_id, village_id, prov_id } = location;
+  return {
+    "location.prov_id": toObjectId(prov_id),
+    "location.dist_id": toObjectId(dist_id),
+    "location.sect_id": toObjectId(sect_id),
+    "location.cell_id": toObjectId(cell_id),
+    "location.village_id": toObjectId(village_id),
+  };
+}
 
 class GroupRepository extends BaseRepository {
   constructor(model) {
@@ -18,16 +27,12 @@ class GroupRepository extends BaseRepository {
 
   async find(data) {
     const {
-      location: { dist_id, sect_id, cell_id, village_id, prov_id } = {},
+      location,
       ...filters
     } = data;
     const query = removeNilProps({
         ...filters,
-        "location.dist_id": dist_id,
-        "location.sect_id": sect_id,
-        "location.village_id": village_id,
-        "location.cell_id": cell_id,
-        "location.prov_id": prov_id,
+        ...generateLocationFilters(location)
       }
     );
     const groups = await super
@@ -142,7 +147,7 @@ class GroupRepository extends BaseRepository {
 
   getSingleMember(memberId, groupId) {
     let filters = {
-      "members.userId": memberId,
+      "members.userId": toObjectId(memberId),
     };
     if (groupId) {
       filters = {
@@ -167,11 +172,7 @@ class GroupRepository extends BaseRepository {
   statistics(body) {
     const filters = {
       $match: removeNilProps({
-        "location.prov_id": toObjectId(body?.location?.prov_id),
-        "location.dist_id": toObjectId(body?.location?.dist_id),
-        "location.sect_id": toObjectId(body?.location?.sect_id),
-        "location.cell_id": toObjectId(body?.location?.cell_id),
-        "location.village_id": toObjectId(body?.location?.village_id),
+        ...this.generateLocationFilters(body.location),
         reference: body?.reference,
         _id: toObjectId(body?.id),
         isDeleted: false,
@@ -206,11 +207,7 @@ class GroupRepository extends BaseRepository {
 
   report(body) {
     const filter = removeNilProps({
-      "location.prov_id": toObjectId(body?.location?.prov_id),
-      "location.dist_id": toObjectId(body?.location?.dist_id),
-      "location.sect_id": toObjectId(body?.location?.sect_id),
-      "location.cell_id": toObjectId(body?.location?.cell_id),
-      "location.village_id": toObjectId(body?.location?.village_id),
+      ...generateLocationFilters(body.location),
       reference: body?.reference,
       _id: toObjectId(body?.id),
     });

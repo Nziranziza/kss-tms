@@ -5,13 +5,33 @@ const {
 const {
   FarmVisitSchedule,
 } = require("database/farm-visit-schedule/farm-visit-schedule");
-const { ObjectId } = require("mongodb");
 const { Evaluation } = require("database/evaluation/evaluation");
 const moment = require("moment/moment");
 const CustomError = require("core/helpers/customerError");
 const { statusCodes } = require("utils/constants/common");
 const populate = require('./farm-visit-conduct.populate');
-const toObjectId = require('utils/toObjectId')
+const toObjectId = require('utils/toObjectId');
+const removeNilProps = require('utils/removeNilProps');
+
+function generateFilters(body) {
+  return removeNilProps({
+    "farm.location.prov_id": toObjectId(body.location.prov_id),
+    "farm.location.dist_id": toObjectId(body.location.dist_id),
+    "farm.location.sect_id": toObjectId(body.location.sect_id),
+    "farm.location.cell_id": toObjectId(body.location.cell_id),
+    "farm.location.village_id": toObjectId(body.location.village_id),
+    reference: body.reference,
+    scheduleId: body.scheduleId,
+    groupId: toObjectId(body.groupId),
+    createdAt: body.date ? {
+      createdAt: {
+        $gte: moment(body.date.from).startOf("day").toDate(),
+        $lt: moment(body.date.to).endOf("day").toDate(),
+      },
+    }: undefined,
+    isDeleted: false,
+  })
+}
 
 class FarmVisitConductRepository extends BaseRepository {
   constructor(model) {
@@ -72,38 +92,8 @@ class FarmVisitConductRepository extends BaseRepository {
   
 
   statistics = (body) => {
-    const filter = {
-      $match: {
-        ...(body.location &&
-          body.location.prov_id && {
-            "farm.location.prov_id": ObjectId(body.location.prov_id),
-          }),
-        ...(body.location &&
-          body.location.dist_id && {
-            "farm.location.dist_id": ObjectId(body.location.dist_id),
-          }),
-        ...(body.location &&
-          body.location.sect_id && {
-            "farm.location.sect_id": ObjectId(body.location.sect_id),
-          }),
-        ...(body.location &&
-          body.location.cell_id && {
-            "farm.location.cell_id": ObjectId(body.location.cell_id),
-          }),
-        ...(body.location &&
-          body.location.village_id && {
-            "farm.location.village_id": ObjectId(body.location.village_id),
-          }),
-        ...(body.reference && { reference: body.reference }),
-        ...(body.scheduleId && { scheduleId: body.scheduleId }),
-        ...(body.groupId && { groupId: ObjectId(body.groupId) }),
-        ...(body.date && { createdAt: { $gte:moment(body.date.from)
-                  .startOf('day')
-                  .toDate() , $lt:  moment(body.date.to)
-                  .endOf('day')
-                  .toDate() }}),
-        ...{ isDeleted: false },
-      },
+    const filters = {
+      $match: generateFilters(body),
     };
     const group = {
       $group: {
@@ -117,7 +107,7 @@ class FarmVisitConductRepository extends BaseRepository {
         _id: 0,
       },
     };
-    return this.model.aggregate([filter, group, visits]);
+    return this.model.aggregate([filters, group, visits]);
   }
 
   report = (body) => {
@@ -228,40 +218,10 @@ class FarmVisitConductRepository extends BaseRepository {
             },
         }
     ];
-    const filter = {
-      $match: {
-        ...(body.location &&
-          body.location.prov_id && {
-            "farm.location.prov_id": ObjectId(body.location.prov_id),
-          }),
-        ...(body.location &&
-          body.location.dist_id && {
-            "farm.location.dist_id": ObjectId(body.location.dist_id),
-          }),
-        ...(body.location &&
-          body.location.sect_id && {
-            "farm.location.sect_id": ObjectId(body.location.sect_id),
-          }),
-        ...(body.location &&
-          body.location.cell_id && {
-            "farm.location.cell_id": ObjectId(body.location.cell_id),
-          }),
-        ...(body.location &&
-          body.location.village_id && {
-            "farm.location.village_id": ObjectId(body.location.village_id),
-          }),
-          ...(body.reference && { reference: body.reference }),
-          ...(body.scheduleId && { scheduleId: body.scheduleId }),
-          ...(body.groupId && { groupId: body.groupId }),
-          ...(body.date && { createdAt: { $gte:moment(body.date.from)
-                      .startOf('day')
-                      .toDate() , $lt:  moment(body.date.to)
-                      .endOf('day')
-                      .toDate() }}),
-          ...{ isDeleted: false },
-      },
+    const filters = {
+      $match: generateFilters(body),
     };
-    return this.model.aggregate([filter].concat(lookup));
+    return this.model.aggregate([filters].concat(lookup));
   }
 
   calculateAdoptionScore = (data) => {
@@ -278,15 +238,13 @@ class FarmVisitConductRepository extends BaseRepository {
     }
 
     const filters = {
-      $match: {
-        ...(gapId && { gap: gapId }),
-        ...(referenceId && { reference: referenceId }),
-        ...(location && { [locSearchBy]: ObjectId(location.locationId) }),
-        ...(date && {
-          createdAt: { $gte: startDate, $lt: endDate },
-        }),
+      $match: removeNilProps({
+        gap: gapId,
+        reference: referenceId ,
+        [locSearchBy]: toObjectId(location.locationId),
+        createdAt: date ? { $gte: startDate, $lt: endDate } : undefined,
         isDeleted: false
-      },
+      }),
     };
 
     const group = {
@@ -303,10 +261,10 @@ class FarmVisitConductRepository extends BaseRepository {
     const { gapId } = data;
 
     const filters = {
-      $match: {
-        ...(gapId && { gap: ObjectId(gapId) }),
+      $match: removeNilProps({
+        gap: toObjectId(gapId),
         isDeleted: false
-      },
+      }),
     };
 
     const sort = {
