@@ -133,7 +133,7 @@ class FarmVisitScheduleRepository extends BaseRepository {
     const filter = {
       $match: removeNilProps({
         "visitor.userId": toObjectId(visitorId),
-        [locSearchBy]: toObjectId(location.locationId),
+        [locSearchBy]: toObjectId(location?.locationId),
         reference: referenceId,
         date: date ? { $gte: startDate, $lt: endDate } : undefined,
         isDeleted: false,
@@ -205,16 +205,16 @@ class FarmVisitScheduleRepository extends BaseRepository {
     ]);
   }
 
-  farmScheduledVisits(body) {
+  farmScheduledVisits(body = {}) {
     return this.aggregate([
       {
         $match: removeNilProps({
-          "farms.farmId": toObjectId(body.farmId),
-          _id: toObjectId(body.scheduleId),
-          created_at: body.created_at
+          "farms.farmId": toObjectId(body?.farmId),
+          _id: toObjectId(body?.scheduleId),
+          created_at: body?.created_at
             ? {
-                $gte: body.created_at.from,
-                $lt: body.created_at.to,
+                $gte: body?.created_at.from,
+                $lt: body?.created_at.to,
               }
             : undefined,
         }),
@@ -224,7 +224,7 @@ class FarmVisitScheduleRepository extends BaseRepository {
       },
       {
         $match: removeNilProps({
-          "farms.farmId": toObjectId(body.farmId),
+          "farms.farmId": toObjectId(body?.farmId),
         }),
       },
       ...lookups,
@@ -234,7 +234,7 @@ class FarmVisitScheduleRepository extends BaseRepository {
   farmsScheduledVisits(body) {
     const filter = {
       $match: removeNilProps({
-        reference: body.reference,
+        reference: body?.reference,
       }),
     };
     return this.aggregate([
@@ -250,7 +250,7 @@ class FarmVisitScheduleRepository extends BaseRepository {
     const { location, date, referenceId } = body;
 
     let locSearchBy = "";
-    if (location) locSearchBy = `farms.location.${location.searchBy}`;
+    if (location) locSearchBy = `farms.location.${location?.searchBy}`;
 
     let startDate = "";
     let endDate = "";
@@ -262,7 +262,7 @@ class FarmVisitScheduleRepository extends BaseRepository {
     // Filter statistics by different values
     const filter = {
       $match: removeNilProps({
-        [locSearchBy]: toObjectId(location.locationId),
+        [locSearchBy]: toObjectId(location?.locationId),
         reference: referenceId,
         date: date ? { $gte: startDate, $lt: endDate } : undefined,
       }),
