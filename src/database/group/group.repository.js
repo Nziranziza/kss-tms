@@ -6,23 +6,23 @@ const populate = require('./group.populate')
 const toObjectId = require("utils/toObjectId");
 const removeNilProps = require("utils/removeNilProps");
 
-function generateLocationFilters(location = {}) {
-  const { dist_id, sect_id, cell_id, village_id, prov_id } = location;
-  return {
-    "location.prov_id": toObjectId(prov_id),
-    "location.dist_id": toObjectId(dist_id),
-    "location.sect_id": toObjectId(sect_id),
-    "location.cell_id": toObjectId(cell_id),
-    "location.village_id": toObjectId(village_id),
-  };
-}
-
 class GroupRepository extends BaseRepository {
   constructor(model) {
     super(model);
     this.searchGroup = this.searchGroup.bind(this);
     this.statistics = this.statistics.bind(this);
     this.report = this.report.bind(this);
+  }
+
+  generateLocationFilters(location = {}) {
+    const { dist_id, sect_id, cell_id, village_id, prov_id } = location;
+    return {
+      "location.prov_id": toObjectId(prov_id),
+      "location.dist_id": toObjectId(dist_id),
+      "location.sect_id": toObjectId(sect_id),
+      "location.cell_id": toObjectId(cell_id),
+      "location.village_id": toObjectId(village_id),
+    };
   }
 
   async find(data) {
@@ -32,7 +32,7 @@ class GroupRepository extends BaseRepository {
     } = data;
     const query = removeNilProps({
         ...filters,
-        ...generateLocationFilters(location)
+        ...this.generateLocationFilters(location)
       }
     );
     const groups = await super
@@ -169,10 +169,10 @@ class GroupRepository extends BaseRepository {
     );
   }
 
-  statistics(body) {
+  statistics(body = {}) {
     const filters = {
       $match: removeNilProps({
-        ...this.generateLocationFilters(body.location),
+        ...this.generateLocationFilters(body?.location),
         reference: body?.reference,
         _id: toObjectId(body?.id),
         isDeleted: false,
@@ -205,9 +205,9 @@ class GroupRepository extends BaseRepository {
     return this.model.aggregate([filters, group, members]);
   }
 
-  report(body) {
+  report(body = {}) {
     const filter = removeNilProps({
-      ...generateLocationFilters(body.location),
+      ...this.generateLocationFilters(body?.location),
       reference: body?.reference,
       _id: toObjectId(body?.id),
     });
