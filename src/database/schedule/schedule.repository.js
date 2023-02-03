@@ -6,9 +6,32 @@ const populate = require('./schedule.populate')
 const removeNilProps = require('utils/removeNilProps')
 const toObjectId = require('utils/toObjectId')
 
+
 class ScheduleRepository extends BaseRepository {
   constructor(model) {
     super(model);
+  }
+
+  generateCommonFilters(body) {
+    return removeNilProps({
+      "groupId.location.prov_id": toObjectId(body?.location?.prov_id),
+      "groupId.location.dist_id": toObjectId(body?.location?.dist_id),
+      "groupId.location.sect_id": toObjectId(body?.location?.sect_id),
+      "groupId.location.cell_id": toObjectId(body?.location?.cell_id),
+      "groupId.location.village_id": toObjectId(body?.location?.village_id),
+      referenceId: toObjectId(body?.reference),
+      "trainingId._id": toObjectId(body?.trainingId),
+      "trainer.userId": toObjectId(body?.trainerId),
+      status: body?.status,
+      "trainees.gender": body?.gender,
+      createdAt: body?.date
+        ? {
+            $gte: moment(body?.date?.from).startOf("day").toDate(),
+            $lt: moment(body?.date?.to).endOf("day").toDate(),
+          }
+        : undefined,
+      isDeleted: false,
+    });
   }
 
   find(data = {}) {
@@ -100,7 +123,7 @@ class ScheduleRepository extends BaseRepository {
         "trainer.userId": toObjectId(trainerId),
         _id: toObjectId(scheduleId),
         referenceId: toObjectId(referenceId),
-        [locSearchBy]: toObjectId(location.locationId),
+        [locSearchBy]: toObjectId(location?.locationId),
         startTime: date ? { $gte: startDate, $lt: endDate } : undefined,
         isDeleted: false,
       }),
@@ -176,11 +199,11 @@ class ScheduleRepository extends BaseRepository {
     };
   }
 
-  statistics(body) {
+  statistics(body = {}) {
     const preFilter = [
       {
         $match: removeNilProps({
-          groupId: toObjectId(body.groupId),
+          groupId: toObjectId(body?.groupId),
         }),
       },
       {
@@ -219,23 +242,7 @@ class ScheduleRepository extends BaseRepository {
     ];
 
     const filter = {
-      $match: removeNilProps({
-        "groupId.location.prov_id": toObjectId(body.location.prov_id),
-        "groupId.location.dist_id": toObjectId(body.location.dist_id),
-        "groupId.location.sect_id": toObjectId(body.location.sect_id),
-        "groupId.location.cell_id": toObjectId(body.location.cell_id),
-        "groupId.location.village_id": toObjectId(body.location.village_id),
-        referenceId: toObjectId(body.reference),
-        "trainingId._id": toObjectId(body.trainingId),
-        "trainer.userId": toObjectId(body.trainerId),
-        status: body.status,
-        "trainees.gender": body.gender,
-          createdAt: body.date ? {
-            $gte: moment(body.date.from).startOf("day").toDate(),
-            $lt: moment(body.date.to).endOf("day").toDate(),
-          } : undefined,
-        isDeleted: false,
-      }),
+      $match: this.generateCommonFilters(body),
     };
 
     const group = {
@@ -269,7 +276,7 @@ class ScheduleRepository extends BaseRepository {
     const preFilter = [
       {
         $match: removeNilProps({
-          groupId: toObjectId(body.groupId),
+          groupId: toObjectId(body?.groupId),
         }),
       },
       {
@@ -383,24 +390,8 @@ class ScheduleRepository extends BaseRepository {
     ];
     const filter = {
       $match: removeNilProps({
-        "groupId.location.prov_id": toObjectId(body.location.prov_id),
-        "groupId.location.dist_id": toObjectId(body.location.dist_id),
-        "groupId.location.sect_id": toObjectId(body.location.sect_id),
-        "groupId.location.cell_id": toObjectId(body.location.cell_id),
-        "groupId.location.village_id": toObjectId(body.location.village_id),
-        referenceId: toObjectId(body.reference),
-        "trainingId._id": toObjectId(body.trainingId),
-        "trainer.userId": toObjectId(body.trainerId),
+        ...this.generateCommonFilters(body),
         groupId: body.groupId,
-        status: body.status,
-        "trainees.gender": body.gender,
-        startTime: body.date
-          ? {
-              $gte: moment(body.date.from).startOf("day").toDate(),
-              $lt: moment(body.date.to).endOf("day").toDate(),
-            }
-          : undefined,
-        isDeleted: false,
       }),
     };
     return this.model.aggregate(preFilter.concat([filter]));
@@ -451,7 +442,7 @@ class ScheduleRepository extends BaseRepository {
       $match: removeNilProps({
         referenceId: toObjectId(reference),
         "trainees.groupId": groupId,
-        status: scheduleStatus.HAPPENED,
+        status: scheduleStatus?.HAPPENED,
       }),
     };
 
@@ -489,7 +480,7 @@ class ScheduleRepository extends BaseRepository {
       },
     };
 
-    // Run query 
+    // Run query
     const summary = await this.model.aggregate([
       unwind,
       filters,
@@ -534,7 +525,7 @@ class ScheduleRepository extends BaseRepository {
     const filter = {
       $match: removeNilProps({
         referenceId: toObjectId(referenceId),
-        [locSearchBy]: toObjectId(location.locationId),
+        [locSearchBy]: toObjectId(location?.locationId),
         startTime: date ? { $gte: startDate, $lt: endDate } : undefined,
         isDeleted: false,
       }),

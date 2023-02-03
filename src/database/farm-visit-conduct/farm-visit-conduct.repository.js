@@ -15,18 +15,18 @@ const removeNilProps = require('utils/removeNilProps');
 
 function generateFilters(body) {
   return removeNilProps({
-    "farm.location.prov_id": toObjectId(body.location.prov_id),
-    "farm.location.dist_id": toObjectId(body.location.dist_id),
-    "farm.location.sect_id": toObjectId(body.location.sect_id),
-    "farm.location.cell_id": toObjectId(body.location.cell_id),
-    "farm.location.village_id": toObjectId(body.location.village_id),
-    reference: body.reference,
-    scheduleId: body.scheduleId,
-    groupId: toObjectId(body.groupId),
-    createdAt: body.date ? {
+    "farm.location.prov_id": toObjectId(body?.location?.prov_id),
+    "farm.location.dist_id": toObjectId(body?.location?.dist_id),
+    "farm.location.sect_id": toObjectId(body?.location?.sect_id),
+    "farm.location.cell_id": toObjectId(body?.location?.cell_id),
+    "farm.location.village_id": toObjectId(body?.location?.village_id),
+    reference: body?.reference,
+    scheduleId: body?.scheduleId,
+    groupId: toObjectId(body?.groupId),
+    createdAt: body?.date ? {
       createdAt: {
-        $gte: moment(body.date.from).startOf("day").toDate(),
-        $lt: moment(body.date.to).endOf("day").toDate(),
+        $gte: moment(body?.date?.from).startOf("day").toDate(),
+        $lt: moment(body?.date?.to).endOf("day").toDate(),
       },
     }: undefined,
     isDeleted: false,
@@ -241,7 +241,7 @@ class FarmVisitConductRepository extends BaseRepository {
       $match: removeNilProps({
         gap: gapId,
         reference: referenceId ,
-        [locSearchBy]: toObjectId(location.locationId),
+        [locSearchBy]: toObjectId(location?.locationId),
         createdAt: date ? { $gte: startDate, $lt: endDate } : undefined,
         isDeleted: false
       }),
