@@ -28,9 +28,9 @@ RUN sudo apt-get update --fix-missing && \
     
 
 WORKDIR /home/docker-deployer/
-COPY training-ms.conf /etc/nginx/sites-available/
+COPY training-ms-srv01.conf /etc/nginx/sites-available/
+COPY training-ms-srv02.conf /etc/nginx/sites-available/
 COPY .profile /home/docker-deployer/
-RUN sudo ln -s /etc/nginx/sites-available/training-ms.conf /etc/nginx/sites-enabled
 RUN sudo rm -rf /etc/nginx/sites-available/default
 RUN sudo rm -rf /etc/nginx/sites-enabled/default
 COPY mod-http-passenger.conf /etc/nginx/conf.d/mod-http-passenger.conf
