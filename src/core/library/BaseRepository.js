@@ -18,7 +18,10 @@ class BaseRepository {
    * @returns {Promise<Object<string, any>[]>} data
    */
   find(filters = {}, sortOptions = { createdAt: -1 }) {
-    return this.model.find(filters).sort(sortOptions);
+    return this.model
+      .find(filters)
+      .collation({ locale: "en" })
+      .sort(sortOptions);
   }
 
   /**
