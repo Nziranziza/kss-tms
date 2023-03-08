@@ -36,8 +36,8 @@ class ScheduleRepository extends BaseRepository {
 
   find(data = {}) {
     return super
-    .find(data)
-    .populate(populate)
+      .find(data, { status: 'desc', startTime: 1 })
+      .populate(populate)
   }
 
   findOne(data = {}) {
@@ -388,13 +388,13 @@ class ScheduleRepository extends BaseRepository {
         $unwind: "$trainees",
       },
     ];
-    const filter = {
+    const filter = [{
       $match: removeNilProps({
         ...this.generateCommonFilters(body),
         groupId: body.groupId,
       }),
-    };
-    return this.model.aggregate(preFilter.concat([filter]));
+    }, { $sort: { 'trainees.attended': 1, startTime: 1, _id: 1 }}];
+    return this.model.aggregate(preFilter.concat(filter));
   }
 
   async farmerAttendance(params) {
