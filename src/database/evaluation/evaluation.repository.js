@@ -17,19 +17,21 @@ class EvaluationRepository extends BaseRepository {
     return Promise.all(
       evaluations.map(async (element) => {
         const { _id, gap_name, baselineRate, isDeleted } = element;
-        const adoption =
+        const adoptions =
           await farmVisitConductRepository.calculateAdoptionScore({
             gapId: _id,
             ...body
           });
-          
+        const { score, weight } = adoptions.reduce((prev, curr) => {
+          return {
+            score: prev.score + curr.overall_score,
+            weight: prev.weight + curr.overall_weight
+          }
+        }, { score: 0, weight: 0 });
         return {
           _id,
           gap_name,
-          adoptionRate:
-            adoption.length > 0
-              ? (adoption[0].overall_score * 100) / adoption[0].overall_weight
-              : 0,
+          adoptionRate: (score * 100) / weight,
           baselineRate,
           isDeleted,
         };
@@ -37,15 +39,22 @@ class EvaluationRepository extends BaseRepository {
     );
   }
 
-  calculateScore(data){
+  calculateScore(data) {
     return Promise.all(
       data.map(async (element) => {
         const { _id, gap_name, gap_weight, gap_score, sections, status, createdAt, baselineRate } = element;
-        const adoption =
+        const adoptions =
           await farmVisitConductRepository.calculateAdoptionScore({
             gapId: _id,
           });
-          
+
+        const { score, weight } = adoptions.reduce((prev, curr) => {
+          return {
+            score: prev.score + curr.overall_score,
+            weight: prev.weight + curr.overall_weight
+          }
+        }, { score: 0, weight: 0 });
+
         return {
           _id,
           gap_name,
@@ -54,10 +63,7 @@ class EvaluationRepository extends BaseRepository {
           sections,
           status,
           createdAt,
-          adoptionRate:
-            adoption.length > 0
-              ? (adoption[0].overall_score * 100) / adoption[0].overall_weight
-              : 0,
+          adoptionRate: (score * 100) / weight,
           baselineRate
         };
       })
