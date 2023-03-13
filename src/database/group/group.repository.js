@@ -211,7 +211,7 @@ class GroupRepository extends BaseRepository {
       reference: body?.reference,
       _id: toObjectId(body?.id),
     });
-    return this.model.find(filter).lean().populate(populate);
+    return this.model.find(filter).sort({ groupName: 'asc' }).lean().populate(populate);
   }
 }
 

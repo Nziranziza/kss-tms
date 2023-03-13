@@ -221,7 +221,7 @@ class FarmVisitConductRepository extends BaseRepository {
     const filters = {
       $match: generateFilters(body),
     };
-    return this.model.aggregate([filters].concat(lookup));
+    return this.aggregate([filters].concat(lookup));
   }
 
   calculateAdoptionScore = (data) => {
