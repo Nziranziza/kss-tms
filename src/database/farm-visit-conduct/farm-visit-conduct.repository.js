@@ -49,7 +49,10 @@ class FarmVisitConductRepository extends BaseRepository {
         score = score + question.score;
       });
     });
-    entity.overall_score = (gap.gap_weight / 100) * score;
+    if(score > gap.gap_score) {
+      throw new CustomError('Total question score should be less or equal to gap score', statusCodes.BAD_REQUEST)
+    }
+    entity.overall_score = (gap.gap_weight / gap.gap_score) * score;
     entity.overall_weight = gap.gap_weight;
     const conduct = await this.model.create(entity);
     await FarmVisitSchedule.findOneAndUpdate(
