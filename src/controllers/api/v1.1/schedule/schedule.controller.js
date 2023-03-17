@@ -24,7 +24,6 @@ class ScheduleController extends BaseController {
     this.sendSMS = this.sendSMS.bind(this);
     this.report = this.report.bind(this);
     this.statistics = this.statistics.bind(this);
-    this.attendanceSummary = this.attendanceSummary.bind(this);
     this.getFarmerAttendance = this.getFarmerAttendance.bind(this);
     this.editAtt = this.editAtt.bind(this);
   }
@@ -233,21 +232,6 @@ class ScheduleController extends BaseController {
                 message: "Schedule not found or no trainees Added",
               });
       
-        });
-    }
-
-    // Get Attendance Summary
-    attendanceSummary(req, res) {
-        const {body} = req;
-        return asyncWrapper(res, async () => {
-            const summary = await this.repository.attendanceSummary(body);
-            if (summary)
-                return responseWrapper({
-                    res,
-                    status: statusCodes.OK,
-                    message: serverMessages.SUCCESS,
-                    data: summary,
-                });
         });
     }
 
