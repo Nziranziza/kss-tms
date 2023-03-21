@@ -20,11 +20,6 @@ routes.put(
 routes.post("/reference/:id", scheduleCtrl.findAllByRef);
 routes.delete("/:id", scheduleCtrl.delete);
 routes.post("/sms/:id", scheduleCtrl.sendSMS);
-routes.post(
-  "/stats",
-  validator("validateStats"),
-  scheduleCtrl.attendanceSummary
-);
 routes.post('/report', scheduleCtrl.report);
 routes.post('/statistics', scheduleCtrl.statistics);
 routes.get('/farmer/attendancerate/:id', scheduleCtrl.getFarmerAttendance)

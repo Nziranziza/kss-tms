@@ -14,17 +14,18 @@ class ScheduleRepository extends BaseRepository {
 
   generateCommonFilters(body) {
     return removeNilProps({
+      _id: toObjectId(body?.scheduleId),
       "groupId.location.prov_id": toObjectId(body?.location?.prov_id),
       "groupId.location.dist_id": toObjectId(body?.location?.dist_id),
       "groupId.location.sect_id": toObjectId(body?.location?.sect_id),
       "groupId.location.cell_id": toObjectId(body?.location?.cell_id),
       "groupId.location.village_id": toObjectId(body?.location?.village_id),
-      referenceId: toObjectId(body?.reference),
+      referenceId: toObjectId(body?.reference || body?.referenceId),
       "trainingId._id": toObjectId(body?.trainingId),
       "trainer.userId": toObjectId(body?.trainerId),
       status: body?.status,
       "trainees.gender": body?.gender,
-      createdAt: body?.date
+      startTime: body?.date
         ? {
             $gte: moment(body?.date?.from).startOf("day").toDate(),
             $lt: moment(body?.date?.to).endOf("day").toDate(),
@@ -36,7 +37,7 @@ class ScheduleRepository extends BaseRepository {
 
   find(data = {}) {
     return super
-      .find(data, { status: 'desc', startTime: 1 })
+      .find(data, { status: 'asc', startTime: 1 })
       .populate(populate)
   }
 
@@ -94,112 +95,7 @@ class ScheduleRepository extends BaseRepository {
     return schedule.save();
   }
 
-  // Get Attendance Summary
-  async attendanceSummary(body) {
-    const {
-      trainingId,
-      trainerId,
-      scheduleId,
-      referenceId,
-      location,
-      date,
-      groupId,
-    } = body;
-
-    let locSearchBy = "";
-    if (location) locSearchBy = `location.${location.searchBy}`;
-
-    let startDate = "";
-    let endDate = "";
-    if (date) {
-      startDate = moment(date.from).startOf("day").toDate();
-      endDate = moment(date.to).endOf("day").toDate();
-    }
-
-    // Filter statistics by different values
-    const filter = {
-      $match: removeNilProps({
-        trainingId: toObjectId(trainingId),
-        "trainer.userId": toObjectId(trainerId),
-        _id: toObjectId(scheduleId),
-        referenceId: toObjectId(referenceId),
-        [locSearchBy]: toObjectId(location?.locationId),
-        startTime: date ? { $gte: startDate, $lt: endDate } : undefined,
-        isDeleted: false,
-      }),
-    };
-
-    // Unwind all trainees so we can compute data
-    const unwind = {
-      $unwind: "$trainees",
-    };
-
-    const filterGroups = {
-      $match: removeNilProps({
-        "trainees.groupId": groupId,
-      }),
-    };
-
-    // Group by each gender and attendance
-    const group = {
-      $group: {
-        _id: {
-          absence: "$trainees.attended",
-          gender: "$trainees.gender",
-        },
-        Unique: {
-          $addToSet: "$trainees.userId",
-        },
-      },
-    };
-
-    // count by unique gender and absence status
-    const project = {
-      $project: {
-        _id: 0,
-        absence: "$_id.absence",
-        gender: "$_id.gender",
-        unique: { $size: "$Unique" },
-      },
-    };
-
-    // Run query // Query will return 4 objects or less each containing stats for each gender
-    const summary = await this.model.aggregate([
-      filter,
-      unwind,
-      filterGroups,
-      group,
-      project,
-    ]);
-
-    let femaleAbsent = 0;
-    let maleAbsent = 0;
-    let femalePresent = 0;
-    let malePresent = 0;
-
-    // Compile results
-    summary.forEach((data) => {
-      if (data.gender == "M") {
-        if (data.absence === true) malePresent = malePresent + data.unique;
-        else maleAbsent = maleAbsent + data.unique;
-      } else {
-        if (data.absence === true) femalePresent = femalePresent + data.unique;
-        else femaleAbsent = femaleAbsent + data.unique;
-      }
-    });
-
-    return {
-      femaleAbsent,
-      femalePresent,
-      malePresent,
-      maleAbsent,
-      totalAbsent: femaleAbsent + maleAbsent,
-      totalPresent: malePresent + femalePresent,
-      totalInvitees: femaleAbsent + femalePresent + maleAbsent + malePresent,
-    };
-  }
-
-  statistics(body = {}) {
+  async statistics(body = {}) {
     const preFilter = [
       {
         $match: removeNilProps({
@@ -245,31 +141,120 @@ class ScheduleRepository extends BaseRepository {
       $match: this.generateCommonFilters(body),
     };
 
-    const group = {
-      $group: {
-        _id: { gender: "$trainees.gender" },
-        numberOfTrainees: { $sum: 1 },
-        numberOfAttendedTrainees: {
-          $sum: {
-            $cond: {
-              if: "$trainees.attended",
-              then: 1,
-              else: 0,
-            },
-          },
+    const groupByTraineeId = {
+        $group: {
+          _id: { userId: "$trainees.userId", gender: "$trainees.gender" },
+          attendance: {
+            $addToSet: "$trainees.attended",
+          }
         },
-      },
-    };
-    const trainees = {
+      }
+    const project = {
       $project: {
-        gender: "$_id.gender",
-        numberOfTrainees: 1,
-        numberOfAttendedTrainees: 1,
         _id: 0,
-      },
-    };
+        userId: '$_id.userId',
+        gender: '$_id.gender',
+        attendance: 1
+      }
+    }
 
-    return this.model.aggregate(preFilter.concat([filter, group, trainees]));
+    const res = await this.model.aggregate(preFilter.concat([filter, groupByTraineeId, project]))
+    return res.reduce(
+      (prev, curr) => {
+        let prevWithTotal = {
+          ...prev,
+          total: prev.total + 1,
+        };
+        if (curr.gender.toLowerCase() === "f") {
+          prevWithTotal = {
+            ...prevWithTotal,
+            female: prevWithTotal.female + 1,
+          };
+          if (curr.attendance.find((att) => att)) {
+            prevWithTotal = {
+              ...prevWithTotal,
+              presence: {
+                ...prevWithTotal.presence,
+                total: prevWithTotal.presence.total + 1
+              }
+            };
+            return {
+              ...prevWithTotal,
+              presence: {
+                ...prevWithTotal.presence,
+                female: prevWithTotal.presence.female + 1,
+              },
+            };
+          } else {
+            prevWithTotal = {
+              ...prevWithTotal,
+              absence: {
+                ...prevWithTotal.absence,
+                total: prevWithTotal.absence.total + 1
+              }
+            };
+            return {
+              ...prevWithTotal,
+              absence: {
+                ...prevWithTotal.absence,
+                female: prevWithTotal.absence.female + 1,
+              },
+            };
+          }
+        } else {
+          prevWithTotal = {
+            ...prevWithTotal,
+            male: prevWithTotal.male + 1,
+          };
+          if (curr.attendance.find((att) => att)) {
+            prevWithTotal = {
+              ...prevWithTotal,
+              presence: {
+                ...prevWithTotal.presence,
+                total: prevWithTotal.presence.total + 1
+              }
+            };
+            return {
+              ...prevWithTotal,
+              presence: {
+                ...prevWithTotal.presence,
+                male: prevWithTotal.presence.male + 1,
+              },
+            };
+          } else {
+            prevWithTotal = {
+              ...prevWithTotal,
+              absence: {
+                ...prevWithTotal.absence,
+                total: prevWithTotal.absence.total + 1
+              }
+            };
+            return {
+              ...prevWithTotal,
+              absence: {
+                ...prevWithTotal.absence,
+                male: prevWithTotal.absence.male + 1,
+              },
+            };
+          }
+        }
+      },
+      {
+        presence: {
+          male: 0,
+          female: 0,
+          total: 0
+        },
+        absence: {
+          male: 0,
+          female: 0,
+          total: 0
+        },
+        male: 0,
+        female: 0,
+        total: 0,
+      }
+    );
   }
 
   report(body) {
