@@ -20,14 +20,12 @@ function generateFilters(body) {
     "farm.location.sect_id": toObjectId(body?.location?.sect_id),
     "farm.location.cell_id": toObjectId(body?.location?.cell_id),
     "farm.location.village_id": toObjectId(body?.location?.village_id),
-    reference: body?.reference,
+    reference: body?.reference || body?.referenceId,
     scheduleId: body?.scheduleId,
     groupId: toObjectId(body?.groupId),
     createdAt: body?.date ? {
-      createdAt: {
         $gte: moment(body?.date?.from).startOf("day").toDate(),
         $lt: moment(body?.date?.to).endOf("day").toDate(),
-      },
     }: undefined,
     isDeleted: false,
   })
@@ -94,8 +92,8 @@ class FarmVisitConductRepository extends BaseRepository {
   }
   
 
-  statistics = (body) => {
-    const filters = {
+  statistics = async (body) => {
+    const match = {
       $match: generateFilters(body),
     };
     const group = {
@@ -104,13 +102,61 @@ class FarmVisitConductRepository extends BaseRepository {
         numberOfFarmVisits: { $sum: 1 },
       },
     };
-    const visits = {
-      $project: {
-        numberOfFarmVisits: 1,
-        _id: 0,
+    const groupByFarm = {
+      $group: {
+        _id: "$farm.farmId",
       },
     };
-    return this.model.aggregate([filters, group, visits]);
+    const groupByOwnerGenderAndId = {
+      $group: {
+        _id: { sex: "$owner.sex", farmerId: "$owner.userId" },
+      },
+    };
+    const groupByGender = {
+      $group: {
+        _id: "$sex",
+        total: { $sum: 1 }
+      }
+    }
+    const projectToSexAndFarmerId = {
+      $project: { _id: 0, sex: "$_id.sex", farmerId: "$_id.farmerId" },
+    };
+    const project = {
+      $project: {
+        numberOfFarmVisits: 1,
+      },
+    };
+    const [{ numberOfFarmVisits } = { numberOfFarmVisits: 0 }] = await this.model.aggregate([match, group, project]);
+    const [{ numberOfFarmVisited } = { numberOfFarmVisited: 0 }] = await this.model.aggregate([match, groupByFarm, { $count: "numberOfFarmVisited" }]);
+    const genderInfos = await this.model.aggregate([match, groupByOwnerGenderAndId, projectToSexAndFarmerId, groupByGender]);
+    return [
+      {
+        numberOfFarmVisits,
+        numberOfFarmVisited,
+        ...genderInfos.reduce(
+          (prev, curr) => {
+            if (curr._id.toLowerCase() === "f") {
+              return {
+                ...prev,
+                numberFemaleVisited: curr.total,
+                numberOfFarmerVisited: curr.total + prev.numberOfFarmerVisited,
+              };
+            } else {
+              return {
+                ...prev,
+                numberOfMaleVisited: curr.total,
+                numberOfFarmerVisited: curr.total + prev.numberOfFarmerVisited,
+              };
+            }
+          },
+          {
+            numberFemaleVisited: 0,
+            numberOfMaleVisited: 0,
+            numberOfFarmerVisited: 0,
+          }
+        ),
+      },
+    ];
   }
 
   report = (body) => {
