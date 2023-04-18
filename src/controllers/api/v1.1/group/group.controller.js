@@ -79,8 +79,8 @@ class GroupController extends BaseController {
         return asyncWrapper(res, async () => {
             const {body, params} = req;
             const member = await this.repository.getSingleMember(
-                params.id,
-                body.userId
+                body.userId,
+                params.id
             );
             if (member) {
                 const update = await this.repository.updateMemberPhone(params.id, body);
