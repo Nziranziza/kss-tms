@@ -44,6 +44,7 @@ module.exports.validateFarmVisitSchedule = Joi.object({
       })
     ),
   visitor: ownerSchema,
+  farmers: Joi.array().min(1).max(35).items(ownerSchema),
   gaps: Joi.array()
     .min(1)
     .max(35)

@@ -23,7 +23,11 @@ const authenticateApp = async (data) => {
 /* sending SMS on the non-chargeable endpoint */
 const sendAppSMS = async (data) => {
   try {
-    const token = await RedisService.getCachedData("comm-token");
+    let token = await RedisService.getCachedData("comm-token");
+    if(token == null) {
+      await claimToken();
+      token = await RedisService.getCachedData("comm-token");
+    }
     return await CommService.post("/messages/app/sendSMS", data, {
       token: token.replace(/['"]+/g, ""),
     });
@@ -35,7 +39,11 @@ const sendAppSMS = async (data) => {
 /* sending SMS on the chargeable endpoint */
 const sendClientSMS = async (data) => {
   try {
-    const token = await RedisService.getCachedData("comm-token");
+    let token = await RedisService.getCachedData("comm-token");
+    if(token == null) {
+      await claimToken();
+      token = await RedisService.getCachedData("comm-token");
+    }
     return await CommService.post("/messages/client/sendSMS", data, {
       token: token.replace(/['"]+/g, ""),
     });
@@ -47,8 +55,11 @@ const sendClientSMS = async (data) => {
 // Get balance for the client
 const getBalance = async (id) => {
   try {
-    const token = await RedisService.getCachedData("comm-token");
-    if(token == null) claimToken();
+    let token = await RedisService.getCachedData("comm-token");
+    if(token == null) {
+      await claimToken();
+      token = await RedisService.getCachedData("comm-token");
+    }
     return await CommService.get("/orders/getBalance/" + id, {
       token: token.replace(/['"]+/g, ""),
     });
@@ -60,7 +71,11 @@ const getBalance = async (id) => {
 // Order SMS for Client
 const orderSMS = async (data) => {
   try {
-    const token = await RedisService.getCachedData("comm-token");
+    let token = await RedisService.getCachedData("comm-token");
+    if(token == null) {
+      await claimToken();
+      token = await RedisService.getCachedData("comm-token");
+    }
     return await CommService.post("/orders/", data, {
       token: token.replace(/['"]+/g, ""),
     });
@@ -72,7 +87,11 @@ const orderSMS = async (data) => {
 // Get Orders for Client
 const getOrders = async (id) => {
   try {
-    const token = await RedisService.getCachedData("comm-token");
+    let token = await RedisService.getCachedData("comm-token");
+    if(token == null) {
+      await claimToken();
+      token = await RedisService.getCachedData("comm-token");
+    }
     return await CommService.get("/orders/getOrders/" + id, {
       token: token.replace(/['"]+/g, ""),
     });
@@ -83,7 +102,11 @@ const getOrders = async (id) => {
 
 const smsHistory = async (filters = {}) => {
   try {
-    const token = await RedisService.getCachedData("comm-token");
+    let token = await RedisService.getCachedData("comm-token");
+    if(token == null) {
+      await claimToken();
+      token = await RedisService.getCachedData("comm-token");
+    }
     return CommService.get("/messages/getMessages", {
       token: token.replace(/['"]+/g, ""),
       params: {

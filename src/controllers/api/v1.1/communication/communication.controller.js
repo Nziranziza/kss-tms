@@ -25,14 +25,15 @@ class CommController extends BaseController {
         })
       }
       schedule.trainees.forEach(trainee => {
-        trainee.smsStatus = body.status
+        if(trainee.phoneNumber === body.recipient) {
+          trainee.smsStatus = body.status
+        }
       });
       await schedule.save();
       return responseWrapper({
         res,
         status: statusCodes.OK,
         message: "Success",
-        data: "random data",
       });
     });
   }
