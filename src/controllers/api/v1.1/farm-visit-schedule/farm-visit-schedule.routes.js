@@ -20,7 +20,8 @@ routes.post(
   farmVisitScheduleCtrl.schedulesStats
 );
 routes.get("/farmer/:id", farmVisitScheduleCtrl.farmerScheduledVisits);
-routes.get("/sms/:id", farmVisitScheduleCtrl.sendSMS);
+routes.post("/sms/:id", farmVisitScheduleCtrl.sendSMS);
+routes.post('/sms-callback', farmVisitScheduleCtrl.smsCallback)
 routes.post("/farm", farmVisitScheduleCtrl.farmScheduledVisits);
 routes.post("/visited/farms", farmVisitScheduleCtrl.visitedFarmsOverview);
 
